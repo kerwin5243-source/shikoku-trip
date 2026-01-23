@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>四國慢旅 2026</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+        /* 基礎樣式 */
+        :root { --bg-color: #f4f1ea; --primary: #5d7d45; --secondary: #d48e6c; --card-bg: #ffffff; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-color); color: #4a4a4a; margin: 0; padding-bottom: 90px; -webkit-tap-highlight-color: transparent; }
+        
+        /* Header & Nav */
+        header { background: var(--primary); color: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; z-index: 200; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+        .nav-item { text-align: center; font-size: 0.8rem; color: #999; cursor: pointer; transition: 0.2s; }
+        .nav-item.active { color: var(--primary); font-weight: bold; transform: scale(1.1); }
+        
+        /* Containers & Cards */
+        .container { padding: 15px; display: none; animation: fadeIn 0.3s ease; }
+        .container.active { display: block; }
+        .card { background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 16px; border-left: 5px solid var(--primary); box-shadow: 0 4px 12px rgba(93, 125, 69, 0.15); position: relative; }
+        .card h3 { margin: 0 0 8px; font-size: 1.1rem; }
+        .desc { font-size: 0.9rem; color: #666; margin-bottom: 10px; line-height: 1.5; }
+        
+        /* Buttons & Inputs */
+        .btn { padding: 10px; border: none; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 8px; background: var(--primary); color: white; font-size: 0.9rem; font-weight: bold; }
+        .btn:active { transform: scale(0.98); }
+        input { padding: 12px; width: 100%; box-sizing: border-box; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; }
+        
+        /* List */
+        ul { list-style: none; padding: 0; }
+        li { background: #fff; border-bottom: 1px solid #eee; padding: 12px 5px; display: flex; justify-content: space-between; align-items: center; }
+        .amount { font-weight: bold; color: var(--secondary); }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>四國慢旅 2026</h1>
+    <p>02/27 - 03/07 | 10天9夜</p>
+</header>
+
+<div id="tab-itinerary" class="container active">
+    <div class="card">
+        <h3>Day 1: 抵達 & 金刀比羅宮</h3>
+        <div class="desc">10:30 抵達高松。租車後前往森家烏龍麵。下午挑戰金刀比羅宮 785 階。</div>
+        <button class="btn" onclick="window.open('https://www.google.com/maps/search/?api=1&query=金刀比羅宮')">🗺️ 導航：金刀比羅宮</button>
+    </div>
+    <div class="card">
+        <h3>Day 3: 鳴門漩渦 (重點!)</h3>
+        <div class="desc">⚠️ 11:30 是最佳觀賞時間，請務必準時抵達鳴門。</div>
+        <button class="btn" onclick="window.open('https://www.google.com/maps/search/?api=1&query=鳴門渦之道')">🗺️ 導航：鳴門渦之道</button>
+    </div>
+    <div style="text-align:center; color:#999; margin-top:20px; font-size:0.8rem;">(完整行程請參閱 PDF)</div>
+</div>
+
+<div id="tab-tools" class="container">
+    <div class="card" style="border-left-color: var(--secondary);">
+        <h3>💰 共同記帳</h3>
+        <input type="text" id="expense-desc" placeholder="消費項目 (例如: 午餐)">
+        <input type="number" id="expense-amount" placeholder="金額 (日幣)" inputmode="numeric">
+        <button class="btn" style="background: var(--secondary);" onclick="addExpense()">➕ 新增支出</button>
+    </div>
+
+    <div class="card">
+        <h3 style="display:flex; justify-content:space-between;">
+            <span>支出列表</span>
+            <span style="font-size:0.9rem; color:#888;" id="status">連線中...</span>
+        </h3>
+        <ul id="expense-list">
+            </ul>
+        <div style="text-align:right; margin-top:15px; font-weight:bold; font-size:1.1rem; border-top:2px dashed #eee; padding-top:10px;">
+            總計: ¥<span id="total-amount" style="color:var(--secondary);">0</span>
+        </div>
+    </div>
+</div>
+
+<nav class="nav-bar">
+    <div class="nav-item active" onclick="switchTab('itinerary', this)">📅 行程</div>
+    <div class="nav-item" onclick="switchTab('tools', this)">💰 記帳</div>
+</nav>
+
+<script type="module">
+  // 改用 CDN 連結，瀏覽器才看得懂
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } 
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+
+  // 您的專屬設定
+  const firebaseConfig = {
+    apiKey: "AIzaSyDVjPhieb7LVZAwtKjg1tpmZ6TE9Ti6g14",
+    authDomain: "shikoku-trip-2026.firebaseapp.com",
+    projectId: "shikoku-trip-2026",
+    storageBucket: "shikoku-trip-2026.firebasestorage.app",
+    messagingSenderId: "332889284995",
+    appId: "1:332889284995:web:686e325c99a2ecfa0316b6",
+    measurementId: "G-4LCZND97JT"
+  };
+
+  // 初始化 Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const analytics = getAnalytics(app);
+
+  console.log("Firebase initialized!");
+  document.getElementById('status').innerText = "已連線";
+
+  // 新增支出功能
+  window.addExpense = async function() {
+      const desc = document.getElementById('expense-desc').value;
+      const amount = Number(document.getElementById('expense-amount').value);
+      
+      if(desc && amount) {
+          try {
+              document.getElementById('status').innerText = "儲存中...";
+              await addDoc(collection(db, "expenses"), {
+                  desc: desc,
+                  amount: amount,
+                  timestamp: serverTimestamp()
+              });
+              // 清空欄位
+              document.getElementById('expense-desc').value = '';
+              document.getElementById('expense-amount').value = '';
+              document.getElementById('status').innerText = "儲存成功!";
+              setTimeout(() => document.getElementById('status').innerText = "已連線", 2000);
+          } catch (e) {
+              console.error("Error: ", e);
+              alert('上傳失敗，請檢查網路');
+          }
+      } else {
+          alert("請輸入項目和金額");
+      }
+  }
+
+  // 即時監聽資料庫
+  const q = query(collection(db, "expenses"), orderBy("timestamp", "desc"));
+  onSnapshot(q, (snapshot) => {
+      const list = document.getElementById('expense-list');
+      const totalEl = document.getElementById('total-amount');
+      list.innerHTML = '';
+      let total = 0;
+      
+      snapshot.forEach((doc) => {
+          const data = doc.data();
+          const safeAmount = data.amount ? data.amount : 0; // 防止錯誤資料
+          total += safeAmount;
+          list.innerHTML += `
+            <li>
+                <span>${data.desc}</span> 
+                <span class="amount">¥${safeAmount.toLocaleString()}</span>
+            </li>`;
+      });
+      totalEl.innerText = total.toLocaleString();
+  });
+
+  // Tab 切換
+  window.switchTab = function(tabId, navEl) {
+      document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      navEl.classList.add('active');
+  }
+</script>
+
+</body>
+</html>
