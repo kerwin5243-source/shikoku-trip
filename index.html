@@ -7,92 +7,491 @@
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* 基礎樣式 */
-        :root { --bg-color: #f4f1ea; --primary: #5d7d45; --secondary: #d48e6c; --card-bg: #ffffff; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-color); color: #4a4a4a; margin: 0; padding-bottom: 90px; -webkit-tap-highlight-color: transparent; }
-        
-        /* Header & Nav */
-        header { background: var(--primary); color: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; z-index: 200; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
-        .nav-item { text-align: center; font-size: 0.8rem; color: #999; cursor: pointer; transition: 0.2s; }
-        .nav-item.active { color: var(--primary); font-weight: bold; transform: scale(1.1); }
-        
-        /* Containers & Cards */
-        .container { padding: 15px; display: none; animation: fadeIn 0.3s ease; }
+        /* --- 日式鄉村風配色變數 --- */
+        :root {
+            --bg-color: #f9f7f2; /* 和紙米白 */
+            --primary: #7d9463; /* 抹茶綠 */
+            --secondary: #b58463; /* 焙茶棕 */
+            --accent: #d46c5e; /* 茜色 (強調用) */
+            --text-main: #4d4d4d; /* 炭灰 */
+            --card-bg: #ffffff;
+            --shadow: 0 4px 15px rgba(125, 148, 99, 0.15);
+        }
+
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding-bottom: 100px; /* 避開底部導航 */
+            -webkit-tap-highlight-color: transparent;
+            background-image: radial-gradient(#e6e2d8 1px, transparent 1px);
+            background-size: 20px 20px; /* 點點背景 */
+        }
+
+        /* --- Header --- */
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 20px 15px 30px;
+            border-bottom-left-radius: 25px;
+            border-bottom-right-radius: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            text-align: center;
+        }
+        header h1 { margin: 0; font-size: 1.4rem; letter-spacing: 2px; }
+        header p { margin: 5px 0 0; font-size: 0.9rem; opacity: 0.9; }
+
+        /* --- 導航列 --- */
+        .nav-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-radius: 50px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            z-index: 200;
+        }
+        .nav-item {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #999;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .nav-item i { font-size: 1.2rem; margin-bottom: 3px; }
+        .nav-item.active { color: var(--primary); font-weight: bold; transform: translateY(-2px); }
+
+        /* --- 容器與卡片 --- */
+        .container { padding: 20px; display: none; animation: fadeIn 0.4s ease; }
         .container.active { display: block; }
-        .card { background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 16px; border-left: 5px solid var(--primary); box-shadow: 0 4px 12px rgba(93, 125, 69, 0.15); position: relative; }
-        .card h3 { margin: 0 0 8px; font-size: 1.1rem; }
-        .desc { font-size: 0.9rem; color: #666; margin-bottom: 10px; line-height: 1.5; }
+
+        /* 日期標題 */
+        .date-divider {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 30px 0 15px;
+            padding: 5px 10px;
+            background: rgba(125, 148, 99, 0.1);
+            border-radius: 10px;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        .weather-info { font-size: 0.85rem; display: flex; align-items: center; gap: 5px; }
+
+        /* 通用卡片樣式 */
+        .card {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 18px;
+            box-shadow: var(--shadow);
+            position: relative;
+            border-left: 6px solid #ccc;
+        }
+
+        /* 分類顏色 */
+        .card.sightseeing { border-left-color: var(--primary); } /* 景點-綠 */
+        .card.food { border-left-color: var(--secondary); } /* 美食-棕 */
+        .card.transport { border-left-color: #6a8caf; } /* 交通/住宿-藍 */
+        .card.shopping { border-left-color: var(--accent); } /* 購物-紅 */
+
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .time-tag { 
+            background: #eee; color: #666; 
+            padding: 3px 8px; border-radius: 6px; 
+            font-size: 0.75rem; font-weight: bold; 
+        }
+        .card h3 { margin: 0; font-size: 1.15rem; color: #333; flex: 1; margin-left: 10px; }
+        .desc { font-size: 0.95rem; color: #666; line-height: 1.6; margin-bottom: 12px; }
         
-        /* Buttons & Inputs */
-        .btn { padding: 10px; border: none; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 8px; background: var(--primary); color: white; font-size: 0.9rem; font-weight: bold; }
-        .btn:active { transform: scale(0.98); }
-        input { padding: 12px; width: 100%; box-sizing: border-box; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; }
-        
-        /* List */
-        ul { list-style: none; padding: 0; }
-        li { background: #fff; border-bottom: 1px solid #eee; padding: 12px 5px; display: flex; justify-content: space-between; align-items: center; }
-        .amount { font-weight: bold; color: var(--secondary); }
-        
+        /* 標籤 Tag */
+        .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+        .tag { font-size: 0.75rem; padding: 4px 10px; border-radius: 15px; font-weight: bold; }
+        .tag.must { background: #fff0e6; color: var(--accent); border: 1px solid var(--accent); }
+        .tag.tips { background: #e8f5e9; color: var(--primary); border: 1px solid var(--primary); }
+
+        /* 按鈕群 */
+        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn {
+            border: none; padding: 10px; border-radius: 12px;
+            font-size: 0.9rem; font-weight: bold; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+            transition: 0.2s; text-decoration: none;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-map { background: var(--primary); color: white; }
+        .btn-code { background: #f0f0f0; color: #555; border: 1px solid #ddd; }
+        .btn-full { grid-column: span 2; }
+
+        /* 住宿資訊區塊 */
+        .hotel-card { background: white; border-radius: 15px; overflow: hidden; margin-bottom: 20px; box-shadow: var(--shadow); }
+        .hotel-img { width: 100%; height: 120px; background: #eee; object-fit: cover; display: flex; align-items: center; justify-content: center; color: #999; font-size: 0.8rem; }
+        .hotel-info { padding: 15px; }
+        .hotel-title { font-weight: bold; font-size: 1.1rem; color: var(--primary); margin-bottom: 5px; }
+        .hotel-detail { font-size: 0.9rem; color: #666; margin-bottom: 3px; }
+
+        /* 記帳工具 */
+        .input-group { margin-bottom: 10px; }
+        .input-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; font-family: inherit; }
+        .expense-list li { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #eee; }
+        .total-box { background: var(--primary); color: white; padding: 15px; border-radius: 15px; text-align: right; font-size: 1.2rem; font-weight: bold; margin-top: 15px; }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Toast Notification */
+        #toast {
+            visibility: hidden; min-width: 200px; background-color: #333; color: #fff;
+            text-align: center; border-radius: 50px; padding: 12px;
+            position: fixed; z-index: 300; left: 50%; bottom: 90px;
+            transform: translateX(-50%); font-size: 0.9rem; opacity: 0; transition: opacity 0.3s;
+        }
+        #toast.show { visibility: visible; opacity: 1; }
+
     </style>
 </head>
 <body>
 
 <header>
     <h1>四國慢旅 2026</h1>
-    <p>02/27 - 03/07 | 10天9夜</p>
+    <p>02/27 (五) - 03/07 (六) | 9天8夜自駕</p>
 </header>
 
 <div id="tab-itinerary" class="container active">
-    <div class="card">
-        <h3>Day 1: 抵達 & 金刀比羅宮</h3>
-        <div class="desc">10:30 抵達高松。租車後前往森家烏龍麵。下午挑戰金刀比羅宮 785 階。</div>
-        <button class="btn" onclick="window.open('https://www.google.com/maps/search/?api=1&query=金刀比羅宮')">🗺️ 導航：金刀比羅宮</button>
+    
+    <div class="date-divider">
+        Day 1 : 02/27 (五)
+        <div class="weather-info">☁️ 8-14°C</div>
     </div>
-    <div class="card">
-        <h3>Day 3: 鳴門漩渦 (重點!)</h3>
-        <div class="desc">⚠️ 11:30 是最佳觀賞時間，請務必準時抵達鳴門。</div>
-        <button class="btn" onclick="window.open('https://www.google.com/maps/search/?api=1&query=鳴門渦之道')">🗺️ 導航：鳴門渦之道</button>
+
+    <div class="card transport">
+        <div class="card-header"><span class="time-tag">10:30</span> <h3>抵達高松 & 租車</h3></div>
+        <div class="desc">CI278 抵達高松。領取華航優惠券，前往機場租車櫃台。<br>⚠️ 記得預約 ETC SEP (四國高速吃到飽)。</div>
     </div>
-    <div style="text-align:center; color:#999; margin-top:20px; font-size:0.8rem;">(完整行程請參閱 PDF)</div>
+
+    <div class="card food">
+        <div class="card-header"><span class="time-tag">12:30</span> <h3>午餐：森家烏龍麵</h3></div>
+        <div class="desc">機場附近名店 (Kawata週五休，改吃這家)。必點「炸什錦烏龍麵」。</div>
+        <div class="actions">
+            <a href="https://maps.app.goo.gl/XXXX" target="_blank" class="btn btn-map">導航</a>
+            <button class="btn btn-code" onclick="copyText('77 166 459*22')">Mapcode</button>
+        </div>
+    </div>
+
+    <div class="card sightseeing">
+        <div class="card-header"><span class="time-tag">13:00</span> <h3>呆呆獸公園 (綾川)</h3></div>
+        <div class="desc">寶可夢粉絲必去。旁邊有免費停車場。</div>
+        <div class="actions">
+            <a href="https://maps.app.goo.gl/XXXX" target="_blank" class="btn btn-full btn-map">📍 Google Maps 導航</a>
+        </div>
+    </div>
+
+    <div class="card sightseeing">
+        <div class="card-header"><span class="time-tag">14:30</span> <h3>金刀比羅宮</h3></div>
+        <div class="desc">一生必參拜。挑戰785階御本宮。沿途商店街很熱鬧。<br>⚠️ 17:00 關門。</div>
+        <div class="actions">
+            <a href="https://maps.app.goo.gl/XXXX" target="_blank" class="btn btn-map">琴平公園停車場</a>
+            <button class="btn btn-code" onclick="copyText('77 353 678*81')">77 353 678*81</button>
+        </div>
+    </div>
+
+    <div class="card shopping">
+        <div class="card-header"><span class="time-tag">18:30</span> <h3>永旺夢樂城 (Aeon Mall)</h3></div>
+        <div class="desc">採買補給品。晚餐可在美食街解決。</div>
+    </div>
+
+    <div class="date-divider">
+        Day 2 : 02/28 (六)
+        <div class="weather-info">☀️ 9-15°C</div>
+    </div>
+
+    <div class="card transport">
+        <div class="card-header"><span class="time-tag">07:20</span> <h3>高松港 -> 小豆島</h3></div>
+        <div class="desc">搭乘渡輪前往土庄港 (約60分)。車輛需提前預約。</div>
+    </div>
+
+    <div class="card sightseeing">
+        <div class="card-header"><span class="time-tag">09:00</span> <h3>小豆島環島</h3></div>
+        <div class="desc">
+            1. 橄欖公園 (魔女宅急便掃把)<br>
+            2. 重岩 (能量景點)<br>
+            3. 午餐：小豆島拉麵 HISHIO
+        </div>
+    </div>
+
+    <div class="card sightseeing">
+        <div class="card-header"><span class="time-tag">13:45</span> <h3>👼 天使之路</h3></div>
+        <div class="desc">⚠️ 退潮時間 13:45~19:45。這段時間才能走到對面小島。</div>
+        <div class="tags"><span class="tag must">必看退潮</span></div>
+    </div>
+
+    <div class="card transport">
+        <div class="card-header"><span class="time-tag">15:45</span> <h3>返回高松 & 高松城</h3></div>
+        <div class="desc">搭乘呆呆獸號渡輪。抵達後參觀「玉藻公園 (高松城)」。</div>
+    </div>
+
+    <div class="date-divider">
+        Day 3 : 03/01 (日)
+        <div class="weather-info">⛅ 10-16°C</div>
+    </div>
+
+    <div class="card sightseeing">
+        <div class="card-header"><span class="time-tag">09:00</span> <h3>栗林公園</h3></div>
+        <div class="desc">預約了 09:00 的遊船。米其林三星庭園。</div>
+        <div class="actions">
+            <a href="https://maps.app.goo.gl/XXXX" target="_blank" class="btn btn-map">導航</a>
+            <button class="btn btn-code" onclick="copyText('60 576 348*55')">60 576 348*55</button>
+        </div>
+    </div>
+
+    <div class="card sightseeing">
+        <div class="card-header"><span class="time-tag">11:30</span> <h3>🌀 鳴門漩渦 (重點!)</h3></div>
+        <div class="desc">⚠️ 11:30 是最佳大潮時間！請務必準時抵達渦之道或搭船。</div>
+        <div class="tags"><span class="tag must">時間嚴格</span></div>
+    </div>
+
+    <div class="card food">
+        <div class="card-header"><span class="time-tag">12:30</span> <h3>堂の浦 鯛魚拉麵</h3></div>
+        <div class="desc">必點：鯛魚鹽味拉麵 + 炸鯛魚皮 + 替飯(燉飯)。</div>
+    </div>
+
+    <div class="card sightseeing">
+        <div class="card-header"><span class="time-tag">15:30</span> <h3>眉山 & 阿波舞會館</h3></div>
+        <div class="desc">眉山纜車看風景。阿波舞會館看表演。</div>
+        <div class="actions">
+            <button class="btn btn-code btn-full" onclick="copyText('56 361 036*63')">停車場 Mapcode</button>
+        </div>
+    </div>
+
+    <div class="date-divider">
+        Day 4 : 03/02 (一)
+        <div class="weather-info">☁️ 11-15°C</div>
+    </div>
+
+    <div class="card food">
+        <div class="card-header"><span class="time-tag">08:45</span> <h3>長田 in 香の香</h3></div>
+        <div class="desc">香川烏龍麵百名店 NO.2。必點「釜揚烏龍麵」。</div>
+    </div>
+
+    <div class="card sightseeing">
+        <div class="card-header"><span class="time-tag">10:30</span> <h3>丸龜城 & 高屋神社</h3></div>
+        <div class="desc">丸龜城 (現存天守/陡坡)。<br>高屋神社 (天空鳥居) - 山路狹窄請小心駕駛。</div>
+    </div>
+
+    <div class="card sightseeing">
+        <div class="card-header"><span class="time-tag">15:00</span> <h3>松山城 & 道後溫泉</h3></div>
+        <div class="desc">搭纜車上松山城。晚上逛道後溫泉街，看少爺機關鐘。</div>
+        <div class="tags"><span class="tag tips">住：古湧園 遙</span></div>
+    </div>
+
+    <div class="date-divider">
+        Day 5 : 03/03 (二)
+        <div class="weather-info">🌧️ 10-14°C</div>
+    </div>
+
+    <div class="card sightseeing">
+        <div class="card-header"><span class="time-tag">10:00</span> <h3>下灘車站</h3></div>
+        <div class="desc">神隱少女海上鐵道場景。無人車站，拍照請排隊。</div>
+    </div>
+
+    <div class="card sightseeing">
+        <div class="card-header"><span class="time-tag">13:00</span> <h3>大洲城 & 臥龍山莊</h3></div>
+        <div class="desc">午餐：大洲爐端油屋 (豚栗飯)。</div>
+    </div>
+
+    <div class="card food">
+        <div class="card-header"><span class="time-tag">19:00</span> <h3>高知 弘人市場</h3></div>
+        <div class="desc">高知人的廚房！佔位子 -> 點餐。<br>必吃：明神丸炙燒鰹魚(鹽味)、安兵衛餃子。</div>
+        <div class="tags"><span class="tag must">氣氛超High</span></div>
+    </div>
+
+    <div class="date-divider">
+        Day 6 : 03/04 (三)
+        <div class="weather-info">☀️ 12-18°C</div>
+    </div>
+
+    <div class="card sightseeing">
+        <div class="card-header"><span class="time-tag">全日</span> <h3>四萬十川 一日遊</h3></div>
+        <div class="desc">
+            車程較遠 (約2小時)。<br>
+            1. 佐田沉下橋 (最有名)<br>
+            2. 租腳踏車漫遊<br>
+            3. 搭乘屋形船
+        </div>
+    </div>
+
+    <div class="date-divider">
+        Day 7 : 03/05 (四)
+        <div class="weather-info">⛅ 11-17°C</div>
+    </div>
+
+    <div class="card sightseeing">
+        <div class="card-header"><span class="time-tag">市區</span> <h3>高知市區巡禮</h3></div>
+        <div class="desc">
+            1. 高知城 (追手門+天守同框)<br>
+            2. 桂濱 (坂本龍馬像、水族館)<br>
+            3. 牧野植物園 (日劇《爛漫》原型)<br>
+            4. 五台山展望台 (看夕陽夜景)
+        </div>
+    </div>
+    
+    <div class="card food">
+        <div class="card-header"><span class="time-tag">晚餐</span> <h3>土佐料理 司</h3></div>
+        <div class="desc">百年老店，體驗正宗鰹魚半敲燒與鯨魚料理。</div>
+    </div>
+
+    <div class="date-divider">
+        Day 8 : 03/06 (五)
+        <div class="weather-info">☀️ 9-15°C</div>
+    </div>
+
+    <div class="card sightseeing">
+        <div class="card-header"><span class="time-tag">09:00</span> <h3>大步危峽谷</h3></div>
+        <div class="desc">搭乘觀光遊覽船 (30分鐘)。欣賞奇岩怪石。</div>
+    </div>
+
+    <div class="card sightseeing">
+        <div class="card-header"><span class="time-tag">10:30</span> <h3>GoGo Adventure 滑索</h3></div>
+        <div class="desc">飛越祖谷川！(記得預約)。之後去走「藤蔓橋」。</div>
+    </div>
+
+    <div class="card transport">
+        <div class="card-header"><span class="time-tag">16:00</span> <h3>前往琴平 (住宿)</h3></div>
+        <div class="desc">入住：御宿 敷島館 (就在金刀比羅宮參道下)。<br>有免費宵夜拉麵！</div>
+    </div>
+
+    <div class="date-divider">
+        Day 9 : 03/07 (六)
+        <div class="weather-info">🛫 回程</div>
+    </div>
+
+    <div class="card transport">
+        <div class="card-header"><span class="time-tag">09:00</span> <h3>前往高松機場</h3></div>
+        <div class="desc">CI179 (18:55 起飛)。白天可再逛逛機場附近或還車。<br>完美結束九天旅程！</div>
+    </div>
+
+</div>
+
+<div id="tab-info" class="container">
+    <h3 style="color:var(--secondary); margin-bottom:15px;">✈️ 航班資訊</h3>
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <b>去程 CI278</b> <span>02/27 07:00 TPE</span>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+            <b>回程 CI179</b> <span>03/07 18:55 TAK</span>
+        </div>
+        <hr style="border:0; border-top:1px dashed #ddd; margin:10px 0;">
+        <small style="color:#666;">行李：23kg / 1件</small>
+    </div>
+
+    <h3 style="color:var(--secondary); margin:25px 0 15px;">🏨 住宿列表</h3>
+    
+    <div class="hotel-card">
+        <div class="hotel-img">高松民宿照片</div>
+        <div class="hotel-info">
+            <div class="hotel-title">Second Home 瀬戸風月</div>
+            <div class="hotel-detail">📅 02/27 - 03/02 (3晚)</div>
+            <div class="hotel-detail">📍 高松 | Google 4.9⭐</div>
+            <div class="hotel-detail">📞 +81 87-813-7738</div>
+            <div class="actions" style="margin-top:10px;">
+                <button class="btn btn-code" onclick="copyText('請輸入Mapcode')">Mapcode</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="hotel-card">
+        <div class="hotel-img">古湧園照片</div>
+        <div class="hotel-info">
+            <div class="hotel-title">Kowakuen Haruka 古湧園 遙</div>
+            <div class="hotel-detail">📅 03/02 - 03/03 (1晚)</div>
+            <div class="hotel-detail">📍 松山道後 | Booking 9.2⭐</div>
+            <div class="hotel-detail">📞 +81 89-945-5911</div>
+            <div class="hotel-detail" style="color:var(--accent); font-size:0.8rem;">⚠️ 15點CI / 11點CO / 總早餐</div>
+        </div>
+    </div>
+
+    <div class="hotel-card">
+        <div class="hotel-img">OMO7照片</div>
+        <div class="hotel-info">
+            <div class="hotel-title">OMO7 高知 by 星野集團</div>
+            <div class="hotel-detail">📅 03/03 - 03/06 (3晚)</div>
+            <div class="hotel-detail">📍 高知 | Booking 8.5⭐</div>
+            <div class="hotel-detail">📞 +81 50-3134-8095</div>
+        </div>
+    </div>
+
+    <div class="hotel-card">
+        <div class="hotel-img">敷島館照片</div>
+        <div class="hotel-info">
+            <div class="hotel-title">御宿 敷島館</div>
+            <div class="hotel-detail">📅 03/06 - 03/07 (1晚)</div>
+            <div class="hotel-detail">📍 琴平 | Booking 9.2⭐</div>
+            <div class="hotel-detail">📞 +81 87-758-8005</div>
+            <div class="hotel-detail" style="color:var(--accent); font-size:0.8rem;">🍜 免費宵夜拉麵 / 貸切風呂</div>
+        </div>
+    </div>
 </div>
 
 <div id="tab-tools" class="container">
-    <div class="card" style="border-left-color: var(--secondary);">
-        <h3>💰 共同記帳</h3>
-        <input type="text" id="expense-desc" placeholder="消費項目 (例如: 午餐)">
-        <input type="number" id="expense-amount" placeholder="金額 (日幣)" inputmode="numeric">
-        <button class="btn" style="background: var(--secondary);" onclick="addExpense()">➕ 新增支出</button>
+    <h3 style="color:var(--secondary);">💰 共同記帳</h3>
+    <div class="card">
+        <div class="input-group">
+            <input type="text" id="expense-desc" placeholder="項目 (例如: 弘人市場晚餐)">
+        </div>
+        <div class="input-group">
+            <input type="number" id="expense-amount" placeholder="金額 (日幣)" inputmode="numeric">
+        </div>
+        <button class="btn" style="background:var(--secondary); color:white; width:100%;" onclick="addExpense()">➕ 新增支出</button>
     </div>
 
     <div class="card">
-        <h3 style="display:flex; justify-content:space-between;">
-            <span>支出列表</span>
-            <span style="font-size:0.9rem; color:#888;" id="status">連線中...</span>
-        </h3>
-        <ul id="expense-list">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>支出明細</h3>
+            <span id="status" style="font-size:0.8rem; color:#999;">已連線</span>
+        </div>
+        <ul class="expense-list" id="expense-list">
             </ul>
-        <div style="text-align:right; margin-top:15px; font-weight:bold; font-size:1.1rem; border-top:2px dashed #eee; padding-top:10px;">
-            總計: ¥<span id="total-amount" style="color:var(--secondary);">0</span>
+        <div class="total-box">
+            總計: ¥<span id="total-amount">0</span>
         </div>
     </div>
 </div>
 
 <nav class="nav-bar">
-    <div class="nav-item active" onclick="switchTab('itinerary', this)">📅 行程</div>
-    <div class="nav-item" onclick="switchTab('tools', this)">💰 記帳</div>
+    <div class="nav-item active" onclick="switchTab('itinerary', this)">
+        <i>🗺️</i> 行程
+    </div>
+    <div class="nav-item" onclick="switchTab('info', this)">
+        <i>🏨</i> 資訊
+    </div>
+    <div class="nav-item" onclick="switchTab('tools', this)">
+        <i>¥</i> 記帳
+    </div>
 </nav>
 
-<script type="module">
-  // 改用 CDN 連結，瀏覽器才看得懂
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } 
-    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+<div id="toast">已複製 Mapcode！</div>
 
-  // 您的專屬設定
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc } 
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // 您的 Firebase 設定
   const firebaseConfig = {
     apiKey: "AIzaSyDVjPhieb7LVZAwtKjg1tpmZ6TE9Ti6g14",
     authDomain: "shikoku-trip-2026.firebaseapp.com",
@@ -103,15 +502,10 @@
     measurementId: "G-4LCZND97JT"
   };
 
-  // 初始化 Firebase
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-  const analytics = getAnalytics(app);
 
-  console.log("Firebase initialized!");
-  document.getElementById('status').innerText = "已連線";
-
-  // 新增支出功能
+  // 新增支出
   window.addExpense = async function() {
       const desc = document.getElementById('expense-desc').value;
       const amount = Number(document.getElementById('expense-amount').value);
@@ -124,21 +518,19 @@
                   amount: amount,
                   timestamp: serverTimestamp()
               });
-              // 清空欄位
               document.getElementById('expense-desc').value = '';
               document.getElementById('expense-amount').value = '';
-              document.getElementById('status').innerText = "儲存成功!";
-              setTimeout(() => document.getElementById('status').innerText = "已連線", 2000);
+              document.getElementById('status').innerText = "儲存成功";
           } catch (e) {
               console.error("Error: ", e);
-              alert('上傳失敗，請檢查網路');
+              alert('上傳失敗');
           }
       } else {
-          alert("請輸入項目和金額");
+          alert("請輸入完整資訊");
       }
   }
 
-  // 即時監聽資料庫
+  // 讀取支出
   const q = query(collection(db, "expenses"), orderBy("timestamp", "desc"));
   onSnapshot(q, (snapshot) => {
       const list = document.getElementById('expense-list');
@@ -148,23 +540,33 @@
       
       snapshot.forEach((doc) => {
           const data = doc.data();
-          const safeAmount = data.amount ? data.amount : 0; // 防止錯誤資料
+          const safeAmount = data.amount || 0;
           total += safeAmount;
           list.innerHTML += `
             <li>
                 <span>${data.desc}</span> 
-                <span class="amount">¥${safeAmount.toLocaleString()}</span>
+                <span style="font-weight:bold; color:var(--secondary);">¥${safeAmount.toLocaleString()}</span>
             </li>`;
       });
       totalEl.innerText = total.toLocaleString();
   });
 
-  // Tab 切換
+  // Tab 切換功能
   window.switchTab = function(tabId, navEl) {
       document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
       document.getElementById('tab-' + tabId).classList.add('active');
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
       navEl.classList.add('active');
+      window.scrollTo(0, 0);
+  }
+
+  // 複製文字功能
+  window.copyText = function(text) {
+      navigator.clipboard.writeText(text).then(() => {
+          const toast = document.getElementById("toast");
+          toast.classList.add("show");
+          setTimeout(() => toast.classList.remove("show"), 2000);
+      });
   }
 </script>
 
