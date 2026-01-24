@@ -1,0 +1,89 @@
+[
+  {
+    "date": "03/06",
+    "day": "五",
+    "loc": "祖谷",
+    "hotel_id": "H4",
+    "items": [
+      {
+        "time": "09:00",
+        "title": "大步危遊覽船",
+        "tag": "sight",
+        "desc": "欣賞峽谷奇岩。",
+        "detail": "船程約 30 分，建議早上光線更漂亮。",
+        "mapcode": "",
+        "hours": "09:00–17:00",
+        "price": "成人 1500円",
+        "stay": "約 30 分",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "峽谷地形很壯觀，建議早上光線更漂亮。"
+        ],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "10:30",
+        "title": "GoGo Adventure（森林滑索）",
+        "tag": "sight",
+        "desc": "需預約。穿著限制。",
+        "detail": "建議穿運動鞋、褲裝；會有安全講解。",
+        "mapcode": "",
+        "hours": "09:00–17:00（最後入場依當日規定）",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [
+          "裙裝/涼鞋不建議；現場可能依安全規範拒絕。"
+        ],
+        "guide": [
+          "建議穿運動鞋、褲裝；會有安全講解。"
+        ],
+        "links": [
+          {
+            "title": "GoGo Adventure FAQ",
+            "url": "https://iya.gogo-adventure.com/faq/"
+          }
+        ],
+        "img": ""
+      },
+      {
+        "time": "13:00",
+        "title": "祖谷藤蔓橋",
+        "tag": "sight",
+        "desc": "三大奇橋。",
+        "detail": "橋面簍空會搖晃，走慢一點、握扶手就好。",
+        "mapcode": "",
+        "hours": "08:00–17:00",
+        "price": "550円",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "橋面簍空會搖晃，走慢一點、握扶手就好。"
+        ],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "16:00",
+        "title": "敷島館 Check-in",
+        "tag": "hotel",
+        "desc": "享受溫泉。",
+        "detail": "晚上記得吃免費宵夜拉麵（22:00–23:00）。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "先泡湯再吃晚餐/宵夜，是敷島館最佳節奏。"
+        ],
+        "links": [],
+        "img": ""
+      }
+    ]
+  }
+]

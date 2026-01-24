@@ -1,0 +1,184 @@
+[
+  {
+    "date": "02/28",
+    "day": "六",
+    "loc": "小豆島",
+    "hotel_id": "H1",
+    "items": [
+      {
+        "time": "06:00",
+        "title": "出發：民宿 → 高松港",
+        "tag": "transport",
+        "desc": "建議 6:00–6:30 出發。",
+        "detail": "你筆記：大約 6:00–6:30 出發前往高松港。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "07:20",
+        "title": "高松港 → 小豆島（土庄港）",
+        "tag": "transport",
+        "desc": "約 60 分鐘船程（高木同學號）。車輛需預約。",
+        "detail": "你筆記票價：車輌運賃 7,120円*2 + 旅客運賃 2,800円*2 = 合計 19,840円。\n車輛需提前預約，建議提早 20 分鐘到港口。",
+        "mapcode": "",
+        "hours": "",
+        "price": "合計 19,840円（依你筆記）",
+        "stay": "約 60 分",
+        "menu": [],
+        "avoid": [
+          "未預約車輛容易滿位，務必事前完成。"
+        ],
+        "guide": [],
+        "links": [
+          {
+            "title": "高木同學聖地巡禮文章",
+            "url": "https://achi0506.medium.com/%E6%93%85%E9%95%B7%E6%8D%89%E5%BC%84%E4%BA%BA%E7%9A%84%E9%AB%98%E6%9C%A8%E5%90%8C%E5%AD%B8-%E8%81%96%E5%9C%B0%E5%B7%A1%E7%A6%AE-%E5%B0%8F%E8%B1%86%E5%B3%B6-%E7%B7%A3%E8%B5%B7-day1-f189e4e174c8"
+          }
+        ],
+        "img": ""
+      },
+      {
+        "time": "09:00",
+        "title": "橄欖公園",
+        "tag": "sight",
+        "desc": "魔女宅急便掃把打卡、橄欖冰淇淋。",
+        "detail": "可免費租借掃把拍照。\n必吃：橄欖冰淇淋。\n可買：橄欖葉書籤、面膜等。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "打卡點在風車與草坡，風大記得固定帽子。"
+        ],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "12:00",
+        "title": "午餐：HISHIO 拉麵（天使之路店）",
+        "tag": "food",
+        "desc": "醬油拉麵。",
+        "detail": "天使之路店。\n推薦：醤そば、替玉（加麵依現場規則）。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [
+          {
+            "jp": "醤そば",
+            "zh": "招牌醬油拉麵"
+          },
+          {
+            "jp": "替玉",
+            "zh": "加麵（店家規則依現場）"
+          }
+        ],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "13:45",
+        "title": "天使之路",
+        "tag": "sight",
+        "desc": "⚠️ 退潮時間：13:45~19:45（以當日潮汐表為準）。",
+        "detail": "只有退潮時才能走的沙洲。\n潮汐時間每日不同：出發前再確認當日退潮表（連結）。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [
+          "潮汐時間每日不同：出發前再確認當日退潮表。"
+        ],
+        "guide": [],
+        "links": [
+          {
+            "title": "天使之路潮汐表",
+            "url": "https://www.shikokuferry.com/angel"
+          }
+        ],
+        "img": ""
+      },
+      {
+        "time": "15:45",
+        "title": "小豆島 → 高松（回程船）",
+        "tag": "transport",
+        "desc": "約 1 小時船程。",
+        "detail": "你筆記：15:45–16:45（約 1 小時）。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "約 60 分",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "17:00",
+        "title": "高松城（玉藻公園）",
+        "tag": "sight",
+        "desc": "三大水城，餵鯛魚。",
+        "detail": "又稱玉藻城，日本三大水城之一。\n你筆記：營業時間 2月 07:00–17:30；3月 06:30–18:00（依現場公告）。",
+        "mapcode": "",
+        "hours": "至 17:30（依季節）",
+        "price": "200円",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "18:00",
+        "title": "高松市區逛街（Pokemon Center/Loft/丸龜町商店街）",
+        "tag": "shop",
+        "desc": "依時間彈性挑選。",
+        "detail": "你筆記備選：\n- Pokemon Center Kagawa（10:00–20:00）\n- Loft（11:00–20:00）\n- 丸龜町商店街（11:00–19:30）\n- 大國藥妝（09:00–22:50）\n\n停車場備選：\n- 高松市立中央駐車場：18:00–08:00 最大 800円\n- Bancho Parking Lot 番町パーキング",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "19:30",
+        "title": "晚餐：Matsuoka（預約）",
+        "tag": "food",
+        "desc": "晚餐預約 19:30–20:00。",
+        "detail": "你筆記：Tabelog 預約連結如下。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [
+          {
+            "title": "Tabelog 預約",
+            "url": "https://tabelog.com/tw/kagawa/A3701/A370101/37010997/"
+          }
+        ],
+        "img": ""
+      }
+    ]
+  }
+]
