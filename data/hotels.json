@@ -1,0 +1,62 @@
+[
+  {
+    "id": "H1",
+    "name": "Second Home 瀬戸風月",
+    "stay": {
+      "from": "2026-02-27",
+      "to": "2026-03-02"
+    },
+    "city": "高松",
+    "desc": "11點退房 | 附車位*2 | 提供密碼",
+    "mapcode": "77 353 678*81",
+    "phone": "",
+    "address": "〒1077-1 Murojinmachi, Takamatsu, Kagawa 761-8062 日本",
+    "booking": "Booking.com（雙臥室房屋 獨棟民宿 80㎡）",
+    "images": []
+  },
+  {
+    "id": "H2",
+    "name": "Kowakuen Haruka 古湧園 遙",
+    "stay": {
+      "from": "2026-03-02",
+      "to": "2026-03-03"
+    },
+    "city": "松山",
+    "desc": "15點CI/11點CO | 含早餐+NDT$700 | 道後溫泉旁",
+    "mapcode": "",
+    "phone": "",
+    "address": "〒1-1 Dogosagidanicho, Matsuyama, Ehime 790-0836 日本",
+    "booking": "Booking.com（日式家庭房 標準雙床房）",
+    "images": []
+  },
+  {
+    "id": "H3",
+    "name": "OMO7 高知 by 星野集團",
+    "stay": {
+      "from": "2026-03-03",
+      "to": "2026-03-06"
+    },
+    "city": "高知",
+    "desc": "含早餐 | 晚上夜來祭表演",
+    "mapcode": "",
+    "phone": "",
+    "address": "〒9-15 Kutanda, Kochi, 781-0832 日本",
+    "booking": "Booking.com（宴會套房/宴會雙床房）",
+    "images": []
+  },
+  {
+    "id": "H4",
+    "name": "御宿 敷島館",
+    "stay": {
+      "from": "2026-03-06",
+      "to": "2026-03-07"
+    },
+    "city": "琴平",
+    "desc": "一泊二食 | 22點免費拉麵 | 私人湯屋",
+    "mapcode": "",
+    "phone": "",
+    "address": "〒766-0001 Kagawa, Nakatado District, Kotohira, 川西713-1 日本",
+    "booking": "",
+    "images": []
+  }
+]
