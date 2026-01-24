@@ -1,0 +1,713 @@
+[
+  {
+    "date": "02/27",
+    "day": "五",
+    "loc": "高松",
+    "hotel_id": "H1",
+    "items": [
+      {
+        "time": "10:30",
+        "title": "抵達高松機場",
+        "tag": "transport",
+        "desc": "領取優惠券、租車 (ETC+SEP)。",
+        "detail": "請確認已購買 SEP（四國高速吃到飽），並在租車櫃台確認 ETC 卡。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [
+          "抵達後先確認車況/ETC/保險；出機場再處理會拖時間。"
+        ],
+        "guide": [
+          "先把『租車/ETC/SEP』一次搞定，後面跨縣移動高速費會差很多。"
+        ],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "12:30",
+        "title": "手打烏龍麵 森家",
+        "tag": "food",
+        "desc": "Kawata週五休改吃這家。必吃炸什錦。",
+        "detail": "Kawata週五休改吃這家。必吃炸什錦。",
+        "mapcode": "77 166 459*22",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [
+          {
+            "jp": "かき揚げおろし",
+            "zh": "炸什錦蘿蔔泥烏龍麵"
+          },
+          {
+            "jp": "ぶっかけ",
+            "zh": "烏龍麵（拌/冷熱皆可）"
+          }
+        ],
+        "avoid": [],
+        "guide": [
+          "第一餐就吃烏龍麵開局：香川的節奏就是『快吃、快走、再吃』。"
+        ],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "13:45",
+        "title": "呆呆獸公園",
+        "tag": "sight",
+        "desc": "寶可夢迷必去，綾川。",
+        "detail": "寶可夢迷必去，綾川。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [
+          "假日人多，想拍空景就快狠準。"
+        ],
+        "guide": [
+          "拍照點集中在公園主入口與大型裝置附近。"
+        ],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "14:30",
+        "title": "金刀比羅宮",
+        "tag": "sight",
+        "desc": "挑戰785階。17:00關門。",
+        "detail": "挑戰785階。17:00關門。",
+        "mapcode": "77 353 678*81",
+        "hours": "06:00–17:00（10–3月）/ 06:00–18:00（4–9月）",
+        "price": "",
+        "stay": "建議停留 2–3 小時（含參道吃喝）",
+        "menu": [],
+        "avoid": [
+          "階梯多、容易流汗：穿好走鞋、帶水。",
+          "下午接近關門易趕行程，盡量提早上山。"
+        ],
+        "guide": [
+          "江戶時代最夯的『金毘羅參』，日本人一生必去之一。",
+          "御本宮 785 階；體力夠可再攻奧社 1368 階。"
+        ],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "18:00",
+        "title": "永旺夢樂城",
+        "tag": "shop",
+        "desc": "晚餐、UNIQLO、藥妝。",
+        "detail": "營業通常至 21:00，晚餐可在美食街解決。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "補貨/藥妝/UNIQLO 一次買齊，後面行程更輕鬆。"
+        ],
+        "links": [],
+        "img": ""
+      }
+    ]
+  },
+  {
+    "date": "02/28",
+    "day": "六",
+    "loc": "小豆島",
+    "hotel_id": "H1",
+    "items": [
+      {
+        "time": "07:20",
+        "title": "高松港出發",
+        "tag": "transport",
+        "desc": "往土庄港 (約60分)。",
+        "detail": "車輛需提前預約，建議提早 20 分鐘到港口。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [
+          "未預約車輛容易滿位，務必事前完成。"
+        ],
+        "guide": [],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "09:00",
+        "title": "橄欖公園",
+        "tag": "sight",
+        "desc": "魔女宅急便掃把打卡。",
+        "detail": "可免費租借掃把拍照，必吃橄欖冰淇淋。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "打卡點在風車與草坡，風大記得固定帽子。"
+        ],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "12:00",
+        "title": "HISHIO 拉麵",
+        "tag": "food",
+        "desc": "天使之路店。醬油拉麵。",
+        "detail": "天使之路店。醬油拉麵。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [
+          {
+            "jp": "醤そば",
+            "zh": "招牌醬油拉麵"
+          },
+          {
+            "jp": "替玉",
+            "zh": "加麵（店家規則依現場）"
+          }
+        ],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "13:45",
+        "title": "天使之路",
+        "tag": "sight",
+        "desc": "⚠️ 退潮時間：13:45~19:45。",
+        "detail": "只有退潮時才能走的沙洲。戀人聖地。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [
+          "潮汐時間每日不同：出發前再確認當日退潮表。"
+        ],
+        "guide": [],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "17:00",
+        "title": "高松城 (玉藻公園)",
+        "tag": "sight",
+        "desc": "三大水城，餵鯛魚。",
+        "detail": "營業至 17:30。門票 200 円。",
+        "mapcode": "",
+        "hours": "",
+        "price": "200円",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      }
+    ]
+  },
+  {
+    "date": "03/01",
+    "day": "日",
+    "loc": "德島",
+    "hotel_id": "H1",
+    "items": [
+      {
+        "time": "09:00",
+        "title": "栗林公園",
+        "tag": "sight",
+        "desc": "米其林三星。已預約遊船。",
+        "detail": "米其林三星。已預約遊船。",
+        "mapcode": "60 576 348*55",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "如果有預約南湖遊船，請提早 15 分鐘報到。"
+        ],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "11:30",
+        "title": "鳴門漩渦",
+        "tag": "sight",
+        "desc": "⚠️ 最佳大潮時間！請準時。",
+        "detail": "可走『渦之道』或搭觀潮船；以大潮時段最震撼。",
+        "mapcode": "",
+        "hours": "",
+        "price": "渦之道 510円；觀潮船 1800円/人",
+        "stay": "",
+        "menu": [],
+        "avoid": [
+          "觀潮是『看時間』的景點：晚到會直接少一半震撼。"
+        ],
+        "guide": [],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "12:30",
+        "title": "堂の浦 Donoura Naruto",
+        "tag": "food",
+        "desc": "必吃鯛魚鹽味拉麵。",
+        "detail": "必吃鯛魚鹽味拉麵。",
+        "mapcode": "",
+        "hours": "11:00–14:00（午間）",
+        "price": "",
+        "stay": "",
+        "menu": [
+          {
+            "jp": "鯛塩ラーメン",
+            "zh": "鯛魚鹽味拉麵"
+          },
+          {
+            "jp": "替飯",
+            "zh": "替飯（炸鯛魚皮飯，必點）"
+          }
+        ],
+        "avoid": [],
+        "guide": [
+          "這家主打『鯛』：湯頭清爽但很有層次，替飯一定要加。"
+        ],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "15:30",
+        "title": "眉山纜車",
+        "tag": "sight",
+        "desc": "阿波舞會館5樓搭乘。",
+        "detail": "阿波舞會館5樓搭乘。",
+        "mapcode": "56 361 036*63",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      }
+    ]
+  },
+  {
+    "date": "03/02",
+    "day": "一",
+    "loc": "松山",
+    "hotel_id": "H2",
+    "items": [
+      {
+        "time": "08:45",
+        "title": "長田 in 香の香",
+        "tag": "food",
+        "desc": "百名店 No.2。",
+        "detail": "百名店 No.2。",
+        "mapcode": "77 132 233*36",
+        "hours": "09:00–15:00（週三、週四休）",
+        "price": "",
+        "stay": "",
+        "menu": [
+          {
+            "jp": "釜あげうどん",
+            "zh": "釜揚烏龍麵（大/小）"
+          }
+        ],
+        "avoid": [],
+        "guide": [
+          "香川烏龍麵名店：排隊速度快，點餐也快，節奏跟上就對了。"
+        ],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "10:30",
+        "title": "丸龜城",
+        "tag": "sight",
+        "desc": "現存天守，好漢坡。",
+        "detail": "現存天守，好漢坡。",
+        "mapcode": "",
+        "hours": "",
+        "price": "天守 200円",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "15:00",
+        "title": "松山城 & 纜車",
+        "tag": "sight",
+        "desc": "搭單人吊椅上山。",
+        "detail": "搭單人吊椅上山。",
+        "mapcode": "",
+        "hours": "",
+        "price": "套票 520円（纜車+天守）",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "18:00",
+        "title": "道後溫泉",
+        "tag": "sight",
+        "desc": "少爺機關鐘、神隱少女湯屋。",
+        "detail": "少爺機關鐘、神隱少女湯屋。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "整點有少爺機關鐘表演；必逛伊織毛巾。"
+        ],
+        "links": [],
+        "img": ""
+      }
+    ]
+  },
+  {
+    "date": "03/03",
+    "day": "二",
+    "loc": "高知",
+    "hotel_id": "H3",
+    "items": [
+      {
+        "time": "10:00",
+        "title": "下灘車站",
+        "tag": "sight",
+        "desc": "神隱少女海上鐵道。",
+        "detail": "神隱少女海上鐵道。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "無人小站很好拍，注意停車與人流。"
+        ],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "13:00",
+        "title": "大洲城 & 油屋",
+        "tag": "food",
+        "desc": "午餐吃豚栗飯。",
+        "detail": "午餐吃豚栗飯。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [
+          {
+            "jp": "豚栗めし",
+            "zh": "豚肉栗子蓋飯"
+          }
+        ],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "19:00",
+        "title": "弘人市場",
+        "tag": "food",
+        "desc": "高知人的廚房！",
+        "detail": "先佔位子再點餐。吃完餐盤放桌上即可。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [
+          {
+            "jp": "鰹のタタキ（塩）",
+            "zh": "炙燒鰹魚（鹽味）"
+          },
+          {
+            "jp": "屋台餃子",
+            "zh": "屋台餃子（安兵衛系）"
+          }
+        ],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      }
+    ]
+  },
+  {
+    "date": "03/04",
+    "day": "三",
+    "loc": "四萬十",
+    "hotel_id": "H3",
+    "items": [
+      {
+        "time": "10:30",
+        "title": "四萬十川",
+        "tag": "sight",
+        "desc": "佐田沉下橋、單車、屋形船。",
+        "detail": "日本最後的清流，建議租腳踏車漫遊。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "拍照點：沉下橋（佐田沈下橋）周邊，注意會車。"
+        ],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "18:00",
+        "title": "俺の串",
+        "tag": "food",
+        "desc": "日式串燒晚餐。",
+        "detail": "日式串燒晚餐。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "當地串燒店，想吃到熱門品項建議早點到。"
+        ],
+        "links": [],
+        "img": ""
+      }
+    ]
+  },
+  {
+    "date": "03/05",
+    "day": "四",
+    "loc": "高知市",
+    "hotel_id": "H3",
+    "items": [
+      {
+        "time": "09:00",
+        "title": "高知城",
+        "tag": "sight",
+        "desc": "追手門與天守同框。",
+        "detail": "追手門與天守同框。",
+        "mapcode": "",
+        "hours": "",
+        "price": "420円",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "11:00",
+        "title": "桂濱公園",
+        "tag": "sight",
+        "desc": "坂本龍馬像、水族館。",
+        "detail": "海流湍急，嚴禁游泳，請勿太靠近海浪。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "龍馬像＋海岸線很好拍；風大要顧帽子。"
+        ],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "14:00",
+        "title": "牧野植物園",
+        "tag": "sight",
+        "desc": "日劇《爛漫》場景。",
+        "detail": "日劇《爛漫》場景。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "建築與溫室很好拍，安排 1.5–2 小時舒服。"
+        ],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "19:00",
+        "title": "土佐料理 司",
+        "tag": "food",
+        "desc": "百年老店。",
+        "detail": "百年老店。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [
+          {
+            "jp": "皿鉢料理",
+            "zh": "土佐大拼盤"
+          },
+          {
+            "jp": "鯨料理",
+            "zh": "鯨魚料理（想嘗鮮可點）"
+          }
+        ],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      }
+    ]
+  },
+  {
+    "date": "03/06",
+    "day": "五",
+    "loc": "祖谷",
+    "hotel_id": "H4",
+    "items": [
+      {
+        "time": "09:00",
+        "title": "大步危遊覽船",
+        "tag": "sight",
+        "desc": "欣賞峽谷奇岩。",
+        "detail": "欣賞峽谷奇岩。",
+        "mapcode": "",
+        "hours": "09:00–17:00",
+        "price": "成人 1500円",
+        "stay": "船程約 30 分",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "峽谷地形很壯觀，建議早上光線更漂亮。"
+        ],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "10:30",
+        "title": "GoGo Adventure",
+        "tag": "sight",
+        "desc": "森林滑索 (需預約)。",
+        "detail": "森林滑索 (需預約)。",
+        "mapcode": "",
+        "hours": "09:00–17:00（最後入場依當日規定）",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [
+          "裙裝/涼鞋不建議；現場可能依安全規範拒絕。"
+        ],
+        "guide": [
+          "建議穿運動鞋、褲裝；會有安全講解。"
+        ],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "13:00",
+        "title": "祖谷藤蔓橋",
+        "tag": "sight",
+        "desc": "三大奇橋。",
+        "detail": "三大奇橋。",
+        "mapcode": "",
+        "hours": "08:00–17:00",
+        "price": "550円",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "橋面簍空會搖晃，走慢一點、握扶手就好。"
+        ],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "16:00",
+        "title": "敷島館 Check-in",
+        "tag": "hotel",
+        "desc": "享受溫泉。",
+        "detail": "晚上記得吃免費宵夜拉麵（22:00–23:00）。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "先泡湯再吃晚餐/宵夜，是敷島館最佳節奏。"
+        ],
+        "links": [],
+        "img": ""
+      }
+    ]
+  },
+  {
+    "date": "03/07",
+    "day": "六",
+    "loc": "返台",
+    "hotel_id": "H4",
+    "items": [
+      {
+        "time": "09:00",
+        "title": "高松機場",
+        "tag": "transport",
+        "desc": "還車、逛免稅店。",
+        "detail": "還車、逛免稅店。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "自駕還車＋加油通常耗時，建議提早到機場。"
+        ],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "18:55",
+        "title": "CI 179 起飛",
+        "tag": "transport",
+        "desc": "帶著滿滿回憶回家！",
+        "detail": "高松→台北（TPE）。",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      }
+    ]
+  }
+]
