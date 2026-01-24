@@ -264,7 +264,7 @@
   </header>
 
   <!-- 行前 -->
-  <div id="page-pre" class="page active">
+  <div id="page-pre" class="page">
     <!-- ✅ 全員重要待辦（移到上面） -->
     <div class="card">
       <div class="section-title"><i class="fas fa-bullhorn"></i> 全員重要待辦</div>
@@ -275,6 +275,9 @@
       <div class="section-title"><i class="fas fa-clipboard-user"></i> 個人清單</div>
       <div class="user-tabs" id="userSwitch"></div>
 
+      <h4 style="margin:10px 0 10px; color:var(--text-sec);">旅行前</h4>
+      <div class="checklist-grid" id="list-pretrip"></div>
+
       <h4 style="margin:10px 0 10px; color:var(--text-sec);">隨身行李</h4>
       <div class="checklist-grid" id="list-carry"></div>
 
@@ -284,7 +287,7 @@
   </div>
 
   <!-- 行程 -->
-  <div id="page-itinerary" class="page">
+  <div id="page-itinerary" class="page active">
     <div class="date-scroller" id="dayScroller"></div>
 
     <div class="card" style="margin-top: 20px;">
@@ -341,10 +344,10 @@
   </div>
 
   <nav class="bottom-nav">
-    <div class="nav-item active" onclick="nav('pre', this)"><i class="fas fa-list-check"></i> 行前</div>
     <div class="nav-item" onclick="nav('itinerary', this)"><i class="fas fa-map-location-dot"></i> 行程</div>
     <div class="nav-item" onclick="nav('info', this)"><i class="fas fa-passport"></i> 資訊</div>
     <div class="nav-item" onclick="nav('money', this)"><i class="fas fa-yen-sign"></i> 記帳</div>
+    <div class="nav-item active" onclick="nav('pre', this)"><i class="fas fa-list-check"></i> 行前</div>
   </nav>
 
 <script>
@@ -460,18 +463,23 @@
 
   function renderChecklists() {
     const data = JSON.parse(localStorage.getItem('check_'+curUser)) || {};
-    ['carry','check'].forEach(type => {
-      document.getElementById('list-'+type).innerHTML = (checklistData[type] || []).map(item => {
+
+    // ✅ 支援新類型 pretrip + 舊類型 carry/check
+    ['pretrip','carry','check'].forEach(type => {
+        const target = document.getElementById('list-'+type);
+        if(!target) return; // 沒有該容器就跳過（保證不會報錯）
+
+        target.innerHTML = (checklistData[type] || []).map(item => {
         const isChecked = data[item] ? 'checked' : '';
         const icon = iconForItem(item);
         return `
-          <div class="check-item ${isChecked}" onclick="toggleCheck('${escapeHtml(item)}', this)">
+            <div class="check-item ${isChecked}" onclick="toggleCheck('${escapeHtml(item)}', this)">
             <i class="fas ${icon}"></i>
             <span>${escapeHtml(item)}</span>
-          </div>`;
-      }).join('');
+            </div>`;
+        }).join('');
     });
-  }
+    }
 
   function toggleCheck(itemEscaped, el) {
     const item = unescapeHtml(itemEscaped);
