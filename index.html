@@ -154,7 +154,7 @@
 
     .tl-title{ font-size:1.1rem; font-weight:700; margin-bottom:4px; }
     .tl-desc{ font-size:.9rem; color:var(--text-sec); line-height:1.4;
-      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+      display:-webkit-box; -webkit-box-orient:vertical; overflow:hidden;
     }
 
     /* modal */
@@ -360,7 +360,10 @@
 
   let checklistData = { carry: [], check: [] };
   let hotels = [];
-  let itinerary = [];
+  let itineraryIndex = [];
+  let dayCache = {};               // 每日 json 快取
+  let currentDayData = null;       // 目前選到的 day json（給 openModal 用）
+  let currentDayIdx = 0;
 
   // ====== Load Data ======
   async function loadAllData(){
@@ -370,7 +373,7 @@
       fetch("./data/todos.json").then(r=>r.json()),
       fetch("./data/flights.json").then(r=>r.json()),
       fetch("./data/hotels.json").then(r=>r.json()),
-      fetch("./data/itinerary.json").then(r=>r.json()),
+      fetch("./data/itinerary.index.json").then(r=>r.json()),
     ]);
 
     users = CONFIG?.members || ['L','K','R','Y','J'];
@@ -379,7 +382,7 @@
 
     checklistData = CHECKLISTS || { carry: [], check: [] };
     hotels = HOTELS || [];
-    itinerary = ITINERARY || [];
+    itineraryIndex = ITINERARY || [];
 
     // header
     document.getElementById('hdrTitle').innerText = CONFIG?.trip_title || '2026 四國巡禮';
@@ -393,7 +396,7 @@
     renderUserTabs();
     renderChecklists();
     renderDateScroller();
-    selectDay(0);
+    await selectDay(0);
     renderHotels();
     renderFlights();
     renderExpenseUI();
@@ -491,7 +494,7 @@
 
   // ====== 行程 ======
   function renderDateScroller() {
-    document.getElementById('dayScroller').innerHTML = itinerary.map((d, i) => {
+    document.getElementById('dayScroller').innerHTML = itineraryIndex.map((d, i) => {
       // ✅ 日期固定 02/27 格式（JSON 已是 02/27）
       return `
         <div class="date-chip" id="chip-${i}" onclick="selectDay(${i})">
@@ -512,20 +515,34 @@
     return 'tag-transport';
   }
 
-  function selectDay(idx) {
+  async function selectDay(idx) {
+    currentDayIdx = idx;
+
     document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
     const chip = document.getElementById('chip-'+idx);
     if(chip) chip.classList.add('active');
 
-    const dayData = itinerary[idx];
-    document.getElementById('weatherLoc').innerText = dayData?.loc || '';
+    const meta = itineraryIndex[idx];
+    if(!meta) return;
 
-    const h = hotels.find(x => x.id === dayData?.hotel_id);
+    // 顯示地點
+    document.getElementById('weatherLoc').innerText = meta.loc || '';
+
+    // 顯示住宿
+    const h = hotels.find(x => x.id === meta.hotel_id);
     document.getElementById('stayHotelName').innerText = h ? h.name : '';
+
+    // 讀取每日 json（有快取就不重抓）
+    if(!dayCache[idx]) {
+      const url = `./${meta.file}?v=${Date.now()}`; // v=... 避免 CDN 快取造成看不到更新
+      dayCache[idx] = await fetch(url).then(r=>r.json());
+    }
+    const dayData = dayCache[idx];
+    currentDayData = dayData;
 
     // timeline
     document.getElementById('timelineList').innerHTML = (dayData?.items || []).map((item, i) => `
-      <div class="timeline-item" onclick='openModal(${idx}, ${i})'>
+      <div class="timeline-item" onclick='openModal(${i})'>
         <div class="tl-time">${escapeHtml(item.time || '')}</div>
         <div class="tl-content">
           <div class="tl-tag ${tagClass(item.tag)}">${escapeHtml((item.tag||'').toUpperCase())}</div>
@@ -535,7 +552,7 @@
       </div>
     `).join('');
 
-    // mock weather
+    // mock weather（保留你原本的）
     let weatherHTML = '';
     for(let h=9; h<=21; h++) {
       let icon = 'fa-sun';
@@ -552,9 +569,10 @@
     document.getElementById('weatherStrip').innerHTML = weatherHTML;
   }
 
+
   // ====== Modal（導遊模式 + 防背景滑動） ======
-  function openModal(dayIdx, itemIdx) {
-    const item = itinerary[dayIdx]?.items?.[itemIdx];
+  function openModal(itemIdx) {
+    const item = currentDayData?.items?.[itemIdx];
     if(!item) return;
 
     const content = document.getElementById('modalContent');
@@ -607,11 +625,11 @@
       </div>
     `;
 
-    // ✅ 防滑動衝突：開 modal 時鎖背景
     document.body.classList.add('body-no-scroll');
     document.getElementById('modalOverlay').classList.add('active');
     document.getElementById('modalSheet').classList.add('active');
   }
+
 
   function closeModal() {
     document.getElementById('modalOverlay').classList.remove('active');
