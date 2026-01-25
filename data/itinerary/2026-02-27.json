@@ -15,9 +15,8 @@
         "mode": "drive",
         "from": "",
         "to": "",
-        "route": ""
+        "route": { "mode": "drive", "from": "家", "to": "台北桃園國際機場 T2", "minutes": 30 }
       },
-      
       {
         "time": "05:00",
         "title": "抵達台北桃園國際機場 T2",
@@ -47,7 +46,7 @@
         "mode": "plan",
         "from": "",
         "to": "",
-        "route": ""
+        "route": { "mode": "plan", "from": "家", "to": "台北桃園國際機場 T2", "minutes": 30 }
       },
       {
         "time": "10:30",
