@@ -679,6 +679,30 @@
     body{
       padding-bottom: calc(110px + env(safe-area-inset-bottom));
     }
+    /* 右側：時間 + 導航按鈕（把 15min 移到這裡） */
+    .route-cta{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      justify-content:center;
+      gap:10px;
+      flex:0 0 auto;
+    }
+
+    .route-time{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#ECECF0;
+      font-weight:900;
+      color:#333;
+      white-space:nowrap;
+    }
+
+    .route-time i{ color:#8E8E93; }
+
 
   </style>
 </head>
@@ -1034,6 +1058,9 @@
   }
 
 
+  
+
+
   async function selectDay(idx) {
     currentDayIdx = idx;
 
@@ -1062,38 +1089,51 @@
       const stay = item.stay ? `
         <div class="stay-pill"><i class="fas fa-hourglass-half"></i>${escapeHtml(item.stay)}</div>
       ` : '';
+    function jsStr(s){ return JSON.stringify(String(s ?? '')); }
 
-      // ✅ route strip：只要有 route 物件就用（你的 Day1.json 就是這種）
-      if(item.route && (item.route.from || item.route.to)){
-        const r = item.route;
-        const ico = routeIcon(r.mode || 'drive'); // 沒寫 mode 就預設 drive
-        const title = item.title || `移動：${r.from || ''} → ${r.to || ''}`;
-        const sub = `${r.from || ''} → ${r.to || ''}`.trim();
-        const minsText = item.stay || (Number.isFinite(r.minutes) ? `${r.minutes} min` : '');
+    if(item.route && (item.route.from || item.route.to)){
+      const r = item.route;
+      const mode = r.mode || 'drive';
+      const ico = routeIcon(mode);
 
-        return `
-          <div class="timeline-item" onclick="openModal(${i})">
-            <div class="tl-time">${escapeHtml(t)}</div>
+      const title = (item.title && item.title.trim())
+        ? item.title.trim()
+        : `${r.from || ''} → ${r.to || ''}`.trim();
 
-            <div class="route-strip">
-              <div class="route-ico"><i class="fas ${ico}"></i></div>
+      const dur = (item.stay && String(item.stay).trim())
+        ? String(item.stay).trim()
+        : (Number.isFinite(r.minutes) ? `${r.minutes} min` : '');
 
-              <div class="route-main">
-                <div class="route-title">${escapeHtml(title)}</div>
-                <div class="route-sub">${escapeHtml(sub)}</div>
+      const from = r.from || item.from || '';
+      const to   = r.to   || item.to   || '';
 
-                ${minsText ? `<div class="stay-pill"><i class="fas fa-hourglass-half"></i>${escapeHtml(minsText)}</div>` : ``}
-              </div>
+      return `
+        <div class="timeline-item">
+          <div class="tl-time">${escapeHtml(t)}</div>
+
+          <div class="route-strip"
+              onclick="openDirections(${jsStr(from)}, ${jsStr(to)}, ${jsStr(mode)})">
+
+            <div class="route-ico"><i class="fas ${ico}"></i></div>
+
+            <div class="route-main">
+              <div class="route-title">${escapeHtml(title)}</div>
+            </div>
+
+            <div class="route-cta" onclick="event.stopPropagation()">
+              ${dur ? `<div class="route-time"><i class="fas fa-hourglass-half"></i>${escapeHtml(dur)}</div>` : ``}
 
               <button class="btn btn-outline"
                       style="width:auto; padding:10px 12px;"
-                      onclick="openRouteMap(event, ${i})">
+                      onclick="event.stopPropagation(); openDirections(${jsStr(from)}, ${jsStr(to)}, ${jsStr(mode)})">
                 <i class="fas fa-location-arrow"></i>
               </button>
             </div>
+
           </div>
-        `;
-      }
+        </div>
+      `;
+    }
 
 
       // ✅ 一般行程卡（可點開 modal）
