@@ -283,10 +283,12 @@
     .modal-sheet{
       position:fixed;
       left:50%;
-      bottom:14px;
+      bottom:max(14px, env(safe-area-inset-bottom));
       transform:translateX(-50%) translateY(120%);
       width:min(760px, calc(100vw - 24px));
-      max-height:calc(100vh - 60px);
+
+      /* ✅ 用 dvh 比 vh 穩（手機網址列縮放不亂跳） */
+      max-height:calc(100dvh - 24px - env(safe-area-inset-top));
       background:#FAF7F2;
       z-index:2001;
       border-radius:28px;
@@ -297,27 +299,31 @@
       overflow:hidden;
       transition:transform .18s cubic-bezier(.16,1,.3,1);
     }
-    .modal-overlay.active{ opacity:1; pointer-events:auto; }
+
     .modal-sheet.active{ transform:translateX(-50%) translateY(0); }
 
+    /* ✅ Header 不滾動，永遠在上方 */
+    .modal-header{
+      position:relative;
+      flex:0 0 auto;
+      padding:6px 0 4px;
+      background:#FAF7F2;
+      border-bottom:1px solid rgba(233,225,214,.75);
+    }
+
+    /* 拖曳條保持置中 */
     .modal-drag-handle{
       width:44px; height:5px;
       background:#D8CFC4;
       border-radius:99px;
-      margin:10px auto 6px;
-      flex-shrink:0;
+      margin:8px auto 6px;
     }
-    .modal-scroll{
-      flex:1;
-      overflow-y:auto;
-      padding:10px 18px 16px;
-      -webkit-overflow-scrolling:touch;
-      overscroll-behavior: contain; /* Android/新 iOS 有效：避免滾動鏈 */
-    }
+
+    /* ✅ X 永遠可見（在 header 內） */
     .modal-x{
       position:absolute;
       right:12px;
-      top:10px;
+      top:8px;
       width:36px; height:36px;
       border-radius:50%;
       border:1px solid rgba(233,225,214,.95);
@@ -326,6 +332,24 @@
       cursor:pointer;
       display:flex; align-items:center; justify-content:center;
       z-index:10;
+    }
+
+    /* 內容滾動只在這裡發生 */
+    .modal-scroll{
+      flex:1;
+      overflow-y:auto;
+      padding:12px 18px 16px;
+      -webkit-overflow-scrolling:touch;
+      overscroll-behavior:contain;
+    }
+
+
+    .modal-drag-handle{
+      width:44px; height:5px;
+      background:#D8CFC4;
+      border-radius:99px;
+      margin:10px auto 6px;
+      flex-shrink:0;
     }
 
     .sheet-head{
@@ -740,10 +764,13 @@
   <!-- modal -->
   <div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
   <div class="modal-sheet" id="modalSheet" role="dialog" aria-modal="true">
-    <div class="modal-drag-handle"></div>
-    <button class="modal-x" onclick="closeModal()" aria-label="close">×</button>
+    <div class="modal-header">
+      <div class="modal-drag-handle"></div>
+      <button class="modal-x" onclick="closeModal()" aria-label="close">×</button>
+    </div>
     <div class="modal-scroll" id="modalContent"></div>
   </div>
+
 
   <nav class="bottom-nav">
     <div class="nav-item" onclick="nav('itinerary', this)"><i class="fas fa-map-location-dot"></i> 行程</div>
@@ -802,7 +829,7 @@
     renderFlights();
     renderExpenseUI();
   });
-  
+
   document.getElementById('modalSheet')?.addEventListener(
     'touchmove',
     (e) => e.stopPropagation(),
@@ -1112,6 +1139,26 @@
     if(!q) return 'https://www.google.com/maps';
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
   }
+  function travelModeForRoute(mode){
+    const m = (mode || '').toLowerCase();
+    if(m === 'walk')  return 'walking';
+    if(m === 'train') return 'transit';
+    if(m === 'ship')  return 'transit';
+    if(m === 'plane') return 'transit';
+    return 'driving';
+  }
+
+  function buildGoogleDirUrl(item){
+    // route item：用 directions
+    const r = item?.route;
+    if(r?.from && r?.to){
+      const tm = travelModeForRoute(r.mode);
+      return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(r.from)}&destination=${encodeURIComponent(r.to)}&travelmode=${tm}`;
+    }
+    // 一般景點：用 search
+    return buildGoogleNavUrl(item);
+  }
+
 
   // ====== Modal：預計到達/地址/停車/Mapcode/介紹 + Google 導航 ======
   function openModal(itemIdx) {
@@ -1151,7 +1198,7 @@
     const parking = item.parking || '';
     const mapcode = item.mapcode || '';
 
-    const navUrl = buildGoogleNavUrl(item);
+    const navUrl = buildGoogleDirUrl(item);
 
     content.innerHTML = `
       <div class="sheet-head">
@@ -1213,12 +1260,6 @@
         ${item.mapcode
           ? `<button class="btn btn-outline" onclick="copyText('${escapeHtml(item.mapcode)}')">複製 Mapcode</button>`
           : `<button class="btn btn-outline" onclick="copyText('${escapeHtml(item.addr || item.title || '')}')">複製地址</button>`}
-
-        ${
-          ((item.tag||'').toLowerCase()==='transport' && item.route)
-          ? `<button class="btn" style="grid-column:1 / span 2;" onclick="openDirections('${escapeHtml(item.route.from||'')}', '${escapeHtml(item.route.to||'')}')">Google 導航（路線）</button>`
-          : `<button class="btn" style="grid-column:1 / span 2;" onclick="openMap('${escapeHtml(item.addr || item.title || '')}')">Google 導航</button>`
-        }
       </div>
 
 
@@ -1233,31 +1274,41 @@
     document.getElementById('modalSheet').classList.add('active');
   }
 
+  // function openRouteMap(ev, idx){
+  //   ev?.stopPropagation?.();
+
+  //   const item = currentDayData?.items?.[idx];
+  //   if(!item) return;
+
+  //   const r = item.route || {};
+  //   const from = r.from || '';
+  //   const to   = r.to || '';
+  //   if(!to) return;
+
+  //   const mode = (r.mode || 'drive').toLowerCase();
+  //   const travelmode =
+  //     mode === 'walk'  ? 'walking' :
+  //     mode === 'train' ? 'transit' :
+  //     mode === 'ship'  ? 'transit' :
+  //     mode === 'plane' ? 'transit' :
+  //     'driving';
+
+  //   window.open(
+  //     `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(from)}&destination=${encodeURIComponent(to)}&travelmode=${travelmode}`,
+  //     '_blank',
+  //     'noopener'
+  //   );
+  // }
   function openRouteMap(ev, idx){
     ev?.stopPropagation?.();
-
     const item = currentDayData?.items?.[idx];
-    if(!item) return;
+    if(!item?.route) return;
 
-    const r = item.route || {};
-    const from = r.from || '';
-    const to   = r.to || '';
-    if(!to) return;
-
-    const mode = (r.mode || 'drive').toLowerCase();
-    const travelmode =
-      mode === 'walk'  ? 'walking' :
-      mode === 'train' ? 'transit' :
-      mode === 'ship'  ? 'transit' :
-      mode === 'plane' ? 'transit' :
-      'driving';
-
-    window.open(
-      `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(from)}&destination=${encodeURIComponent(to)}&travelmode=${travelmode}`,
-      '_blank',
-      'noopener'
-    );
+    const r = item.route;
+    const tm = travelModeForRoute(r.mode);
+    window.open(`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(r.from||'')}&destination=${encodeURIComponent(r.to||'')}&travelmode=${tm}`, '_blank', 'noopener');
   }
+
 
   function closeModal() {
     document.getElementById('modalOverlay').classList.remove('active');
