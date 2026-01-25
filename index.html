@@ -843,13 +843,6 @@
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
-    const el = e.target.closest('.route-click');
-    if(!el) return;
-
-    const from = el.dataset.from || '';
-    const to   = el.dataset.to || '';
-    const mode = el.dataset.mode || 'drive';
-    openDirections(from, to, mode);
     await loadAllData();
     renderGlobalTodos();
     renderUserTabs();
@@ -1058,25 +1051,11 @@
 
 
 
-  function openDirections(from, to, mode='drive'){
-    const m = (mode || 'drive').toLowerCase();
-
-    // Google Maps travelmode: driving, walking, transit
-    // 船/飛機在 directions 不一定有，保守用 transit 或直接用 dir 不帶 travelmode
-    let travelmode = 'driving';
-    if(m === 'walk') travelmode = 'walking';
-    if(m === 'train') travelmode = 'transit';
-    if(m === 'ship') travelmode = 'transit';
-    if(m === 'plane') travelmode = 'transit';
-
-    const url = `https://www.google.com/maps/dir/?api=1`
-      + `&origin=${encodeURIComponent(from)}`
-      + `&destination=${encodeURIComponent(to)}`
-      + `&travelmode=${encodeURIComponent(travelmode)}`;
-
-    window.open(url, '_blank', 'noopener');
+  function openDirections(from, to){
+    // Google Maps Directions
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(from||'')}&destination=${encodeURIComponent(to||'')}&travelmode=driving`;
+    window.open(url, '_blank');
   }
-
 
 
   
