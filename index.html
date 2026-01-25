@@ -251,7 +251,6 @@
       color:var(--ink2);
       line-height:1.5;
       display:-webkit-box;
-      -webkit-line-clamp:2;
       -webkit-box-orient:vertical;
       overflow:hidden;
     }
@@ -496,6 +495,80 @@
       display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
       color:var(--ink2); font-size:.9rem;
       font-weight:800;
+    }
+    /* ===== Route strip (transport as slim bar) ===== */
+    .route-item{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin:8px 0 18px;
+      padding-left:68px; /* 對齊時間欄位 + gap */
+    }
+
+    .route-pill{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:999px;
+      background:#F2F2F7;
+      border:1px solid rgba(0,0,0,.04);
+      box-shadow:0 1px 6px rgba(0,0,0,.04);
+      cursor:pointer;
+    }
+
+    .route-left{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+
+    .route-icon{
+      width:30px; height:30px;
+      border-radius:999px;
+      display:grid; place-items:center;
+      background:#E5F1FB;
+      color:var(--primary);
+      flex:0 0 auto;
+    }
+
+    .route-text{
+      display:flex;
+      flex-direction:column;
+      min-width:0;
+    }
+
+    .route-title{
+      font-weight:800;
+      font-size:.95rem;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .route-sub{
+      font-size:.82rem;
+      color:var(--text-sec);
+      margin-top:2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .route-right{
+      font-family:'Roboto Mono', monospace;
+      font-weight:800;
+      color:#444;
+      white-space:nowrap;
+      flex:0 0 auto;
+      padding-left:8px;
+    }
+
+    .route-pill:active{
+      transform:scale(.99);
     }
   </style>
 </head>
@@ -750,6 +823,36 @@
     if(t==='shop') return 'tag-shop';
     return 'tag-transport';
   }
+  function renderRouteStrip(item, i){
+    const r = item.route || {};
+    const from = r.from || '';
+    const to = r.to || '';
+    const mins = r.minutes ? `${r.minutes} 分` : (item.stay || '');
+    const title = item.title || `開車：${from} → ${to}`;
+    const sub = (from && to) ? `${from} → ${to}` : (item.desc || '');
+
+    return `
+      <div class="route-item" onclick="openModal(${i})">
+        <div class="route-pill">
+          <div class="route-left">
+            <div class="route-icon"><i class="fas fa-car"></i></div>
+            <div class="route-text">
+              <div class="route-title">${escapeHtml(title)}</div>
+              <div class="route-sub">${escapeHtml(sub)}</div>
+            </div>
+          </div>
+          <div class="route-right">${escapeHtml(mins || '')}</div>
+        </div>
+      </div>
+    `;
+  }
+
+function openDirections(from, to){
+  // Google Maps Directions
+  const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(from||'')}&destination=${encodeURIComponent(to||'')}&travelmode=driving`;
+  window.open(url, '_blank');
+}
+
 
   async function selectDay(idx) {
     currentDayIdx = idx;
@@ -773,16 +876,25 @@
     const dayData = dayCache[idx];
     currentDayData = dayData;
 
-    document.getElementById('timelineList').innerHTML = (dayData?.items || []).map((item, i) => `
-      <div class="timeline-item" onclick='openModal(${i})'>
-        <div class="tl-time">${escapeHtml(item.time || '—')}</div>
-        <div class="tl-content">
-          <div class="tl-tag ${tagClass(item.tag)}">${escapeHtml((item.tag||'').toUpperCase())}</div>
-          <div class="tl-title">${escapeHtml(item.title || '')}</div>
-          <div class="tl-desc">${escapeHtml(item.desc || '')}</div>
+    document.getElementById('timelineList').innerHTML = (dayData?.items || []).map((item, i) => {
+      // ✅ transport 且有 route => 顯示路線條（不做方格卡）
+      if((item.tag||'').toLowerCase()==='transport' && item.route){
+        return renderRouteStrip(item, i);
+      }
+
+      // 其他維持原本卡片
+      return `
+        <div class="timeline-item" onclick='openModal(${i})'>
+          <div class="tl-time">${escapeHtml(item.time || '')}</div>
+          <div class="tl-content">
+            <div class="tl-tag ${tagClass(item.tag)}">${escapeHtml((item.tag||'').toUpperCase())}</div>
+            <div class="tl-title">${escapeHtml(item.title || '')}</div>
+            <div class="tl-desc">${escapeHtml(item.desc || '')}</div>
+          </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
+
 
     // mock weather
     let weatherHTML = '';
@@ -906,17 +1018,26 @@
       ${avoidList}
       ${guideList}
 
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
         <button class="btn btn-outline" onclick="copyText('${escapeHtml(item.title || '')}')">複製名稱</button>
-        <button class="btn btn-outline" onclick="openUrl('${escapeHtml(navUrl)}')">Google 導航</button>
+
+        ${item.mapcode
+          ? `<button class="btn btn-outline" onclick="copyText('${escapeHtml(item.mapcode)}')">複製 Mapcode</button>`
+          : `<button class="btn btn-outline" onclick="copyText('${escapeHtml(item.addr || item.title || '')}')">複製地址</button>`}
+
+        ${
+          ((item.tag||'').toLowerCase()==='transport' && item.route)
+          ? `<button class="btn" style="grid-column:1 / span 2;" onclick="openDirections('${escapeHtml(item.route.from||'')}', '${escapeHtml(item.route.to||'')}')">Google 導航（路線）</button>`
+          : `<button class="btn" style="grid-column:1 / span 2;" onclick="openMap('${escapeHtml(item.addr || item.title || '')}')">Google 導航</button>`
+        }
       </div>
+
 
       <div class="sheet-actions">
         <a class="btn-primary" href="${navUrl}" target="_blank" rel="noopener">
           <i class="fas fa-location-arrow"></i> 開啟 Google Maps 導航
         </a>
-      </div>
-    `;
+      </div>`;
 
     document.body.classList.add('body-no-scroll');
     document.getElementById('modalOverlay').classList.add('active');
