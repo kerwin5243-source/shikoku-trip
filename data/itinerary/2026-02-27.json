@@ -6,6 +6,26 @@
     "hotel_id": "H1",
     "items": [
       {
+        "time": "Before \n05:00",
+        "title": "抵達台北桃園國際機場 T2",
+        "tag": "transport",
+        "desc": "5:00 前抵達，準備出境/托運。",
+        "detail": "台北桃園國際機場 第二航廈（T2）\n\n提醒：\n- 護照/機票/行李重量先確認\n- 早到可以更從容處理托運、安檢、登機口距離",
+        "mapcode": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "addr": "33758桃園市大園區航站南路9號",
+        "parking": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "出境尖峰容易排隊：能早到就早到。"
+        ],
+        "links": [],
+        "img": ""
+      },
+      {
         "time": "—",
         "title": "早餐：飛機餐",
         "tag": "food",
@@ -24,31 +44,11 @@
         "img": ""
       },
       {
-        "time": "Before \n05:00",
-        "title": "抵達台北桃園國際機場 T2",
-        "tag": "transport",
-        "desc": "5:00 前抵達，準備出境/托運。",
-        "detail": "台北桃園國際機場 第二航廈（T2）\n地址：33758 桃園市大園區航站南路9號\n\n提醒：\n- 護照/機票/行李重量先確認\n- 早到可以更從容處理托運、安檢、登機口距離",
-        "mapcode": "",
-        "hours": "",
-        "price": "",
-        "stay": "",
-        "addr": "33758桃園市大園區航站南路9號",
-        "parking": "",
-        "menu": [],
-        "avoid": [],
-        "guide": [
-          "出境尖峰容易排隊：能早到就早到。"
-        ],
-        "links": [],
-        "img": ""
-      },
-      {
         "time": "10:30",
         "title": "抵達高松空港",
         "tag": "transport",
         "desc": "抵達高松 10:30。",
-        "detail": "高松空港\n地址：Konanchooka, Takamatsu, Kagawa 761-1401 日本\n\n下一步：入境 → 領取優惠（如有）→ 租車櫃檯",
+        "detail": "高松空港\n\n下一步：入境 → 領取優惠（如有）→ 租車櫃檯",
         "mapcode": "",
         "hours": "",
         "price": "",
