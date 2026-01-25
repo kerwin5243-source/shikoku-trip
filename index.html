@@ -6,29 +6,35 @@
   <title>2026 四國巡禮</title>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#F2F2F7" />
+  <meta name="theme-color" content="#F6F3EE" />
 
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+  <!-- ✅ Serif + Sans（標題日系感） -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
     :root{
-      --bg-body:#F2F2F7;
-      --bg-card:#FFFFFF;
-      --primary:#007AFF;
-      --text-main:#1C1C1E;
-      --text-sec:#8E8E93;
-      --divider:#E5E5EA;
-      --radius-L:24px;
-      --radius-M:16px;
-      --radius-S:12px;
-      --shadow:0 8px 30px rgba(0,0,0,.08);
+      --bg-body:#F6F3EE;
+      --bg-card:rgba(255,255,255,.72);
+      --ink:#1E1E1E;
+      --ink2:#6F6A62;
+      --divider:#E9E1D6;
+
+      --primary:#2B2723;
+      --accent:#B08A5B;
+
+      --radius-L:28px;
+      --radius-M:20px;
+      --radius-S:14px;
+
+      --shadow-soft:0 10px 26px rgba(0,0,0,.08);
     }
+
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
     body{
       font-family:'Noto Sans TC',sans-serif;
       background:var(--bg-body);
-      color:var(--text-main);
+      color:var(--ink);
       margin:0;
       padding-bottom:110px;
       overscroll-behavior-y:none;
@@ -36,223 +42,460 @@
     body.body-no-scroll{ overflow:hidden; }
 
     .app-header{
-      padding:60px 20px 20px;
-      background:var(--bg-body);
+      padding:56px 20px 16px;
+      background:linear-gradient(to bottom, rgba(246,243,238,1), rgba(246,243,238,.82));
     }
-    .app-header h1{ margin:0; font-size:2rem; font-weight:900; letter-spacing:-.5px; }
-    .app-header p{ margin:5px 0 0; font-size:.95rem; color:var(--text-sec); font-weight:500; }
+    .app-header h1{
+      margin:0;
+      font-family:'Noto Serif TC', serif;
+      font-size:2.2rem;
+      font-weight:900;
+      letter-spacing:.2px;
+    }
+    .app-header p{
+      margin:8px 0 0;
+      font-size:.95rem;
+      color:var(--ink2);
+      font-weight:600;
+    }
 
-    .page{ display:none; padding:0 20px; animation:fadeIn .3s ease; }
+    .page{ display:none; padding:0 20px; animation:fadeIn .28s ease; }
     .page.active{ display:block; }
     @keyframes fadeIn{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
 
     .card{
       background:var(--bg-card);
+      border:1px solid rgba(233,225,214,.85);
       border-radius:var(--radius-L);
-      padding:24px;
-      margin-bottom:20px;
-      box-shadow:var(--shadow);
+      padding:22px;
+      margin-bottom:18px;
+      box-shadow:var(--shadow-soft);
+      backdrop-filter: blur(10px);
     }
     .section-title{
-      font-size:1.1rem; font-weight:700; margin-bottom:15px;
-      display:flex; align-items:center; gap:8px;
+      font-size:1.05rem; font-weight:900; margin-bottom:14px;
+      display:flex; align-items:center; gap:10px;
+      font-family:'Noto Serif TC', serif;
     }
+    .section-title i{ color:#8B8175; }
 
     .btn{
-      background:var(--text-main); color:#fff; border:none;
+      background:var(--primary); color:#fff; border:none;
       padding:14px; border-radius:var(--radius-S);
-      font-weight:600; width:100%; font-size:1rem; cursor:pointer;
+      font-weight:800; width:100%; font-size:1rem; cursor:pointer;
       transition:transform .1s;
     }
     .btn:active{ transform:scale(.98); }
-    .btn-outline{ background:transparent; border:2px solid var(--text-main); color:var(--text-main); }
+    .btn-outline{
+      background:transparent;
+      border:1.5px solid rgba(43,39,35,.35);
+      color:var(--primary);
+      font-weight:900;
+    }
 
     /* tabs */
     .user-tabs{
-      display:flex; gap:8px; margin-bottom:20px;
-      background:#E5E5EA; padding:4px; border-radius:14px;
+      display:flex; gap:8px; margin-bottom:16px;
+      background:rgba(233,225,214,.9); padding:4px; border-radius:14px;
     }
     .user-tab{
       flex:1; text-align:center; padding:10px 0; border-radius:10px;
-      font-weight:600; font-size:.9rem; color:var(--text-sec);
+      font-weight:800; font-size:.9rem; color:var(--ink2);
       cursor:pointer; transition:.2s;
     }
-    .user-tab.active{ background:#fff; color:var(--text-main); box-shadow:0 2px 8px rgba(0,0,0,.1); }
+    .user-tab.active{
+      background:#fff;
+      color:var(--primary);
+      box-shadow:0 6px 16px rgba(0,0,0,.10);
+    }
 
-    /* checklist grid */
+    /* checklist */
     .checklist-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
     .check-item{
-      background:#F2F2F7; border-radius:var(--radius-S);
-      padding:15px 5px; text-align:center; font-size:.85rem; font-weight:500;
+      background:rgba(255,255,255,.65);
+      border:1px solid rgba(233,225,214,.8);
+      border-radius:var(--radius-S);
+      padding:14px 6px;
+      text-align:center;
+      font-size:.85rem;
+      font-weight:700;
       display:flex; flex-direction:column; align-items:center; gap:8px;
-      cursor:pointer; border:2px solid transparent; transition:.2s;
+      cursor:pointer;
+      transition:.2s;
     }
-    .check-item i{ font-size:1.4rem; color:#C7C7CC; }
-    .check-item.checked{ background:#E8F5E9; border-color:#34C759; color:#2E7D32; }
+    .check-item i{ font-size:1.35rem; color:#B9B2AA; }
+    .check-item.checked{
+      background:rgba(232,245,233,.9);
+      border-color:rgba(52,199,89,.65);
+      color:#2E7D32;
+    }
     .check-item.checked i{ color:#34C759; }
 
-    /* 全員待辦（可勾選） */
+    /* 全員待辦 */
     .todo-li{
       display:flex; align-items:flex-start; gap:10px;
-      padding:10px 0; border-bottom:1px solid #eee;
+      padding:10px 0; border-bottom:1px solid rgba(233,225,214,.8);
     }
     .todo-li:last-child{ border-bottom:none; }
-    .todo-li input{ width:18px; height:18px; margin-top:2px; accent-color:var(--primary); }
-    .todo-title a{ color:inherit; text-decoration:none; font-weight:700; }
-    .todo-title span{ font-weight:700; }
-    .todo-note{ font-size:.85rem; color:var(--text-sec); margin-top:2px; }
+    .todo-li input{ width:18px; height:18px; margin-top:2px; accent-color:#8C6B43; }
+    .todo-title a{ color:inherit; text-decoration:none; font-weight:900; }
+    .todo-title span{ font-weight:900; }
+    .todo-note{ font-size:.85rem; color:var(--ink2); margin-top:4px; line-height:1.45; }
 
     /* date scroller */
     .date-scroller{
-      display:flex; gap:12px; overflow-x:auto; padding:10px 20px 20px;
+      display:flex; gap:12px; overflow-x:auto; padding:10px 20px 18px;
       margin:0 -20px; scrollbar-width:none;
     }
+    .date-scroller::-webkit-scrollbar{ display:none; }
     .date-chip{
-      flex:0 0 auto; background:#fff; border-radius:20px;
-      padding:12px 18px; text-align:center; min-width:92px;
-      box-shadow:0 4px 10px rgba(0,0,0,.05);
-      transition:.2s; cursor:pointer; border:2px solid transparent;
+      flex:0 0 auto;
+      background:rgba(255,255,255,.75);
+      border:1px solid rgba(233,225,214,.9);
+      border-radius:22px;
+      padding:12px 18px;
+      text-align:center;
+      min-width:96px;
+      box-shadow:0 10px 24px rgba(0,0,0,.08);
+      transition:.2s;
+      cursor:pointer;
     }
-    /* ✅ 日期大、Day小 */
-    .date-chip .day{ font-size:1.15rem; font-weight:900; letter-spacing:.3px; }
-    .date-chip .date{ font-size:.8rem; font-weight:800; color:var(--text-sec); margin-top:2px; }
-    .date-chip.active{ border-color:var(--primary); background:#F0F8FF; }
-    .date-chip.active .day{ color:var(--primary); }
+    .date-chip .day{
+      font-family:'Noto Serif TC', serif;
+      font-size:1.2rem; font-weight:900; letter-spacing:.3px;
+    }
+    .date-chip .date{
+      font-size:.78rem;
+      font-weight:900;
+      color:var(--ink2);
+      margin-top:2px;
+    }
+    .date-chip.active{
+      background:#fff;
+      border-color:rgba(176,138,91,.55);
+      box-shadow:0 14px 30px rgba(0,0,0,.10);
+    }
+    .date-chip.active .day{ color:#7D5B34; }
 
-    /* weather strip */
+    /* weather */
     .weather-strip{
-      display:flex; gap:20px; overflow-x:auto; padding-bottom:10px; margin-bottom:20px;
-      scrollbar-width:none; border-bottom:1px solid var(--divider);
+      display:flex; gap:20px; overflow-x:auto;
+      padding-bottom:10px; margin-bottom:14px;
+      scrollbar-width:none;
+      border-bottom:1px solid var(--divider);
     }
+    .weather-strip::-webkit-scrollbar{ display:none; }
     .weather-hour{ text-align:center; flex:0 0 auto; }
-    .w-time{ font-size:.8rem; color:var(--text-sec); margin-bottom:5px; }
-    .w-icon{ font-size:1.2rem; margin-bottom:5px; }
-    .w-temp{ font-weight:700; font-size:.9rem; }
+    .w-time{ font-size:.8rem; color:var(--ink2); margin-bottom:5px; font-weight:800; }
+    .w-icon{ font-size:1.15rem; margin-bottom:5px; color:#8B8175; }
+    .w-temp{ font-weight:900; font-size:.9rem; color:var(--primary); }
 
     /* timeline */
-    .timeline-item{ display:flex; gap:16px; margin-bottom:24px; cursor:pointer; }
+    .timeline-item{ display:flex; gap:16px; margin-bottom:18px; cursor:pointer; }
     .tl-time{
-      min-width:52px; font-family:'Roboto Mono', monospace;
-      font-weight:600; color:var(--text-sec); text-align:right; padding-top:2px;
+      min-width:56px;
+      font-family:'Roboto Mono', monospace;
+      font-weight:700;
+      color:var(--ink2);
+      text-align:right;
+      padding-top:6px;
     }
     .tl-content{
-      flex:1; background:#fff; border-radius:var(--radius-M); padding:16px;
-      box-shadow:0 2px 10px rgba(0,0,0,.03);
-      border:1px solid rgba(0,0,0,.02);
-      transition:transform .1s;
+      flex:1;
+      background:rgba(255,255,255,.78);
+      border:1px solid rgba(233,225,214,.9);
+      border-radius:var(--radius-M);
+      padding:16px 16px 14px;
+      box-shadow:0 14px 30px rgba(0,0,0,.07);
+      transition:transform .12s ease;
     }
-    .tl-content:active{ transform:scale(.98); background:#F9F9F9; }
+    .tl-content:active{ transform:scale(.985); }
+
     .tl-tag{
-      display:inline-block; padding:4px 8px; border-radius:6px;
-      font-size:.7rem; font-weight:700; margin-bottom:8px; text-transform:uppercase;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:.72rem;
+      font-weight:900;
+      letter-spacing:.12em;
+      margin-bottom:10px;
+      text-transform:uppercase;
+      background:#fff;
+      border:1px solid rgba(233,225,214,.95);
+      color:#6F6A62;
     }
-    .tag-food{ background:#FFF3E0; color:#FF9500; }
-    .tag-sight{ background:#E8F5E9; color:#34C759; }
-    .tag-transport{ background:#E5F1FB; color:#007AFF; }
-    .tag-hotel{ background:#F3E5F5; color:#9C27B0; }
-    .tag-shop{ background:#E3F2FD; color:#1565C0; }
+    .tl-tag::before{
+      content:'';
+      width:8px; height:8px;
+      border-radius:50%;
+      display:inline-block;
+      background:#B9B2AA;
+    }
+    .tag-food::before{ background:#D28A3A; }
+    .tag-sight::before{ background:#2F8F5B; }
+    .tag-transport::before{ background:#3D6EA9; }
+    .tag-hotel::before{ background:#7A4FA8; }
+    .tag-shop::before{ background:#2A6FA0; }
 
-    .tl-title{ font-size:1.1rem; font-weight:700; margin-bottom:4px; }
-    .tl-desc{ font-size:.9rem; color:var(--text-sec); line-height:1.4;
-      display:-webkit-box; -webkit-box-orient:vertical; overflow:hidden;
+    .tl-title{
+      font-family:'Noto Serif TC', serif;
+      font-size:1.15rem;
+      font-weight:900;
+      margin-bottom:6px;
+      letter-spacing:.2px;
+    }
+    .tl-desc{
+      font-size:.92rem;
+      color:var(--ink2);
+      line-height:1.5;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
     }
 
-    /* modal */
+    /* ===== Modal: bottom sheet ===== */
     .modal-overlay{
       position:fixed; inset:0;
-      background:rgba(0,0,0,.4); z-index:2000;
-      opacity:0; pointer-events:none; transition:opacity .3s;
+      background:rgba(0,0,0,.38);
+      z-index:2000;
+      opacity:0; pointer-events:none;
+      transition:opacity .2s ease;
     }
     .modal-sheet{
-      position:fixed; left:0; right:0; bottom:0;
-      height:85vh; background:#fff; z-index:2001;
-      border-radius:24px 24px 0 0;
-      transform:translateY(100%);
-      transition:transform .3s cubic-bezier(.16,1,.3,1);
-      display:flex; flex-direction:column; overflow:hidden;
+      position:fixed;
+      left:50%;
+      bottom:14px;
+      transform:translateX(-50%) translateY(120%);
+      width:min(760px, calc(100vw - 24px));
+      max-height:calc(100vh - 60px);
+      background:#FAF7F2;
+      z-index:2001;
+      border-radius:28px;
+      border:1px solid rgba(233,225,214,.95);
+      box-shadow:0 22px 60px rgba(0,0,0,.18);
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      transition:transform .18s cubic-bezier(.16,1,.3,1);
     }
     .modal-overlay.active{ opacity:1; pointer-events:auto; }
-    .modal-sheet.active{ transform:translateY(0); }
+    .modal-sheet.active{ transform:translateX(-50%) translateY(0); }
 
     .modal-drag-handle{
-      width:40px; height:5px; background:#E5E5EA; border-radius:10px;
-      margin:12px auto; flex-shrink:0;
+      width:44px; height:5px;
+      background:#D8CFC4;
+      border-radius:99px;
+      margin:10px auto 6px;
+      flex-shrink:0;
     }
-    .modal-scroll{ flex:1; overflow-y:auto; padding:0 24px 40px; -webkit-overflow-scrolling:touch; }
-    .modal-img{
-      width:100%; height:200px; object-fit:cover; border-radius:var(--radius-M);
-      margin-bottom:20px; background:#eee;
+    .modal-scroll{
+      flex:1;
+      overflow-y:auto;
+      padding:10px 18px 16px;
+      -webkit-overflow-scrolling:touch;
     }
-    .modal-title{ font-size:1.8rem; font-weight:900; margin:0 0 6px 0; }
-    .modal-subtitle{ color:var(--text-sec); font-size:.9rem; margin-bottom:6px; }
+    .modal-x{
+      position:absolute;
+      right:12px;
+      top:10px;
+      width:36px; height:36px;
+      border-radius:50%;
+      border:1px solid rgba(233,225,214,.95);
+      background:#fff;
+      font-size:20px;
+      cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      z-index:10;
+    }
 
-    .pill{
-      display:inline-flex; gap:6px; align-items:center;
-      padding:6px 10px; border-radius:999px; background:#F2F2F7;
-      font-size:.85rem; font-weight:700; color:#444; margin-right:8px; margin-bottom:10px;
+    .sheet-head{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:6px 2px 10px;
     }
+    .sheet-time{
+      font-family:'Noto Serif TC', serif;
+      font-size:1.12rem;
+      font-weight:900;
+      color:#2B2723;
+    }
+
+    .modal-title{
+      font-family:'Noto Serif TC', serif;
+      font-size:1.55rem;
+      font-weight:900;
+      line-height:1.18;
+      margin:0 0 10px 0;
+      letter-spacing:.2px;
+    }
+
+    .meta-box{
+      border-top:1px solid var(--divider);
+      border-bottom:1px solid var(--divider);
+      padding:10px 0;
+      margin:10px 0 12px;
+      color:var(--ink2);
+    }
+    .meta-row{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      padding:7px 0;
+      font-size:.95rem;
+      line-height:1.35;
+    }
+    .meta-ico{ width:22px; text-align:center; flex:0 0 auto; padding-top:1px; }
+    .meta-val{ flex:1; }
+
+    .mini-btn{
+      margin-left:auto;
+      border:1px solid rgba(233,225,214,.95);
+      background:#fff;
+      border-radius:10px;
+      padding:6px 10px;
+      cursor:pointer;
+      font-weight:900;
+      color:#5F5A52;
+      flex:0 0 auto;
+    }
+
+    .detail{
+      font-size:1rem;
+      color:#3A352E;
+      line-height:1.7;
+      white-space:pre-wrap;
+    }
+
+    .pill-row{ margin:8px 0 4px; display:flex; flex-wrap:wrap; gap:8px; }
+    .pill{
+      display:inline-flex;
+      gap:6px; align-items:center;
+      padding:7px 10px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid rgba(233,225,214,.95);
+      font-size:.86rem;
+      font-weight:900;
+      color:#5F5A52;
+    }
+    .pill i{ color:#8B8175; }
 
     .block{
-      background:#F2F2F7; padding:14px; border-radius:var(--radius-M);
-      margin:14px 0;
+      background:rgba(255,255,255,.72);
+      border:1px solid rgba(233,225,214,.85);
+      padding:14px;
+      border-radius:var(--radius-M);
+      margin:12px 0;
     }
-    .block h4{ margin:0 0 10px; font-size:1rem; }
+    .block h4{
+      margin:0 0 10px;
+      font-size:1rem;
+      font-weight:900;
+      color:#2B2723;
+      font-family:'Noto Serif TC', serif;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
     .bullet{ margin:0; padding-left:18px; line-height:1.7; color:#444; }
+
     .menu-recommend{
-      background:#FFF8E1; border:1px solid #FFECB3;
-      padding:15px; border-radius:var(--radius-M); margin:14px 0;
+      background:#FFF8E1;
+      border:1px solid #FFECB3;
+      padding:15px;
+      border-radius:var(--radius-M);
+      margin:12px 0;
     }
-    .menu-item{ display:flex; justify-content:space-between; gap:12px; padding:6px 0; border-bottom:1px dashed #FFE082; }
+    .menu-item{
+      display:flex; justify-content:space-between; gap:12px;
+      padding:6px 0;
+      border-bottom:1px dashed #FFE082;
+    }
     .menu-item:last-child{ border-bottom:none; }
-    .jp-text{ font-weight:800; color:#5D4037; }
+    .jp-text{ font-weight:900; color:#5D4037; }
+
+    .sheet-actions{
+      position:sticky;
+      bottom:0;
+      padding:10px 0 2px;
+      background:linear-gradient(to top, #FAF7F2 70%, rgba(250,247,242,0));
+    }
+    .btn-primary{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:10px;
+      width:100%;
+      height:50px;
+      border-radius:16px;
+      border:1px solid rgba(176,138,91,.55);
+      background:#fff;
+      font-weight:900;
+      text-decoration:none;
+      color:#2B2723;
+    }
 
     /* bottom nav */
     .bottom-nav{
       position:fixed; bottom:20px; left:20px; right:20px;
-      background:rgba(255,255,255,.9); backdrop-filter:blur(20px);
-      border-radius:30px; display:flex; justify-content:space-around;
-      padding:14px 0; box-shadow:0 10px 40px rgba(0,0,0,.1);
-      z-index:1000; border:1px solid rgba(255,255,255,.5);
+      background:rgba(255,255,255,.72);
+      backdrop-filter:blur(20px);
+      border-radius:30px;
+      display:flex;
+      justify-content:space-around;
+      padding:14px 0;
+      box-shadow:0 16px 50px rgba(0,0,0,.13);
+      z-index:1000;
+      border:1px solid rgba(233,225,214,.9);
     }
-    .nav-item{ text-align:center; color:#C7C7CC; font-size:.7rem; cursor:pointer; flex:1; transition:.2s; }
-    .nav-item i{ display:block; font-size:1.4rem; margin-bottom:4px; }
-    .nav-item.active{ color:var(--text-main); transform:translateY(-2px); }
+    .nav-item{ text-align:center; color:#B9B2AA; font-size:.7rem; cursor:pointer; flex:1; transition:.2s; }
+    .nav-item i{ display:block; font-size:1.35rem; margin-bottom:4px; }
+    .nav-item.active{ color:#2B2723; transform:translateY(-2px); }
 
-    /* hotel card */
-    .hotel-img-cover{ height:180px; width:100%; object-fit:cover; border-radius:var(--radius-M); margin-bottom:15px; }
-    .tag-alert{
-      display:inline-block; background:#FFEBEE; color:#D32F2F;
-      padding:4px 8px; border-radius:6px; font-size:.8rem; font-weight:700; margin-top:8px;
-    }
-
-    /* ✅ 登機證樣式 */
+    /* boarding */
     .boarding{
-      background:#fff; border-radius:var(--radius-L);
-      box-shadow:var(--shadow); overflow:hidden; margin-bottom:18px;
-      border:1px solid rgba(0,0,0,.04);
+      background:rgba(255,255,255,.76);
+      border-radius:var(--radius-L);
+      box-shadow:var(--shadow-soft);
+      overflow:hidden; margin-bottom:18px;
+      border:1px solid rgba(233,225,214,.9);
+      backdrop-filter: blur(10px);
     }
     .boarding-top{
       padding:18px 18px 14px;
-      background:linear-gradient(135deg, rgba(0,122,255,.12), rgba(52,199,89,.10));
+      background:linear-gradient(135deg, rgba(176,138,91,.16), rgba(43,39,35,.06));
     }
     .boarding-top .row{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
     .boarding-badge{
       display:inline-flex; align-items:center; gap:8px;
-      padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.7);
-      font-weight:800; font-size:.85rem;
+      padding:6px 10px; border-radius:999px;
+      background:rgba(255,255,255,.75);
+      font-weight:900; font-size:.85rem;
+      border:1px solid rgba(233,225,214,.9);
     }
     .boarding-mid{
       padding:14px 18px;
       display:flex; justify-content:space-between; align-items:center;
-      border-top:1px dashed #E5E5EA;
+      border-top:1px dashed rgba(233,225,214,.95);
     }
-    .code{ font-size:2.1rem; font-weight:1000; color:var(--primary); letter-spacing:1px; }
-    .t{ color:var(--text-sec); font-size:.9rem; margin-top:2px; }
+    .code{
+      font-family:'Noto Serif TC', serif;
+      font-size:2.0rem;
+      font-weight:900;
+      color:#7D5B34;
+      letter-spacing:1px;
+    }
+    .t{ color:var(--ink2); font-size:.9rem; margin-top:2px; font-weight:800; }
     .boarding-bottom{
       padding:14px 18px;
-      border-top:1px solid #F0F0F0;
+      border-top:1px solid rgba(233,225,214,.7);
       display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
-      color:var(--text-sec); font-size:.9rem;
+      color:var(--ink2); font-size:.9rem;
+      font-weight:800;
     }
   </style>
 </head>
@@ -265,7 +508,6 @@
 
   <!-- 行前 -->
   <div id="page-pre" class="page">
-    <!-- ✅ 全員重要待辦（移到上面） -->
     <div class="card">
       <div class="section-title"><i class="fas fa-bullhorn"></i> 全員重要待辦</div>
       <ul id="globalTodoList" style="list-style:none; padding:0; margin:0;"></ul>
@@ -275,13 +517,13 @@
       <div class="section-title"><i class="fas fa-clipboard-user"></i> 個人清單</div>
       <div class="user-tabs" id="userSwitch"></div>
 
-      <h4 style="margin:10px 0 10px; color:var(--text-sec);">旅行前</h4>
+      <h4 style="margin:10px 0 10px; color:var(--ink2); font-weight:900;">旅行前</h4>
       <div class="checklist-grid" id="list-pretrip"></div>
 
-      <h4 style="margin:10px 0 10px; color:var(--text-sec);">隨身行李</h4>
+      <h4 style="margin:10px 0 10px; color:var(--ink2); font-weight:900;">隨身行李</h4>
       <div class="checklist-grid" id="list-carry"></div>
 
-      <h4 style="margin:20px 0 10px; color:var(--text-sec);">託運行李</h4>
+      <h4 style="margin:20px 0 10px; color:var(--ink2); font-weight:900;">託運行李</h4>
       <div class="checklist-grid" id="list-check"></div>
     </div>
   </div>
@@ -290,14 +532,14 @@
   <div id="page-itinerary" class="page active">
     <div class="date-scroller" id="dayScroller"></div>
 
-    <div class="card" style="margin-top: 20px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+    <div class="card" style="margin-top: 18px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
         <div class="section-title" style="margin:0;"><i class="fas fa-cloud-sun"></i> 24H 預報</div>
-        <span id="weatherLoc" style="font-size:0.9rem; color:var(--text-sec);"></span>
+        <span id="weatherLoc" style="font-size:0.9rem; color:var(--ink2); font-weight:900;"></span>
       </div>
       <div class="weather-strip" id="weatherStrip"></div>
-      <div style="text-align:right; font-size:0.8rem; color:var(--text-sec);">
-        今晚住宿：<strong id="stayHotelName" style="color:var(--text-main);"></strong>
+      <div style="text-align:right; font-size:0.86rem; color:var(--ink2); font-weight:800;">
+        今晚住宿：<strong id="stayHotelName" style="color:var(--primary);"></strong>
       </div>
     </div>
 
@@ -318,10 +560,10 @@
     <div class="card">
       <div class="section-title">新增支出</div>
       <div style="display:flex; gap:10px; margin-bottom:15px;">
-        <input type="text" id="exName" placeholder="項目 (例: 晚餐)" style="padding:12px; border:1px solid #ddd; border-radius:12px; flex:1;">
-        <input type="number" id="exCost" placeholder="金額 (¥)" style="padding:12px; border:1px solid #ddd; border-radius:12px; width:110px;">
+        <input type="text" id="exName" placeholder="項目 (例: 晚餐)" style="padding:12px; border:1px solid rgba(233,225,214,.9); border-radius:14px; flex:1; background:rgba(255,255,255,.8);">
+        <input type="number" id="exCost" placeholder="金額 (¥)" style="padding:12px; border:1px solid rgba(233,225,214,.9); border-radius:14px; width:110px; background:rgba(255,255,255,.8);">
       </div>
-      <div class="user-tabs" id="payerSwitch" style="background:white; margin-bottom:15px;"></div>
+      <div class="user-tabs" id="payerSwitch" style="background:rgba(233,225,214,.9); margin-bottom:15px;"></div>
       <button class="btn" onclick="addExpense()">加入紀錄 (平分)</button>
     </div>
 
@@ -338,8 +580,9 @@
 
   <!-- modal -->
   <div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
-  <div class="modal-sheet" id="modalSheet">
+  <div class="modal-sheet" id="modalSheet" role="dialog" aria-modal="true">
     <div class="modal-drag-handle"></div>
+    <button class="modal-x" onclick="closeModal()" aria-label="close">×</button>
     <div class="modal-scroll" id="modalContent"></div>
   </div>
 
@@ -361,8 +604,8 @@
   let checklistData = { carry: [], check: [] };
   let hotels = [];
   let itineraryIndex = [];
-  let dayCache = {};               // 每日 json 快取
-  let currentDayData = null;       // 目前選到的 day json（給 openModal 用）
+  let dayCache = {};
+  let currentDayData = null;
   let currentDayIdx = 0;
 
   // ====== Load Data ======
@@ -384,7 +627,6 @@
     hotels = HOTELS || [];
     itineraryIndex = ITINERARY || [];
 
-    // header
     document.getElementById('hdrTitle').innerText = CONFIG?.trip_title || '2026 四國巡禮';
     const sub = `${CONFIG?.days || 9}天${CONFIG?.nights || 8}夜${CONFIG?.mode ? CONFIG.mode : ''} • ${users.join(', ')}`;
     document.getElementById('hdrSub').innerText = sub;
@@ -410,7 +652,7 @@
     window.scrollTo(0,0);
   }
 
-  // ====== 全員待辦（JSON + 勾選 + link 無藍線） ======
+  // ====== 全員待辦 ======
   function renderGlobalTodos(){
     const el = document.getElementById('globalTodoList');
     if(!el) return;
@@ -421,8 +663,8 @@
       const checked = saved[key] ? 'checked' : '';
 
       const titleHTML = t.link
-        ? `<div class="todo-title"><a href="${t.link}" target="_blank">${t.title}</a></div>`
-        : `<div class="todo-title"><span>${t.title}</span></div>`;
+        ? `<div class="todo-title"><a href="${t.link}" target="_blank" rel="noopener">${escapeHtml(t.title)}</a></div>`
+        : `<div class="todo-title"><span>${escapeHtml(t.title)}</span></div>`;
 
       return `
         <li class="todo-li">
@@ -437,7 +679,6 @@
   }
 
   function toggleGlobalTodo(key){
-    // key 可能含特殊字元，用 unescape 處理
     const k = unescapeHtml(key);
     const saved = JSON.parse(localStorage.getItem('global_todos')) || {};
     saved[k] = !saved[k];
@@ -453,7 +694,6 @@
   function switchUser(u) { curUser = u; renderUserTabs(); renderChecklists(); }
 
   function iconForItem(item){
-    // 你要不同 icon，就在這裡加規則
     if(item.includes('護照')) return 'fa-passport';
     if(item.includes('手機')) return 'fa-mobile-screen';
     if(item.includes('行動電源') || item.includes('充電')) return 'fa-battery-full';
@@ -467,22 +707,21 @@
   function renderChecklists() {
     const data = JSON.parse(localStorage.getItem('check_'+curUser)) || {};
 
-    // ✅ 支援新類型 pretrip + 舊類型 carry/check
     ['pretrip','carry','check'].forEach(type => {
-        const target = document.getElementById('list-'+type);
-        if(!target) return; // 沒有該容器就跳過（保證不會報錯）
+      const target = document.getElementById('list-'+type);
+      if(!target) return;
 
-        target.innerHTML = (checklistData[type] || []).map(item => {
+      target.innerHTML = (checklistData[type] || []).map(item => {
         const isChecked = data[item] ? 'checked' : '';
         const icon = iconForItem(item);
         return `
-            <div class="check-item ${isChecked}" onclick="toggleCheck('${escapeHtml(item)}', this)">
+          <div class="check-item ${isChecked}" onclick="toggleCheck('${escapeHtml(item)}', this)">
             <i class="fas ${icon}"></i>
             <span>${escapeHtml(item)}</span>
-            </div>`;
-        }).join('');
+          </div>`;
+      }).join('');
     });
-    }
+  }
 
   function toggleCheck(itemEscaped, el) {
     const item = unescapeHtml(itemEscaped);
@@ -494,15 +733,12 @@
 
   // ====== 行程 ======
   function renderDateScroller() {
-    document.getElementById('dayScroller').innerHTML = itineraryIndex.map((d, i) => {
-      // ✅ 日期固定 02/27 格式（JSON 已是 02/27）
-      return `
-        <div class="date-chip" id="chip-${i}" onclick="selectDay(${i})">
-          <div class="day">${escapeHtml(d.date || '')}</div>
-          <div class="date">Day ${i+1} • ${escapeHtml(d.day || '')}</div>
-        </div>
-      `;
-    }).join('');
+    document.getElementById('dayScroller').innerHTML = itineraryIndex.map((d, i) => `
+      <div class="date-chip" id="chip-${i}" onclick="selectDay(${i})">
+        <div class="day">${escapeHtml(d.date || '')}</div>
+        <div class="date">Day ${i+1} • ${escapeHtml(d.day || '')}</div>
+      </div>
+    `).join('');
   }
 
   function tagClass(tag){
@@ -525,27 +761,21 @@
     const meta = itineraryIndex[idx];
     if(!meta) return;
 
-    // 顯示地點
     document.getElementById('weatherLoc').innerText = meta.loc || '';
-
-    // 顯示住宿
     const h = hotels.find(x => x.id === meta.hotel_id);
     document.getElementById('stayHotelName').innerText = h ? h.name : '';
 
-    // 讀取每日 json（有快取就不重抓）
     if(!dayCache[idx]) {
-      const url = `./${meta.file}?v=${Date.now()}`; // v=... 避免 CDN 快取造成看不到更新
+      const url = `./${meta.file}?v=${Date.now()}`;
       const raw = await fetch(url).then(r => r.json());
-      // ✅ 這行是重點：支援你的 daily json 最外層是 []
       dayCache[idx] = Array.isArray(raw) ? raw[0] : raw;
     }
     const dayData = dayCache[idx];
     currentDayData = dayData;
 
-    // timeline
     document.getElementById('timelineList').innerHTML = (dayData?.items || []).map((item, i) => `
       <div class="timeline-item" onclick='openModal(${i})'>
-        <div class="tl-time">${escapeHtml(item.time || '')}</div>
+        <div class="tl-time">${escapeHtml(item.time || '—')}</div>
         <div class="tl-content">
           <div class="tl-tag ${tagClass(item.tag)}">${escapeHtml((item.tag||'').toUpperCase())}</div>
           <div class="tl-title">${escapeHtml(item.title || '')}</div>
@@ -554,7 +784,7 @@
       </div>
     `).join('');
 
-    // mock weather（保留你原本的）
+    // mock weather
     let weatherHTML = '';
     for(let h=9; h<=21; h++) {
       let icon = 'fa-sun';
@@ -564,24 +794,34 @@
       weatherHTML += `
         <div class="weather-hour">
           <div class="w-time">${h}:00</div>
-          <div class="w-icon"><i class="fas ${icon}" style="color:${icon==='fa-sun'?'#FF9500':'#8E8E93'}"></i></div>
+          <div class="w-icon"><i class="fas ${icon}"></i></div>
           <div class="w-temp">${temp}°</div>
         </div>`;
     }
     document.getElementById('weatherStrip').innerHTML = weatherHTML;
   }
 
+  // ====== Google 導航：優先 geo，其次 addr/title ======
+  function buildGoogleNavUrl(item){
+    const hasGeo = item?.geo?.lat != null && item?.geo?.lng != null;
+    if(hasGeo){
+      return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(item.geo.lat + ',' + item.geo.lng)}`;
+    }
+    const q = (item?.addr || item?.title || '').trim();
+    if(!q) return 'https://www.google.com/maps';
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
+  }
 
-  // ====== Modal（導遊模式 + 防背景滑動） ======
+  // ====== Modal：預計到達/地址/停車/Mapcode/介紹 + Google 導航 ======
   function openModal(itemIdx) {
     const item = currentDayData?.items?.[itemIdx];
     if(!item) return;
 
     const content = document.getElementById('modalContent');
 
-    const mapcode = item.mapcode ? `<span class="pill"><i class="fas fa-location-dot"></i> Mapcode：${escapeHtml(item.mapcode)}</span>` : '';
     const hours = item.hours ? `<span class="pill"><i class="fas fa-clock"></i> ${escapeHtml(item.hours)}</span>` : '';
     const price = item.price ? `<span class="pill"><i class="fas fa-ticket"></i> ${escapeHtml(item.price)}</span>` : '';
+    const stay  = item.stay  ? `<span class="pill"><i class="fas fa-hourglass-half"></i> ${escapeHtml(item.stay)}</span>` : '';
 
     const guideList = (item.guide || []).length
       ? `<div class="block"><h4><i class="fas fa-headset"></i> 導遊介紹</h4><ul class="bullet">${item.guide.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul></div>`
@@ -593,37 +833,88 @@
 
     const menuBlock = (item.menu || []).length
       ? `<div class="menu-recommend">
-          <div style="font-weight:800; margin-bottom:10px; color:#F57C00;"><i class="fas fa-thumbs-up"></i> 必吃菜單（中日對照）</div>
+          <div style="font-weight:900; margin-bottom:10px; color:#8C6B43;"><i class="fas fa-thumbs-up"></i> 必吃菜單（中日對照）</div>
           ${(item.menu||[]).map(m=>`
             <div class="menu-item">
               <span class="jp-text">${escapeHtml(m.jp || '')}</span>
-              <span style="font-size:.9rem; color:#666;">${escapeHtml(m.zh || '')}</span>
+              <span style="font-size:.9rem; color:#666; font-weight:800;">${escapeHtml(m.zh || '')}</span>
             </div>`).join('')}
         </div>`
       : '';
 
     const detailText = item.detail || item.desc || '';
 
-    content.innerHTML = `
-      ${item.img ? `<img src="${escapeHtml(item.img)}" class="modal-img">` : ''}
-      <div class="modal-subtitle">${escapeHtml(item.time || '')} • ${(item.tag||'').toUpperCase()}</div>
-      <div class="modal-title">${escapeHtml(item.title || '')}</div>
+    // ✅ 你要的欄位（eta/arrive/arrival 皆可）
+    const eta = item.eta || item.arrive || item.arrival || '';
+    const addr = item.addr || '';
+    const parking = item.parking || '';
+    const mapcode = item.mapcode || '';
 
-      <div style="margin:8px 0 6px;">
-        ${mapcode}${hours}${price}
+    const navUrl = buildGoogleNavUrl(item);
+
+    content.innerHTML = `
+      <div class="sheet-head">
+        <div class="tl-tag ${tagClass(item.tag)}">${escapeHtml((item.tag||'').toUpperCase())}</div>
+        <div class="sheet-time"><i class="fa-regular fa-clock" style="color:#8B8175; margin-right:6px;"></i>${escapeHtml(item.time || '—')}</div>
       </div>
 
-      <p style="line-height:1.7; color:#444; margin:10px 0 0;">${escapeHtml(detailText)}</p>
+      <div class="modal-title">${escapeHtml(item.title || '')}</div>
+
+      <div class="pill-row">
+        ${hours}${price}${stay}
+      </div>
+
+      <div class="meta-box">
+        ${eta ? `
+        <div class="meta-row">
+          <span class="meta-ico">⏱️</span>
+          <span class="meta-val">預計到達：${escapeHtml(eta)}</span>
+          <button class="mini-btn" onclick="copyText('${escapeHtml(eta)}')">複製</button>
+        </div>` : ''}
+
+        ${addr ? `
+        <div class="meta-row">
+          <span class="meta-ico">📍</span>
+          <span class="meta-val">${escapeHtml(addr)}</span>
+          <button class="mini-btn" onclick="copyText('${escapeHtml(addr)}')">複製</button>
+        </div>` : ''}
+
+        ${parking ? `
+        <div class="meta-row">
+          <span class="meta-ico">🅿️</span>
+          <span class="meta-val">${escapeHtml(parking)}</span>
+          <button class="mini-btn" onclick="copyText('${escapeHtml(parking)}')">複製</button>
+        </div>` : ''}
+
+        ${mapcode ? `
+        <div class="meta-row">
+          <span class="meta-ico">🧭</span>
+          <span class="meta-val">Mapcode：${escapeHtml(mapcode)}</span>
+          <button class="mini-btn" onclick="copyText('${escapeHtml(mapcode)}')">複製</button>
+        </div>` : ''}
+
+        ${(!eta && !addr && !parking && !mapcode) ? `
+        <div class="meta-row">
+          <span class="meta-ico">ℹ️</span>
+          <span class="meta-val">（此行程尚未填：到達/地址/停車/Mapcode）</span>
+        </div>` : ''}
+      </div>
+
+      <div class="detail">${escapeHtml(detailText)}</div>
 
       ${menuBlock}
       ${avoidList}
       ${guideList}
 
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px;">
         <button class="btn btn-outline" onclick="copyText('${escapeHtml(item.title || '')}')">複製名稱</button>
-        ${item.mapcode
-          ? `<button class="btn" onclick="copyText('${escapeHtml(item.mapcode)}')">複製 Mapcode</button>`
-          : `<button class="btn" onclick="openMap('${escapeHtml(item.title || '')}')">Google 導航</button>`}
+        <button class="btn btn-outline" onclick="openUrl('${escapeHtml(navUrl)}')">Google 導航</button>
+      </div>
+
+      <div class="sheet-actions">
+        <a class="btn-primary" href="${navUrl}" target="_blank" rel="noopener">
+          <i class="fas fa-location-arrow"></i> 開啟 Google Maps 導航
+        </a>
       </div>
     `;
 
@@ -632,46 +923,40 @@
     document.getElementById('modalSheet').classList.add('active');
   }
 
-
   function closeModal() {
     document.getElementById('modalOverlay').classList.remove('active');
     document.getElementById('modalSheet').classList.remove('active');
     document.body.classList.remove('body-no-scroll');
   }
 
-  function copyText(txt) {
-    navigator.clipboard.writeText(txt);
-    alert('已複製：' + txt);
-  }
-  function openMap(q) {
-    window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`);
+  function openUrl(url){
+    window.open(url, '_blank', 'noopener');
   }
 
-  // ====== 住宿 ======
+  // ====== 住宿/航班/記帳（沿用你原本邏輯） ======
   function renderHotels() {
-    document.getElementById('hotelList').innerHTML = hotels.map(h => {
+    document.getElementById('hotelList').innerHTML = (HOTELS || []).map(h => {
       const dateText = h.stay ? `${h.stay.from} - ${h.stay.to}` : '';
       const img = (h.images && h.images[0]) ? h.images[0]
         : "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=900";
 
       return `
         <div class="card" style="padding:0; overflow:hidden;">
-          <img src="${escapeHtml(img)}" class="hotel-img-cover">
+          <img src="${escapeHtml(img)}" style="height:180px; width:100%; object-fit:cover; border-radius:20px; margin-bottom:0;">
           <div style="padding:20px;">
-            <h3 style="margin:0 0 6px;">${escapeHtml(h.name || '')}</h3>
-            <div style="color:var(--text-sec); font-size:0.9rem; margin-bottom:10px;">${escapeHtml(dateText)}</div>
-            <div style="font-size:0.9rem; line-height:1.6; color:#444;">
+            <h3 style="margin:0 0 6px; font-family:'Noto Serif TC',serif; font-weight:900;">${escapeHtml(h.name || '')}</h3>
+            <div style="color:var(--ink2); font-size:0.9rem; margin-bottom:10px; font-weight:800;">${escapeHtml(dateText)}</div>
+            <div style="font-size:0.95rem; line-height:1.6; color:#444; font-weight:700;">
               ${escapeHtml(h.desc || '')}
             </div>
-            ${h.mapcode ? `<div class="tag-alert">Mapcode: ${escapeHtml(h.mapcode)}</div>` : ''}
-            <button class="btn btn-outline" style="margin-top:15px;" onclick="openMap('${escapeHtml(h.name || '')}')">導航</button>
+            ${h.mapcode ? `<div style="display:inline-block;background:rgba(255,235,238,.92);color:#B42318;padding:6px 10px;border-radius:999px;font-size:.82rem;font-weight:900;margin-top:10px;border:1px solid rgba(180,35,24,.15);">Mapcode: ${escapeHtml(h.mapcode)}</div>` : ''}
+            <button class="btn btn-outline" style="margin-top:15px;" onclick="openUrl('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(h.name || '')}')">導航</button>
           </div>
         </div>
       `;
     }).join('');
   }
 
-  // ====== 航班（登機證樣式） ======
   function renderFlights(){
     const el = document.getElementById('flightBoard');
     const out = FLIGHTS?.outbound;
@@ -689,9 +974,9 @@
           <div class="boarding-top">
             <div class="row">
               <div class="boarding-badge"><i class="fas fa-plane"></i> ${escapeHtml(label)}</div>
-              <div style="font-weight:800; color:#333;">${escapeHtml(f.flight_no || '')}</div>
+              <div style="font-weight:900; color:#333;">${escapeHtml(f.flight_no || '')}</div>
             </div>
-            <div style="margin-top:8px; color:var(--text-sec); font-weight:700;">${escapeHtml(carrier)} • ${escapeHtml(f.aircraft || '')}</div>
+            <div style="margin-top:8px; color:var(--ink2); font-weight:800;">${escapeHtml(carrier)} • ${escapeHtml(f.aircraft || '')}</div>
           </div>
 
           <div class="boarding-mid">
@@ -699,7 +984,7 @@
               <div class="code">${escapeHtml(f.from?.code || '')}</div>
               <div class="t">${escapeHtml(f.from?.city || '')} • ${escapeHtml(f.depart_time || '')} ${escapeHtml(terminal)}</div>
             </div>
-            <i class="fas fa-arrow-right" style="color:#C7C7CC; font-size:1.2rem;"></i>
+            <i class="fas fa-arrow-right" style="color:#B9B2AA; font-size:1.1rem;"></i>
             <div style="text-align:right;">
               <div class="code">${escapeHtml(f.to?.code || '')}</div>
               <div class="t">${escapeHtml(f.to?.city || '')} • ${escapeHtml(f.arrive_time || '')}</div>
@@ -716,23 +1001,22 @@
     }).join('');
   }
 
-  // ====== 記帳 ======
+  // 記帳：沿用你原版（只有視覺已套入上方 CSS）
   let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-
   function renderExpenseUI() {
     document.getElementById('payerSwitch').innerHTML = users.map(u =>
       `<div class="user-tab ${u===curPayer?'active':''}" onclick="curPayer='${u}'; renderExpenseUI();">${u}</div>`
     ).join('');
 
     document.getElementById('expenseList').innerHTML = expenses.map((e,i) => `
-      <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #eee;">
+      <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid rgba(233,225,214,.8);">
         <div>
-          <div style="font-weight:600;">${escapeHtml(e.name)}</div>
-          <div style="font-size:0.8rem; color:#888;">${escapeHtml(e.payer)} 付款</div>
+          <div style="font-weight:900;">${escapeHtml(e.name)}</div>
+          <div style="font-size:0.8rem; color:var(--ink2); font-weight:800;">${escapeHtml(e.payer)} 付款</div>
         </div>
         <div style="text-align:right;">
-          <div style="font-weight:800;">¥${escapeHtml(String(e.cost))}</div>
-          <div style="font-size:0.8rem; color:red; cursor:pointer;" onclick="delExp(${i})">刪除</div>
+          <div style="font-weight:900;">¥${escapeHtml(String(e.cost))}</div>
+          <div style="font-size:0.8rem; color:#B42318; cursor:pointer; font-weight:900;" onclick="delExp(${i})">刪除</div>
         </div>
       </div>
     `).join('');
@@ -750,8 +1034,8 @@
 
     document.getElementById('debtList').innerHTML = users.map(u => {
       let val = Math.round(bal[u]);
-      let color = val>=0 ? '#34C759' : '#FF3B30';
-      return `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee;">
+      let color = val>=0 ? '#2F8F5B' : '#B42318';
+      return `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(233,225,214,.8); font-weight:900;">
         <span>${escapeHtml(u)}</span>
         <span style="color:${color}; font-weight:900;">${val>=0?'收':'付'} ¥${Math.abs(val)}</span>
       </div>`;
@@ -777,14 +1061,13 @@
     }
   }
 
-  // ====== utils ======
+  // utils
   function escapeHtml(str){
     return String(str ?? '').replace(/[&<>"']/g, m => ({
       '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
     }[m]));
   }
   function unescapeHtml(str){
-    // 只處理我們 escape 的幾個
     return String(str ?? '')
       .replaceAll('&amp;','&')
       .replaceAll('&lt;','<')
@@ -792,9 +1075,12 @@
       .replaceAll('&quot;','"')
       .replaceAll('&#39;',"'");
   }
+  function copyText(txt) {
+    navigator.clipboard.writeText(txt);
+    alert('已複製：' + txt);
+  }
 
   function mmdd(iso){
-    // "2026-02-27" -> "02/27"
     if(!iso) return '';
     const m = String(iso).slice(5,7);
     const d = String(iso).slice(8,10);
