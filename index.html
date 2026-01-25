@@ -311,6 +311,7 @@
       overflow-y:auto;
       padding:10px 18px 16px;
       -webkit-overflow-scrolling:touch;
+      overscroll-behavior: contain; /* Android/新 iOS 有效：避免滾動鏈 */
     }
     .modal-x{
       position:absolute;
@@ -512,13 +513,66 @@
       color:var(--ink2); font-size:.9rem;
       font-weight:800;
     }
-    /* ===== Route strip (transport as slim bar) ===== */
-    .route-item{
+    /* ===== Route strip (for drive/walk/train/flight/boat) ===== */
+    .route-strip{
       display:flex;
+      gap:14px;
       align-items:center;
-      gap:12px;
-      margin:8px 0 18px;
-      padding-left:68px; /* 對齊時間欄位 + gap */
+      padding:16px 18px;
+      border-radius:18px;
+      background:#F2F2F7;
+      border:1px solid rgba(0,0,0,.04);
+      box-shadow:0 6px 18px rgba(0,0,0,.06);
+      margin:8px 0 14px;
+    }
+    .route-ico{
+      width:44px; height:44px;
+      border-radius:16px;
+      display:flex; align-items:center; justify-content:center;
+      background:#EAF2FF;
+      flex:0 0 auto;
+    }
+    .route-ico i{ font-size:18px; color:var(--primary); }
+
+    .route-main{ flex:1; min-width:0; }
+    .route-title{
+      font-weight:900;
+      font-size:1.02rem;
+      letter-spacing:-.2px;
+      margin:0;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .route-sub{
+      margin-top:4px;
+      color:var(--text-sec);
+      font-weight:700;
+      font-size:.9rem;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    /* duration / stay pill */
+    .stay-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      margin-top:12px;
+      background:#ECECF0;
+      color:#333;
+      padding:8px 12px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:.95rem;
+    }
+    .stay-pill i{ color:#8E8E93; }
+
+    /* time column better for mobile */
+    .tl-time{
+      min-width:56px;
+      font-size:1rem;
     }
 
     .route-pill{
@@ -586,6 +640,21 @@
     .route-pill:active{
       transform:scale(.99);
     }
+    /* ===== Mobile layout guard ===== */
+    .page, .app-header{
+      max-width: 520px;
+      margin-left:auto;
+      margin-right:auto;
+    }
+
+    .bottom-nav{
+      padding-bottom: calc(14px + env(safe-area-inset-bottom));
+    }
+
+    body{
+      padding-bottom: calc(110px + env(safe-area-inset-bottom));
+    }
+
   </style>
 </head>
 
@@ -733,6 +802,13 @@
     renderExpenseUI();
   });
 
+  document.getElementById('modalOverlay')?.addEventListener(
+    'touchmove',
+    (e) => e.preventDefault(),
+    { passive: false }
+  );
+
+
   function nav(pageId, el) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-'+pageId).classList.add('active');
@@ -839,29 +915,6 @@
     if(t==='shop') return 'tag-shop';
     return 'tag-transport';
   }
-  function renderRouteStrip(item, i){
-    const r = item.route || {};
-    const from = r.from || '';
-    const to = r.to || '';
-    const mins = r.minutes ? `${r.minutes} 分` : (item.stay || '');
-    const title = item.title || `開車：${from} → ${to}`;
-    const sub = (from && to) ? `${from} → ${to}` : (item.desc || '');
-
-    return `
-      <div class="route-item" onclick="openModal(${i})">
-        <div class="route-pill">
-          <div class="route-left">
-            <div class="route-icon"><i class="fas fa-car"></i></div>
-            <div class="route-text">
-              <div class="route-title">${escapeHtml(title)}</div>
-              <div class="route-sub">${escapeHtml(sub)}</div>
-            </div>
-          </div>
-          <div class="route-right">${escapeHtml(mins || '')}</div>
-        </div>
-      </div>
-    `;
-  }
   function durationChip(item){
     // 1) 優先顯示 stay（你 JSON 已經有）
     const stay = (item.stay || '').trim();
@@ -873,6 +926,70 @@
 
     return '';
   }
+  function normalizeTime(t){
+    // 只取 HH:MM（避免 Before 05:00 / 13:20-13:45 破版）
+    const s = String(t ?? '').trim();
+    const m = s.match(/(\d{1,2}:\d{2})/);
+    if(m) return m[1].padStart(5,'0');
+    if(s === '—' || s === '-' || !s) return '—';
+    return s; // 真的不是時間就原樣（但建議 json 就別放這種）
+  }
+
+  function routeIcon(mode){
+    const m = (mode||'').toLowerCase();
+    if(m==='drive') return 'fa-car';
+    if(m==='walk')  return 'fa-person-walking';
+    if(m==='train') return 'fa-train-subway';
+    if(m==='ship')  return 'fa-ship';
+    if(m==='plane') return 'fa-plane';
+    return 'fa-route';
+  }
+
+  function renderRouteStrip(item, i){
+    const r = item.route || {};
+    const mode = (r.mode || 'route').toLowerCase();
+    const icon = routeIcon(mode);
+    const mins = r.minutes ? `${r.minutes} min` : (item.stay || '');
+    const line2 = `${r.from || ''} → ${r.to || ''}`.trim();
+
+    return `
+      <div class="timeline-item" onclick="openModal(${i})">
+        <div class="tl-time">${escapeHtml(item.time || '')}</div>
+        <div class="tl-content" style="display:flex; gap:12px; align-items:center;">
+          <div style="width:44px;height:44px;border-radius:999px;background:#EEF3F7;display:flex;align-items:center;justify-content:center;flex:0 0 auto;">
+            <i class="fas ${icon}" style="color:#6B7280;font-size:18px;"></i>
+          </div>
+          <div style="flex:1;">
+            <div style="font-weight:900;font-size:1.05rem; margin-bottom:2px;">${escapeHtml(item.title || '移動')}</div>
+            <div style="color:var(--text-sec); font-weight:700;">${escapeHtml(line2)}</div>
+            ${mins ? `<div style="margin-top:8px; display:inline-flex; gap:8px; align-items:center; background:#F2F2F7; padding:6px 10px; border-radius:999px; font-weight:900; color:#4B5563;">
+              <i class="fas fa-hourglass-half" style="color:#9CA3AF;"></i>${escapeHtml(mins)}
+            </div>` : ``}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderNormalItem(item, i){
+    const stayPill = item.stay ? `<div style="margin-top:10px; display:inline-flex; gap:8px; align-items:center; background:#F2F2F7; padding:6px 10px; border-radius:999px; font-weight:900; color:#4B5563;">
+      <i class="fas fa-hourglass-half" style="color:#9CA3AF;"></i>${escapeHtml(item.stay)}
+    </div>` : '';
+
+    return `
+      <div class="timeline-item" onclick='openModal(${i})'>
+        <div class="tl-time">${escapeHtml(item.time || '')}</div>
+        <div class="tl-content">
+          <div class="tl-tag ${tagClass(item.tag)}">${escapeHtml((item.tag||'').toUpperCase())}</div>
+          <div class="tl-title">${escapeHtml(item.title || '')}</div>
+          <div class="tl-desc">${escapeHtml(item.desc || '')}</div>
+          ${stayPill}
+        </div>
+      </div>
+    `;
+  }
+
+
 
 
   function openDirections(from, to){
@@ -903,27 +1020,52 @@
     }
     const dayData = dayCache[idx];
     currentDayData = dayData;
-
+    
+    // timeline
     document.getElementById('timelineList').innerHTML = (dayData?.items || []).map((item, i) => {
-      // ✅ transport 且有 route => 顯示路線條（不做方格卡）
-      if((item.tag||'').toLowerCase()==='transport' && item.route){
-        return renderRouteStrip(item, i);
+      const t = normalizeTime(item.time);
+      const stay = item.stay ? `
+        <div class="stay-pill"><i class="fas fa-hourglass-half"></i>${escapeHtml(item.stay)}</div>
+      ` : '';
+
+      // ✅ route strip（不做方格、不重複）
+      if((item.type || '').toLowerCase() === 'route'){
+        const ico = routeIcon(item.mode);
+        const title = item.title || `${item.from || ''} → ${item.to || ''}`;
+        const sub = item.durationText || item.desc || `${item.from || ''} → ${item.to || ''}`;
+
+        return `
+          <div class="timeline-item" style="cursor:default;">
+            <div class="tl-time">${escapeHtml(t)}</div>
+            <div class="route-strip">
+              <div class="route-ico"><i class="fas ${ico}"></i></div>
+              <div class="route-main">
+                <div class="route-title">${escapeHtml(title)}</div>
+                <div class="route-sub">${escapeHtml(sub)}</div>
+                ${item.stay ? `<div class="stay-pill"><i class="fas fa-hourglass-half"></i>${escapeHtml(item.stay)}</div>` : ``}
+              </div>
+              <button class="btn btn-outline" style="width:auto; padding:10px 12px;" onclick="openRouteMap(event, ${i})">
+                <i class="fas fa-location-arrow"></i>
+              </button>
+            </div>
+          </div>
+        `;
       }
 
-      // 其他維持原本卡片
+      // ✅ 一般行程卡（可點開 modal）
       return `
         <div class="timeline-item" onclick='openModal(${i})'>
-          <div class="tl-time">${escapeHtml(item.time || '')}</div>
+          <div class="tl-time">${escapeHtml(t)}</div>
           <div class="tl-content">
             <div class="tl-tag ${tagClass(item.tag)}">${escapeHtml((item.tag||'').toUpperCase())}</div>
             <div class="tl-title">${escapeHtml(item.title || '')}</div>
             <div class="tl-desc">${escapeHtml(item.desc || '')}</div>
-
-            ${durationChip(item) ? `<div class="tl-meta">${durationChip(item)}</div>` : ``}
+            ${stay}
           </div>
         </div>
       `;
     }).join('');
+
 
 
     // mock weather
@@ -1069,16 +1211,33 @@
         </a>
       </div>`;
 
-    document.body.classList.add('body-no-scroll');
+    lockBodyScroll();
     document.getElementById('modalOverlay').classList.add('active');
     document.getElementById('modalSheet').classList.add('active');
+  }
+
+  function openRouteMap(ev, idx){
+    // 避免點按按鈕又觸發父層點擊
+    ev?.stopPropagation?.();
+
+    const item = currentDayData?.items?.[idx];
+    if(!item) return;
+
+    // 你可以在 json 提供 item.map.query 或直接用 from/to 組
+    const q = item?.map?.query || `${item.from || ''} ${item.to || ''}`.trim();
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(item.to || '')}&origin=${encodeURIComponent(item.from || '')}`);
   }
 
   function closeModal() {
     document.getElementById('modalOverlay').classList.remove('active');
     document.getElementById('modalSheet').classList.remove('active');
-    document.body.classList.remove('body-no-scroll');
+
+    // 等 sheet 動畫收起（你的 transition 0.3s）
+    setTimeout(() => {
+      unlockBodyScroll();
+    }, 320);
   }
+
 
   function openUrl(url){
     window.open(url, '_blank', 'noopener');
@@ -1243,6 +1402,32 @@
     const arr = ['日','一','二','三','四','五','六'];
     return arr[dt.getDay()];
   }
+
+  let __scrollY = 0;
+  function lockBodyScroll(){
+    __scrollY = window.scrollY || 0;
+
+    // iOS 最穩：把 body 固定住
+    document.body.classList.add('body-no-scroll'); // 你原本那個 class 可以留著
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${__scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+  }
+
+  function unlockBodyScroll(){
+    document.body.classList.remove('body-no-scroll');
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+
+    window.scrollTo(0, __scrollY);
+  }
+
+
 </script>
 </body>
 </html>
