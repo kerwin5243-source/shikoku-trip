@@ -843,6 +843,13 @@
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
+    const el = e.target.closest('.route-click');
+    if(!el) return;
+
+    const from = el.dataset.from || '';
+    const to   = el.dataset.to || '';
+    const mode = el.dataset.mode || 'drive';
+    openDirections(from, to, mode);
     await loadAllData();
     renderGlobalTodos();
     renderUserTabs();
@@ -1051,11 +1058,25 @@
 
 
 
-  function openDirections(from, to){
-    // Google Maps Directions
-    const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(from||'')}&destination=${encodeURIComponent(to||'')}&travelmode=driving`;
-    window.open(url, '_blank');
+  function openDirections(from, to, mode='drive'){
+    const m = (mode || 'drive').toLowerCase();
+
+    // Google Maps travelmode: driving, walking, transit
+    // 船/飛機在 directions 不一定有，保守用 transit 或直接用 dir 不帶 travelmode
+    let travelmode = 'driving';
+    if(m === 'walk') travelmode = 'walking';
+    if(m === 'train') travelmode = 'transit';
+    if(m === 'ship') travelmode = 'transit';
+    if(m === 'plane') travelmode = 'transit';
+
+    const url = `https://www.google.com/maps/dir/?api=1`
+      + `&origin=${encodeURIComponent(from)}`
+      + `&destination=${encodeURIComponent(to)}`
+      + `&travelmode=${encodeURIComponent(travelmode)}`;
+
+    window.open(url, '_blank', 'noopener');
   }
+
 
 
   
@@ -1091,6 +1112,7 @@
       ` : '';
     function jsStr(s){ return JSON.stringify(String(s ?? '')); }
 
+    // ✅ route strip：只要有 route 物件就用（不開 modal）
     if(item.route && (item.route.from || item.route.to)){
       const r = item.route;
       const mode = r.mode || 'drive';
@@ -1104,36 +1126,27 @@
         ? String(item.stay).trim()
         : (Number.isFinite(r.minutes) ? `${r.minutes} min` : '');
 
-      const from = r.from || item.from || '';
-      const to   = r.to   || item.to   || '';
-
       return `
         <div class="timeline-item">
           <div class="tl-time">${escapeHtml(t)}</div>
 
-          <div class="route-strip"
-              onclick="openDirections(${jsStr(from)}, ${jsStr(to)}, ${jsStr(mode)})">
+          <div class="route-strip route-click"
+              data-from="${escapeHtml(r.from || '')}"
+              data-to="${escapeHtml(r.to || '')}"
+              data-mode="${escapeHtml(mode)}">
 
             <div class="route-ico"><i class="fas ${ico}"></i></div>
 
             <div class="route-main">
               <div class="route-title">${escapeHtml(title)}</div>
-            </div>
-
-            <div class="route-cta" onclick="event.stopPropagation()">
-              ${dur ? `<div class="route-time"><i class="fas fa-hourglass-half"></i>${escapeHtml(dur)}</div>` : ``}
-
-              <button class="btn btn-outline"
-                      style="width:auto; padding:10px 12px;"
-                      onclick="event.stopPropagation(); openDirections(${jsStr(from)}, ${jsStr(to)}, ${jsStr(mode)})">
-                <i class="fas fa-location-arrow"></i>
-              </button>
+              ${dur ? `<div class="stay-pill" style="margin-top:10px;"><i class="fas fa-hourglass-half"></i>${escapeHtml(dur)}</div>` : ``}
             </div>
 
           </div>
         </div>
       `;
     }
+
 
 
       // ✅ 一般行程卡（可點開 modal）
