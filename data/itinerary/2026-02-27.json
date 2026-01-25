@@ -8,7 +8,7 @@
       {
         "type": "route",
         "time": "~",
-        "title": "開車：家 → 桃園國際機場 T2",
+        "title": "家 → 桃園國際機場 T2",
         "desc": "",
         "durationText": "約 30 分鐘車程",
         "stay": "30 min",
@@ -18,7 +18,7 @@
         "route": { "mode": "drive", "from": "家", "to": "台北桃園國際機場 T2", "minutes": 30 }
       },
       {
-        "time": "05:00",
+        "time": "",
         "title": "抵達台北桃園國際機場 T2",
         "tag": "transport",
         "desc": "5:00 前抵達，準備出境/托運。",
@@ -37,20 +37,8 @@
         "img": ""
       },
       {
-        "type": "route",
-        "time": "~",
-        "title": "飛機：TPE → TAK",
-        "desc": "早餐：飛機餐（機上提供）",
-        "durationText": "約 2小時 20 分鐘",
-        "stay": "2 hr 30 min",
-        "mode": "plan",
-        "from": "",
-        "to": "",
-        "route": { "mode": "plan", "from": "家", "to": "台北桃園國際機場 T2", "minutes": 30 }
-      },
-      {
-        "time": "05:00",
-        "title": "飛機：台北桃園 T2 → 高松空港",
+        "time": "",
+        "title": "TPE → TAK",
         "tag": "transport",
         "desc": "早餐：飛機餐｜抵達高松 10:20（依實際航班）",
         "detail": "",
@@ -101,7 +89,7 @@
 
       {
         "time": "11:00",
-        "title": "Toyota Rent a Car（高松空港店）取車",
+        "title": "Toyota Rent a Car\n（高松空港店）取車",
         "tag": "transport",
         "desc": "機場附近取車，開始自駕。",
         "detail": "取車建議：\n- 拍車況（四面/輪胎/刮痕）\n- 確認 ETC、保險、加油規則\n- 右駕新手：先用機場周邊道路適應 10–15 分鐘再上主要道路",
@@ -122,7 +110,7 @@
 
       {
         "time": "11:40",
-        "title": "午餐：Kawata Udon（烏龍麵＋關東煮）",
+        "title": "午餐：Kawata Udon\n（烏龍麵＋關東煮）",
         "tag": "food",
         "desc": "到香川第一碗的人氣選擇。",
         "detail": "特色：\n- 1990 年配合高松空港開港而開業，鎖定往來空港人潮\n- 空間大、位置便利、有停車場\n\n必吃：\n- 鍋焼うどん（鳥肉）：招牌推薦，鐵鍋上桌超有記憶點\n- 牛たまうどん：蛋＋牛肉的滿足系\n- おでん（関東煮）：很多人會先拿幾串再等烏龍麵上桌",
@@ -166,7 +154,7 @@
 
       {
         "time": "13:00",
-        "title": "開車：高松空港 → 呆呆獸公園",
+        "title": "高松空港 → ヤドン公園",
         "tag": "transport",
         "desc": "",
         "detail": "",
@@ -214,7 +202,7 @@
 
       {
         "time": "13:45",
-        "title": "開車：ヤドン公園 → 金刀比羅宮",
+        "title": "ヤドン公園 → 金刀比羅宮",
         "tag": "transport",
         "desc": "",
         "detail": "",
@@ -265,7 +253,7 @@
 
       {
         "time": "17:30",
-        "title": "開車：金刀比羅宮 → AEON 高松 / 山田電機",
+        "title": "金刀比羅宮 → 山田電機",
         "tag": "transport",
         "desc": "",
         "detail": "",
@@ -299,17 +287,40 @@
         "parking": "商場停車場",
         "hours": "10:00–20:00",
         "price": "",
-        "stay": "60–90 min",
+        "stay": "30-40 min",
         "menu": [],
         "avoid": [],
         "guide": [],
         "links": [],
         "img": ""
       },
-
       {
-        "time": "19:40",
-        "title": "永旺夢樂城高松（AEON Mall Takamatsu）逛街＋補給",
+        "time": "19:00",
+        "title": "山田電機 → AEON",
+        "tag": "transport",
+        "desc": "",
+        "detail": "",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "10 min",
+        "route": {
+          "mode": "drive",
+          "from": "山田電機",
+          "to": "イオンモール高松（永旺夢樂城高松）",
+          "minutes": 10
+        },
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "19:20",
+        "title": "永旺夢樂城高松（AEON）",
         "tag": "shop",
         "desc": "UNIQLO/藥妝/雜貨一次補齊。",
         "detail": "可逛：\n- 服飾：UNIQLO、GU、GLOBAL WORK\n- 雜貨：DAISO\n- 戶外：mont-bell\n- 藥妝：cocokarafine\n\n建議：把補貨/藥妝/UNIQLO 一次買齊，後面行程更輕鬆。",
