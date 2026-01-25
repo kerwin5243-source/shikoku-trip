@@ -254,6 +254,22 @@
       -webkit-box-orient:vertical;
       overflow:hidden;
     }
+    /* ✅ 小行程：灰底的「預計停留/車程」膠囊 */
+    .tl-meta{
+      display:flex; gap:8px; flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .tl-chip{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#F2F2F7;
+      color:#555;
+      font-size:.85rem;
+      font-weight:800;
+    }
+    .tl-chip i{ color:#8E8E93; }
+
 
     /* ===== Modal: bottom sheet ===== */
     .modal-overlay{
@@ -846,12 +862,24 @@
       </div>
     `;
   }
+  function durationChip(item){
+    // 1) 優先顯示 stay（你 JSON 已經有）
+    const stay = (item.stay || '').trim();
+    if(stay) return `<span class="tl-chip"><i class="fas fa-hourglass-half"></i> ${escapeHtml(stay)}</span>`;
 
-function openDirections(from, to){
-  // Google Maps Directions
-  const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(from||'')}&destination=${encodeURIComponent(to||'')}&travelmode=driving`;
-  window.open(url, '_blank');
-}
+    // 2) 如果有 route.minutes，顯示車程
+    const mins = item?.route?.minutes;
+    if(Number.isFinite(mins)) return `<span class="tl-chip"><i class="fas fa-car"></i> ${mins} min</span>`;
+
+    return '';
+  }
+
+
+  function openDirections(from, to){
+    // Google Maps Directions
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(from||'')}&destination=${encodeURIComponent(to||'')}&travelmode=driving`;
+    window.open(url, '_blank');
+  }
 
 
   async function selectDay(idx) {
@@ -890,6 +918,8 @@ function openDirections(from, to){
             <div class="tl-tag ${tagClass(item.tag)}">${escapeHtml((item.tag||'').toUpperCase())}</div>
             <div class="tl-title">${escapeHtml(item.title || '')}</div>
             <div class="tl-desc">${escapeHtml(item.desc || '')}</div>
+
+            ${durationChip(item) ? `<div class="tl-meta">${durationChip(item)}</div>` : ``}
           </div>
         </div>
       `;
