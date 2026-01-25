@@ -536,6 +536,8 @@
     if(!dayCache[idx]) {
       const url = `./${meta.file}?v=${Date.now()}`; // v=... 避免 CDN 快取造成看不到更新
       dayCache[idx] = await fetch(url).then(r=>r.json());
+      // ✅ 這行是重點：支援你的 daily json 最外層是 []
+      dayCache[idx] = Array.isArray(raw) ? raw[0] : raw;
     }
     const dayData = dayCache[idx];
     currentDayData = dayData;
