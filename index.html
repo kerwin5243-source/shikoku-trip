@@ -697,8 +697,23 @@
         border-radius:16px;
         background:#EEF2FF;
         overflow:hidden;
+        position: relative;     /* ✅ 讓 chip 用 absolute 定位在卡片上 */
+        padding-top: 18px;      /* ✅ 預留上方空間給時間貼紙 */
     }
-
+    /* 左上角時間貼紙 */
+    .route-time-chip{
+        position: absolute;
+        top: 8px;
+        left: 14px;
+        font-size: 12px;
+        font-weight: 800;
+        color: #6B7280;
+        line-height: 1;
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.65);
+        border: 1px solid rgba(0,0,0,0.05);
+    }
     /* 左側：小時間 + icon
     .route-left{
         flex:0 0 auto;
@@ -1231,7 +1246,7 @@
             data-to="${enc(r.to || '')}"
             data-mode="${enc(mode)}">
 
-
+            <div class="route-time-chip">${escapeHtml(t)}</div> // 左上角時間貼紙
             <div class="route-ico"><i class="fas ${ico}"></i></div>
 
 
