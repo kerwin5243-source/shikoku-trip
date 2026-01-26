@@ -1,0 +1,387 @@
+[
+  {
+    "date": "02/27",
+    "day": "五",
+    "loc": "高松",
+    "hotel_id": "H1",
+    "items": [
+      {
+        "type": "route",
+        "time": "~",
+        "title": "家 → 桃園國際機場 T2",
+        "desc": "",
+        "durationText": "約 30 分鐘車程",
+        "stay": "30 min",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": { "mode": "drive", "from": "家", "to": "台北桃園國際機場 T2", "minutes": 30 }
+      },
+      {
+        "time": "",
+        "title": "抵達台北桃園國際機場 T2",
+        "tag": "transport",
+        "desc": "5:00 前抵達，準備出境/托運。",
+        "detail": "提醒：\n- 護照/機票/行李重量先確認\n- 早到更從容處理托運、安檢、登機口距離",
+        "addr": "33758桃園市大園區航站南路9號",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "eta": "",
+        "menu": [],
+        "avoid": [],
+        "guide": ["出境尖峰容易排隊：能早到就早到。"],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "",
+        "title": "TPE → TAK",
+        "tag": "transport",
+        "desc": "早餐：飛機餐｜抵達高松 10:20（依實際航班）",
+        "detail": "",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "route": {
+          "mode": "plane",
+          "from": "台北桃園國際機場 第二航廈 T2",
+          "to": "高松空港",
+          "minutes": null
+        },
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "5:00 前到機場較穩（托運/安檢尖峰容易排隊）。",
+          "抵達後流程：入境 → 領取優惠（如有）→ 租車櫃檯。"
+        ],
+        "links": [],
+        "img": ""
+      },
+
+      {
+        "time": "10:30",
+        "title": "入境日本 / 抵達高松機場待辦",
+        "tag": "transport",
+        "desc": "領取優惠、前往租車中心。",
+        "detail": "到達後建議順序：\n1) 領取華航香川優惠\n2) 前往機場租車中心櫃檯\n3) 確認 ETC / 保險 / 車況後再出發",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "30 min",
+        "menu": [],
+        "avoid": [
+          "先確認 ETC/保險/車況；出機場後再處理會拖時間。"
+        ],
+        "guide": [
+          "把『租車/ETC/保險』一次搞定，後面跨區移動更省事。"
+        ],
+        "links": [],
+        "img": ""
+      },
+
+      {
+        "time": "11:00",
+        "title": "Toyota Rent a Car\n（高松空港店）取車",
+        "tag": "transport",
+        "desc": "機場附近取車，開始自駕。",
+        "detail": "取車建議：\n- 拍車況（四面/輪胎/刮痕）\n- 確認 ETC、保險、加油規則\n- 右駕新手：先用機場周邊道路適應 10–15 分鐘再上主要道路",
+        "addr": "3388-1 Konancho Yusa, Takamatsu, Kagawa 761-1402 日本",
+        "mapcode": "60182543*34",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "第一次右駕：轉彎注意『左側行駛』，匝道/路口不要急。"
+        ],
+        "links": [],
+        "img": ""
+      },
+
+      {
+        "time": "11:40",
+        "title": "午餐：Kawata Udon\n（烏龍麵＋關東煮）",
+        "tag": "food",
+        "desc": "到香川第一碗的人氣選擇。",
+        "detail": "特色：\n- 1990 年配合高松空港開港而開業，鎖定往來空港人潮\n- 空間大、位置便利、有停車場\n\n必吃：\n- 鍋焼うどん（鳥肉）：招牌推薦，鐵鍋上桌超有記憶點\n- 牛たまうどん：蛋＋牛肉的滿足系\n- おでん（関東煮）：很多人會先拿幾串再等烏龍麵上桌",
+        "addr": "香川県高松市香南町岡1358-1",
+        "mapcode": "60 212 057*81",
+        "parking": "餐廳停車場",
+        "hours": "10:00–19:00（週二縮短/週三公休，依店家公告）",
+        "price": "",
+        "stay": "40–60 min",
+        "menu": [
+          { "jp": "鍋焼うどん（鳥肉）", "zh": "鍋燒烏龍麵（鳥肉）" },
+          { "jp": "牛たまうどん", "zh": "牛玉烏龍麵" },
+          { "jp": "おでん（関東煮）", "zh": "關東煮" }
+        ],
+        "avoid": [],
+        "guide": [
+          "香川烏龍麵節奏就是『快吃、快走、再吃』：第一餐就開局很合理。"
+        ],
+        "links": [],
+        "img": ""
+      },
+
+      {
+        "time": "12:30",
+        "title": "接機：杰哥抵達高松機場",
+        "tag": "transport",
+        "desc": "前去高松機場接人。",
+        "detail": "等杰哥 12:30 抵達高松機場前去接。",
+        "addr": "高松空港",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "20–30 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      },
+
+      {
+        "time": "13:00",
+        "title": "高松空港 → ヤドン公園",
+        "tag": "transport",
+        "desc": "",
+        "detail": "",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "15 min",
+        "route": {
+          "mode": "drive",
+          "from": "高松空港",
+          "to": "ひだまり公園あやがわ（ヤドン公園）",
+          "minutes": 15
+        },
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      },
+
+      {
+        "time": "13:20",
+        "title": "呆呆獸公園（ヤドン公園）",
+        "tag": "sight",
+        "desc": "寶可夢迷必去，主題遊具＋拍照點。",
+        "detail": "亮點：\n- 呆呆獸主題遊具與拍照點\n- 很適合作為第一天『輕鬆小停留』",
+        "addr": "香川県綾歌郡綾川町萱原253-7",
+        "mapcode": "228 877 218*23",
+        "parking": "公園旁停車場（約18台/人多可用周邊）",
+        "hours": "07:00–20:00（你備註）",
+        "price": "",
+        "stay": "15–30 min",
+        "menu": [],
+        "avoid": [
+          "假日人多：想拍空景就快狠準。"
+        ],
+        "guide": [
+          "拍照點集中在主入口與大型裝置附近。"
+        ],
+        "links": [],
+        "img": ""
+      },
+
+      {
+        "time": "13:45",
+        "title": "ヤドン公園 → 金刀比羅宮",
+        "tag": "transport",
+        "desc": "",
+        "detail": "",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "25 min",
+        "route": {
+          "mode": "drive",
+          "from": "ひだまり公園あやがわ（ヤドン公園）",
+          "to": "金刀比羅宮",
+          "minutes": 25
+        },
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      },
+
+      {
+        "time": "14:20",
+        "title": "金刀比羅宮",
+        "tag": "sight",
+        "desc": "江戶時代「金毘羅參」名所，挑戰 785 階到御本宮。",
+        "detail": "背景：\n- 江戶時代「金毘羅參」風靡全國\n- 金刀比羅宮成為「一生一定要去參拜一次」的憧憬目的地\n- 日本知名『海上守護』神社之一\n\n階梯里程碑：\n- 【365階】大門\n- 【365〜431階】櫻馬場\n- 【628階】旭社\n- 【652～785階】御前四段坂\n- 【785階】御本宮\n- 【923階】白峰神社\n- 【1368階】嚴魂神社（奥社）\n\n建議：先到御本宮（785階），再視體力挑戰奥社（1368階）。",
+        "addr": "892-1, Kotohira, Nakatado District, Kagawa 766-8501日本",
+        "mapcode": "77 353 678*81",
+        "parking": "琴平公園停車場",
+        "hours": "06:00–17:00（10–3月）/ 06:00–18:00（4–9月）",
+        "price": "",
+        "stay": "3 hr",
+        "menu": [],
+        "avoid": [
+          "階梯多：穿好走鞋、帶水。",
+          "下午接近關門容易趕行程：盡量提早上山。"
+        ],
+        "guide": [
+          "先攻御本宮 785 階；體力夠再攻奧社 1368 階。"
+        ],
+        "links": [
+          { "title": "金刀比羅宮參考文章", "url": "https://thegate12.com/tw/article/205" }
+        ],
+        "img": ""
+      },
+
+      {
+        "time": "17:30",
+        "title": "金刀比羅宮 → 山田電機",
+        "tag": "transport",
+        "desc": "",
+        "detail": "",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "50 min",
+        "route": {
+          "mode": "drive",
+          "from": "金刀比羅宮",
+          "to": "イオンモール高松（永旺夢樂城高松）",
+          "minutes": 50
+        },
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      },
+
+      {
+        "time": "18:20",
+        "title": "YAMADA Denki",
+        "tag": "shop",
+        "desc": "大型家電量販（免稅/活動依現場）。",
+        "detail": "備註：\n- 山田電機為日本大型家電量販\n- 你筆記：常見 10%+7% 免稅/優惠（以現場規則為準）\n\n採買提醒：電壓/插頭、保固與退稅條件先問清楚。",
+        "addr": "〒761-8032 香川県高松市鶴市町724番地1",
+        "mapcode": "60 571 466*01",
+        "parking": "商場停車場",
+        "hours": "10:00–20:00",
+        "price": "",
+        "stay": "30-40 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "19:00",
+        "title": "山田電機 → AEON",
+        "tag": "transport",
+        "desc": "",
+        "detail": "",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "10 min",
+        "route": {
+          "mode": "drive",
+          "from": "山田電機",
+          "to": "イオンモール高松（永旺夢樂城高松）",
+          "minutes": 10
+        },
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": ""
+      },
+      {
+        "time": "19:20",
+        "title": "永旺夢樂城高松（AEON）",
+        "tag": "shop",
+        "desc": "UNIQLO/藥妝/雜貨一次補齊。",
+        "detail": "可逛：\n- 服飾：UNIQLO、GU、GLOBAL WORK\n- 雜貨：DAISO\n- 戶外：mont-bell\n- 藥妝：cocokarafine\n\n建議：把補貨/藥妝/UNIQLO 一次買齊，後面行程更輕鬆。",
+        "addr": "〒761-8012 香川県高松市香西本町1-1",
+        "mapcode": "60 630 687*27",
+        "parking": "商場停車場",
+        "hours": "10:00–21:00（超市/食品賣場依店別）",
+        "price": "",
+        "stay": "60–90 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [
+          { "title": "AEON 參考影片", "url": "https://www.youtube.com/watch?v=hdEU3BwcaYg" }
+        ],
+        "img": ""
+      },
+
+      {
+        "time": "—",
+        "title": "晚餐：永旺美食街（現場選）",
+        "tag": "food",
+        "desc": "依現場決定。",
+        "detail": "候選：\n- DEAR (1F)\n- Kamakura Pasta (1F)\n- Yamashina (1F)\n- Saizeriya (1F)\n- OMURAICE TEI (3F)\n- ARATI (3F)\n- Kogane Seimenjo (3F)\n- Annyeong (3F)\n- Nagasaki Champon Juttetsu (3F)",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "如果金刀比羅宮走很累：晚餐就走『快速補能量』路線，省時間回住宿休息。"
+        ],
+        "links": [],
+        "img": ""
+      },
+
+      {
+        "time": "Night",
+        "title": "住宿：Second Home 瀬戸風月（民宿）",
+        "tag": "hotel",
+        "desc": "入住 16:00–22:00，退房 11:00（需事前填旅客資訊）。",
+        "detail": "評分（你提供）：\n- Google ⭐4.9（77）\n- Booking ⭐9.0（290）\n\n提醒：\n- 最晚 02/25 前確認\n- 入住前需填旅客資訊（連結）",
+        "addr": "1077-1 Murojinmachi, Takamatsu, Kagawa 761-8062日本",
+        "mapcode": "60 545 336*17",
+        "parking": "住宿提供停車位（你備註：2台）",
+        "hours": "入住 16:00–22:00 / 退房 11:00",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "入住前的旅客資訊記得先填好，現場會省很多時間。"
+        ],
+        "links": [
+          { "title": "入住前旅客資訊填寫", "url": "https://connect.minpakuin.jp/register/AAABIcWXEd-XD9GI4oC_pFD5lrGeW0cf52o?page=Menu" }
+        ],
+        "img": ""
+      }
+    ]
+  }
+]
