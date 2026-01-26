@@ -7,8 +7,8 @@
     "items": [
       {
         "type": "route",
-        "time": "~",
-        "title": "家 → 桃園國際機場 T2",
+        "time": "04:00",
+        "title": "住家 → 桃園國際機場 T2",
         "desc": "",
         "durationText": "約 30 分鐘車程",
         "stay": "30 min",
@@ -18,7 +18,7 @@
         "route": { "mode": "drive", "from": "家", "to": "台北桃園國際機場 T2", "minutes": 30 }
       },
       {
-        "time": "",
+        "time": null,
         "title": "抵達台北桃園國際機場 T2",
         "tag": "transport",
         "desc": "5:00 前抵達，準備出境/托運。",
@@ -37,7 +37,7 @@
         "img": ""
       },
       {
-        "time": "",
+        "time": "07:00-10:20",
         "title": "TPE → TAK",
         "tag": "transport",
         "desc": "早餐：飛機餐｜抵達高松 10:20（依實際航班）",
@@ -52,7 +52,7 @@
           "mode": "plane",
           "from": "台北桃園國際機場 第二航廈 T2",
           "to": "高松空港",
-          "minutes": null
+          "minutes": 140
         },
         "menu": [],
         "avoid": [],
@@ -296,7 +296,7 @@
       },
       {
         "time": "19:00",
-        "title": "山田電機 → AEON",
+        "title": "山田電機 → AEON 高松",
         "tag": "transport",
         "desc": "",
         "detail": "",
