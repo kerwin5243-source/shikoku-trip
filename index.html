@@ -220,7 +220,7 @@
       gap:6px;
       padding:6px 10px;
       border-radius:999px;
-      font-size:.64rem;
+      font-size:.72rem;
       font-weight:900;
       letter-spacing:.12em;
       margin-bottom:10px;
@@ -608,7 +608,7 @@
         display:flex;
         align-items:center;
         gap:12px;
-        padding:8px 10px;
+        padding:10px 12px;
         border-radius:14px;
         max-width:100%;
         width:100%;
@@ -757,7 +757,80 @@
     .route-time i{ color:#8E8E93; }
 
 
-  </style>
+  
+    /* ====== UI tweaks (hero / weather header / date chips) ====== */
+    .wx-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      margin-bottom:14px;
+    }
+    .wx-city{
+      font-family:'Noto Serif TC', serif;
+      font-size:1.30rem;
+      font-weight:900;
+      color:var(--primary);
+      text-align:right;
+    }
+    .wx-label{
+      font-size:.84rem;
+      font-weight:900;
+      color:var(--ink2);
+      display:flex;
+      align-items:center;
+      gap:8px;
+      white-space:nowrap;
+    }
+
+    .date-scroller{ gap:8px; padding:8px 20px 14px; }
+    .date-chip{ min-width:62px; padding:8px 10px; border-radius:18px; }
+    .date-chip .day{ font-size:.92rem; font-weight:900; letter-spacing:.2px; }
+    .date-chip .day .wk{ margin-left:6px; font-size:.60rem; font-weight:900; color:var(--ink2); letter-spacing:.06em; }
+    .date-chip .date{ font-size:.64rem; font-weight:800; margin-top:2px; }
+
+    /* Day hero slideshow (independent block above weather) */
+    .day-hero{
+      border-radius:24px;
+      overflow:hidden;
+      border:1px solid rgba(233,225,214,.9);
+      box-shadow:0 10px 26px rgba(0,0,0,.08);
+      background:rgba(255,255,255,.6);
+      min-height:170px;
+    }
+    .hero-track{
+      display:flex;
+      overflow-x:auto;
+      scroll-snap-type:x mandatory;
+      scrollbar-width:none;
+    }
+    .hero-track::-webkit-scrollbar{ display:none; }
+    .hero-slide{
+      flex:0 0 100%;
+      height:170px;
+      scroll-snap-align:start;
+      position:relative;
+    }
+    .hero-slide img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .hero-dots{
+      position:absolute;
+      left:0; right:0; bottom:10px;
+      display:flex;
+      justify-content:center;
+      gap:6px;
+    }
+    .hero-dot{
+      width:6px; height:6px;
+      border-radius:50%;
+      background:rgba(255,255,255,.6);
+    }
+    .hero-dot.active{ background:rgba(255,255,255,.95); }
+
+</style>
 </head>
 
 <body>
@@ -793,10 +866,10 @@
     <div class="date-scroller" id="dayScroller"></div>
 
     
-    <!-- ✅ Day photos slideshow（獨立一個 block，放在天氣預報上方） -->
+    <!-- ✅ Day photos slideshow（獨立 block，放在天氣預報上方） -->
     <div id="dayHero" class="day-hero" style="margin-top: 14px;"></div>
 
-    <div class="card" style="margin-top: 18px;">
+<div class="card" style="margin-top: 18px;">
       <div class="wx-head">
         <div class="wx-label"><i class="fas fa-cloud-sun"></i> 24H 預報</div>
         <div id="weatherLoc" class="wx-city"></div>
@@ -1165,7 +1238,7 @@
     const dayData = dayCache[idx];
     currentDayData = dayData;
 
-    // ✅ day photos
+    // ✅ day photos (above weather)
     renderDayHero(dayData, meta);
     
     // timeline
@@ -1230,16 +1303,67 @@
 
 
 
-    // ✅ Weather (Open-Meteo / JMA) — 只顯示「未來 16 天」內的逐時預報
+        // ✅ Weather (real forecast)
     await renderWeatherStrip(meta);
 
   }
 
   
-  // ====== Weather helpers ======
+  // ====== Day hero slideshow ======
+  let __heroTimer = null;
+
+  function renderDayHero(dayData, meta){
+    const el = document.getElementById('dayHero');
+    if(!el) return;
+
+    const photos = Array.isArray(dayData?.photos) && dayData.photos.length
+      ? dayData.photos.slice(0,5)
+      : [
+          "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80",
+          "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+          "https://images.unsplash.com/photo-1526481280695-3c687fd5432c?auto=format&fit=crop&w=1200&q=80",
+          "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80",
+          "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80"
+        ];
+
+    el.innerHTML = `
+      <div class="hero-track" id="heroTrack">
+        ${photos.map((src, idx)=>`
+          <div class="hero-slide">
+            <img src="${escapeHtml(src)}" alt="day photo ${idx+1}">
+            <div class="hero-dots">
+              ${photos.map((_,d)=>`<span class="hero-dot ${d===0?'active':''}"></span>`).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+
+    const track = document.getElementById('heroTrack');
+    if(!track) return;
+
+    if(__heroTimer) clearInterval(__heroTimer);
+
+    const dotWraps = Array.from(el.querySelectorAll('.hero-dots'));
+    let cur = 0;
+
+    function setDot(i){
+      dotWraps.forEach(w=>{
+        const dots = w.querySelectorAll('.hero-dot');
+        dots.forEach(d=>d.classList.remove('active'));
+        if(dots[i]) dots[i].classList.add('active');
+      });
+    }
+
+    __heroTimer = setInterval(()=>{
+      cur = (cur + 1) % photos.length;
+      track.scrollTo({ left: cur * track.clientWidth, behavior:'smooth' });
+      setDot(cur);
+    }, 3500);
+  }
+
+  // ====== Weather helpers (Open-Meteo / JMA) ======
   function _wmoToFa(code, hour){
-    // Simple WMO weather_code → FontAwesome icon
-    // hour: local hour (0-23) used for night/day
     const night = (hour <= 5 || hour >= 19);
     if(code === 0) return night ? 'fa-moon' : 'fa-sun';
     if(code >= 1 && code <= 3) return night ? 'fa-cloud-moon' : 'fa-cloud-sun';
@@ -1251,11 +1375,9 @@
   }
 
   function _getLatLon(meta){
-    // 優先：itinerary.index.json 內的 lat/lon
     if(Number.isFinite(meta?.lat) && Number.isFinite(meta?.lon)){
       return { lat: meta.lat, lon: meta.lon };
     }
-    // 次選：hotels.json 內的 geo
     const h = hotels.find(x => x.id === meta.hotel_id);
     const lat = h?.geo?.lat;
     const lon = h?.geo?.lng ?? h?.geo?.lon;
@@ -1276,7 +1398,9 @@
 
     const iso = _metaIsoDate(meta);
     if(!iso){
-      el.innerHTML = `<div style="padding:10px; color:var(--ink2); font-weight:800;">找不到日期（請確認 itinerary.index.json 的 file 命名含 YYYY-MM-DD）</div>`;
+      el.innerHTML = `<div style="padding:10px; color:var(--ink2); font-weight:800;">
+        找不到日期（請確認 itinerary.index.json 的 file 命名含 YYYY-MM-DD）
+      </div>`;
       return;
     }
 
@@ -1284,23 +1408,23 @@
     const target = new Date(iso + 'T00:00:00');
     const diffDays = Math.floor((target - new Date(today.getFullYear(), today.getMonth(), today.getDate())) / 86400000);
 
-    // Open-Meteo 預報最長 16 天；太久遠就提示（避免看起來「不准」）
+    // Open-Meteo 預報最長 16 天：太久遠就提示，避免看起來「不准」
     if(diffDays < 0 || diffDays > 16){
-      el.innerHTML = `<div style="padding:10px; color:var(--ink2); font-weight:800;">
-        天氣預報只提供「未來 16 天」內的逐時資料。<br/>（目前選的是 ${iso}，請接近出發再看會更準）
+      el.innerHTML = `<div style="padding:10px; color:var(--ink2); font-weight:800; line-height:1.4;">
+        天氣預報只提供「未來 16 天」內的逐時資料。<br/>
+        （目前選的是 <strong>${iso}</strong>，請接近出發再看會更準）
       </div>`;
       return;
     }
 
     const ll = _getLatLon(meta);
     if(!ll){
-      el.innerHTML = `<div style="padding:10px; color:var(--ink2); font-weight:800;">
-        尚未設定經緯度：請在 <code>data/itinerary.index.json</code> 這一天加上 <code>lat</code>, <code>lon</code>（或在 hotels.json 的 geo 放 lat/lng）
+      el.innerHTML = `<div style="padding:10px; color:var(--ink2); font-weight:800; line-height:1.4;">
+        尚未設定經緯度：請在 <code>data/itinerary.index.json</code> 這一天加上 <code>lat</code>, <code>lon</code>
       </div>`;
       return;
     }
 
-    // JMA 專用 API（日本較貼近），也可改成 /v1/forecast
     const url =
       `https://api.open-meteo.com/v1/jma?latitude=${encodeURIComponent(ll.lat)}&longitude=${encodeURIComponent(ll.lon)}`
       + `&hourly=temperature_2m,weather_code`
@@ -1316,7 +1440,7 @@
       const pad2 = (n)=>String(n).padStart(2,'0');
       const rows = [];
 
-      // 需要 01:00 ~ 24:00（24:00 用隔天 00:00 表示）
+      // 01:00 ~ 24:00（24:00 取隔天 00:00）
       for(let h=1; h<=24; h++){
         const hh = (h === 24) ? 0 : h;
         const day = (h === 24) ? new Date(target.getTime() + 86400000) : target;
@@ -1343,8 +1467,9 @@
         </div>
       `).join('');
     }catch(e){
-      el.innerHTML = `<div style="padding:10px; color:var(--ink2); font-weight:800;">
-        讀取天氣失敗（可能是網路/CORS/服務暫時不可用）。<br/>你可以先用 mock，或之後換成 OpenWeather/WeatherAPI（需 key）。
+      el.innerHTML = `<div style="padding:10px; color:var(--ink2); font-weight:800; line-height:1.4;">
+        讀取天氣失敗（可能是網路或服務暫時不可用）。<br/>
+        你可以先用 mock，或改用其他來源（通常需要 API Key）。
       </div>`;
     }
   }
