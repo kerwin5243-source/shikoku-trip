@@ -4,7 +4,7 @@
     "day": "FRI",
     "loc": "高松市",
     "hotel_id": "H1",
-    "file": "data/itinerary/2026-02-27.json",
+    "file": "data/itinerary/2026-01-27.json",
     "lat": 34.2034,
     "lon": 134.0248
   },
@@ -13,7 +13,7 @@
     "day": "SAT",
     "loc": "小豆島",
     "hotel_id": "H1",
-    "file": "data/itinerary/2026-02-28.json",
+    "file": "data/itinerary/2026-01-28.json",
     "lat": 34.3049,
     "lon": 134.1780
   },
