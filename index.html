@@ -48,37 +48,18 @@
       padding:56px 20px 16px;
       background:linear-gradient(to bottom, rgba(246,243,238,1), rgba(246,243,238,.82));
     }
-    .app-header{ text-align:center; }
-
     .app-header h1{
-        margin:0;
-        font-family:'Noto Serif TC', serif;
-        font-size:1.75rem;     /* 原本 2.2rem → 縮小 */
-        font-weight:900;
-        letter-spacing:.2px;
-        display:flex;
-        justify-content:center;
-        align-items:baseline;
-        gap:10px;
+      margin:0;
+      font-family:'Noto Serif TC', serif;
+      font-size:2.2rem;
+      font-weight:900;
+      letter-spacing:.2px;
     }
-
-    .year-pill{
-        font-family:'Noto Sans TC',sans-serif;
-        font-size:.78rem;
-        font-weight:900;
-        padding:4px 10px;
-        border-radius:999px;
-        border:1px solid rgba(176,138,91,.55);
-        background:rgba(255,255,255,.65);
-        color:#7D5B34;
-    }
-
     .app-header p{
-        margin:8px 0 0;
-        font-size:.92rem;
-        color:var(--ink2);
-        font-weight:700;
-        text-align:center;
+      margin:8px 0 0;
+      font-size:.95rem;
+      color:var(--ink2);
+      font-weight:600;
     }
 
     .page{ display:none; padding:0 20px; animation:fadeIn .28s ease; }
@@ -166,84 +147,31 @@
 
     /* date scroller */
     .date-scroller{
-      display:flex; gap:8px; overflow-x:auto; padding:8px 20px 14px;
+      display:flex; gap:12px; overflow-x:auto; padding:10px 20px 18px;
       margin:0 -20px; scrollbar-width:none;
     }
     .date-scroller::-webkit-scrollbar{ display:none; }
-    .day-hero{
-        margin:6px 0 14px;
-        border-radius:24px;
-        overflow:hidden;
-        border:1px solid rgba(233,225,214,.9);
-        box-shadow:0 10px 26px rgba(0,0,0,.08);
-        background:rgba(255,255,255,.6);
-    }
-
-    .hero-track{
-        display:flex;
-        overflow-x:auto;
-        scroll-snap-type:x mandatory;
-        scrollbar-width:none;
-    }
-    .hero-track::-webkit-scrollbar{ display:none; }
-
-    .hero-slide{
-        flex:0 0 100%;
-        height:170px;
-        scroll-snap-align:start;
-        position:relative;
-    }
-    .hero-slide img{
-        width:100%;
-        height:100%;
-        object-fit:cover;
-        display:block;
-    }
-
-    .hero-dots{
-        position:absolute;
-        left:0; right:0; bottom:10px;
-        display:flex;
-        justify-content:center;
-        gap:6px;
-    }
-    .hero-dot{
-        width:6px; height:6px;
-        border-radius:50%;
-        background:rgba(255,255,255,.6);
-    }
-    .hero-dot.active{ background:rgba(255,255,255,.95); }
-
-
-
     .date-chip{
       flex:0 0 auto;
       background:rgba(255,255,255,.75);
       border:1px solid rgba(233,225,214,.9);
-      border-radius:18px;
-      padding:10px 12px;
+      border-radius:22px;
+      padding:12px 18px;
       text-align:center;
-      min-width:72px;
+      min-width:96px;
       box-shadow:0 10px 24px rgba(0,0,0,.08);
       transition:.2s;
       cursor:pointer;
     }
     .date-chip .day{
       font-family:'Noto Serif TC', serif;
-      font-size:1.0rem; font-weight:900; letter-spacing:.3px;
+      font-size:1.2rem; font-weight:900; letter-spacing:.3px;
     }
     .date-chip .date{
-      font-size:.72rem;
+      font-size:.78rem;
       font-weight:900;
       color:var(--ink2);
       margin-top:2px;
-    }
-    .date-chip .day .wk{
-        margin-left:6px;
-        font-size:.72rem;        /* 星期更小 */
-        font-weight:900;
-        color:var(--ink2);
-        letter-spacing:.06em;
     }
     .date-chip.active{
       background:#fff;
@@ -612,30 +540,6 @@
       color:var(--ink2); font-size:.9rem;
       font-weight:800;
     }
-    .wx-head{
-        display:flex;
-        justify-content:space-between;
-        align-items:baseline;
-        margin-bottom:14px;
-    }
-
-    .wx-city{
-        font-family:'Noto Serif TC', serif;
-        font-size:1.25rem;
-        font-weight:900;
-        color:var(--primary);
-    }
-
-    .wx-label{
-        font-size:.82rem;
-        font-weight:900;
-        color:var(--ink2);
-        display:flex;
-        align-items:center;
-        gap:8px;
-    }
-
-
     /* ===== Route strip (for drive/walk/train/flight/boat) ===== */
     .route-strip{
         display:flex;
@@ -892,13 +796,63 @@
     .route-time i{ color:#8E8E93; }
 
 
-  </style>
+  
+  /* ===== Day photo slider (per-day) ===== */
+  .day-hero{
+    width:100%;
+    height:140px;
+    border-radius:18px;
+    overflow:hidden;
+    margin-bottom:14px;
+    position:relative;
+    background:#E9E9EF;
+  }
+  .day-hero img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .day-hero .hero-dots{
+    position:absolute;
+    left:12px;
+    bottom:10px;
+    display:flex;
+    gap:6px;
+    z-index:2;
+  }
+  .day-hero .dot{
+    width:6px; height:6px; border-radius:999px;
+    background:rgba(255,255,255,.55);
+    box-shadow:0 2px 6px rgba(0,0,0,.15);
+  }
+  .day-hero .dot.active{ background:rgba(255,255,255,.95); }
+  .day-hero .hero-grad{
+    position:absolute; inset:0;
+    background:linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,.18) 100%);
+    pointer-events:none;
+    z-index:1;
+  }
+  .weather-note{
+    font-size:.9rem;
+    color:var(--ink2);
+    font-weight:800;
+    padding:8px 2px;
+  }
+  .weather-hour .w-pop{
+    font-size:.72rem;
+    color:var(--ink2);
+    margin-top:2px;
+    font-weight:800;
+  }
+
+</style>
 </head>
 
 <body>
   <header class="app-header">
-    <h1 id="hdrTitle"></h1>
-    <p id="hdrSub"></p>
+    <h1 id="hdrTitle">2026 四國巡禮</h1>
+    <p id="hdrSub">9天8夜自駕遊</p>
   </header>
 
   <!-- 行前 -->
@@ -928,9 +882,10 @@
     <div class="date-scroller" id="dayScroller"></div>
 
     <div class="card" style="margin-top: 18px;">
-      <div class="wx-head">
-        <div id="weatherLoc" class="wx-city"></div>
-        <div class="wx-label"><i class="fas fa-cloud-sun"></i> 24H 預報</div>
+      <div class="day-hero" id="dayHero"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <div class="section-title" style="margin:0;"><i class="fas fa-cloud-sun"></i> 24H 預報</div>
+        <span id="weatherLoc" style="font-size:0.9rem; color:var(--ink2); font-weight:900;"></span>
       </div>
       <div class="weather-strip" id="weatherStrip"></div>
       <div style="text-align:right; font-size:0.86rem; color:var(--ink2); font-weight:800;">
@@ -1025,11 +980,8 @@
     hotels = HOTELS || [];
     itineraryIndex = ITINERARY || [];
 
-    const title = (CONFIG?.trip_title || '四國巡禮').replace(/^2026\s*/,'');
-    document.getElementById('hdrTitle').innerHTML = `${escapeHtml(title)}<span class="year-pill">2026</span>`;
-
-    // 2) subtitle 不顯示 L,K,R,Y,J
-    const sub = `${CONFIG?.days || 9}天${CONFIG?.nights || 8}夜${CONFIG?.mode ? CONFIG.mode : ''}`;
+    document.getElementById('hdrTitle').innerText = CONFIG?.trip_title || '2026 四國巡禮';
+    const sub = `${CONFIG?.days || 9}天${CONFIG?.nights || 8}夜${CONFIG?.mode ? CONFIG.mode : ''} • ${users.join(', ')}`;
     document.getElementById('hdrSub').innerText = sub;
   }
 
@@ -1161,11 +1113,8 @@
   function renderDateScroller() {
     document.getElementById('dayScroller').innerHTML = itineraryIndex.map((d, i) => `
       <div class="date-chip" id="chip-${i}" onclick="selectDay(${i})">
-      <div class="day">
-            ${escapeHtml(d.date || '')}
-            <span class="wk">${escapeHtml(d.day || '')}</span>
-       </div>
-       <div class="date">Day ${i+1}</div>
+        <div class="day">${escapeHtml(d.date || '')}</div>
+        <div class="date">Day ${i+1} • ${escapeHtml(d.day || '')}</div>
       </div>
     `).join('');
   }
@@ -1280,7 +1229,214 @@
   
 
 
-  async function selectDay(idx) {
+  
+  // ====== Day Photos + Weather (Open‑Meteo) ======
+  const _openMeteoCache = new Map();
+  const _heroTimer = { id: null, key: '' };
+
+  function _dateFromMeta(meta){
+    // meta.file like: data/itinerary/2026-02-27.json
+    const s = String(meta?.file || '');
+    const m = s.match(/(\d{4}-\d{2}-\d{2})/);
+    return m ? m[1] : '';
+  }
+
+  function renderDayPhotos(dayData, meta){
+    const el = document.getElementById('dayHero');
+    if(!el) return;
+
+    // ✅ 來源優先順序：
+    // 1) day json: dayData.photos (建議你每一天放 5 張)
+    // 2) fallback：用固定的 unsplash 圖（先讓你看到效果）
+    const fallback = [
+      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=60',
+      'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=60',
+      'https://images.unsplash.com/photo-1526481280695-3c687fd5432c?auto=format&fit=crop&w=1200&q=60',
+      'https://images.unsplash.com/photo-1501630834273-4b5604d2ee31?auto=format&fit=crop&w=1200&q=60',
+      'https://images.unsplash.com/photo-1505842465776-3d90f616310d?auto=format&fit=crop&w=1200&q=60',
+    ];
+
+    const photos = Array.isArray(dayData?.photos) && dayData.photos.length
+      ? dayData.photos
+      : fallback;
+
+    // reset timer
+    if(_heroTimer.id) { clearInterval(_heroTimer.id); _heroTimer.id = null; }
+
+    const key = (_dateFromMeta(meta) || '') + '|' + photos.join('|');
+    _heroTimer.key = key;
+
+    let cur = 0;
+    const render = () => {
+      const src = photos[cur % photos.length];
+      el.innerHTML = `
+        <div class="hero-grad"></div>
+        <img src="${src}" alt="day photo" loading="lazy" referrerpolicy="no-referrer">
+        <div class="hero-dots">
+          ${photos.map((_,i)=>`<span class="dot ${i===cur?'active':''}"></span>`).join('')}
+        </div>
+      `;
+    };
+
+    render();
+
+    // auto slideshow
+    if(photos.length > 1){
+      _heroTimer.id = setInterval(()=>{
+        if(_heroTimer.key !== key) return;
+        cur = (cur + 1) % photos.length;
+        render();
+      }, 3500);
+    }
+  }
+
+  async function _fetchOpenMeteo(lat, lon){
+    const k = `${lat},${lon}`;
+    if(_openMeteoCache.has(k)) return _openMeteoCache.get(k);
+
+    const url = `https://api.open-meteo.com/v1/forecast`
+      + `?latitude=${encodeURIComponent(lat)}`
+      + `&longitude=${encodeURIComponent(lon)}`
+      + `&hourly=temperature_2m,precipitation_probability,weather_code`
+      + `&timezone=Asia%2FTokyo`
+      + `&forecast_days=16`;
+
+    const p = fetch(url).then(r => r.json());
+    _openMeteoCache.set(k, p);
+    return p;
+  }
+
+  function _faForWeatherCode(code, hour){
+    // Open‑Meteo weather_code (WMO) → FontAwesome icons (simple mapping)
+    const c = Number(code);
+    if([0].includes(c)) return (hour >= 18 || hour <= 5) ? 'fa-moon' : 'fa-sun';
+    if([1,2].includes(c)) return 'fa-cloud-sun';
+    if([3].includes(c)) return 'fa-cloud';
+    if([45,48].includes(c)) return 'fa-smog';
+    if([51,53,55,56,57].includes(c)) return 'fa-cloud-rain';
+    if([61,63,65,66,67,80,81,82].includes(c)) return 'fa-cloud-showers-heavy';
+    if([71,73,75,77,85,86].includes(c)) return 'fa-snowflake';
+    if([95,96,99].includes(c)) return 'fa-bolt';
+    return 'fa-cloud';
+  }
+
+  function _buildWeatherHTML(times, temps, pops, codes, wantDate){
+    // want 01:00 → 24:00
+    // Open-Meteo hourly provides 00:00~23:00; we take 01~23 and the next day's 00 as 24:00
+    const rows = [];
+    const idxByTime = new Map();
+    for(let i=0;i<times.length;i++) idxByTime.set(times[i], i);
+
+    const nextDate = (() => {
+      if(!wantDate) return '';
+      const d = new Date(wantDate + 'T00:00:00+09:00');
+      d.setDate(d.getDate() + 1);
+      const y = d.getFullYear();
+      const m = String(d.getMonth()+1).padStart(2,'0');
+      const dd= String(d.getDate()).padStart(2,'0');
+      return `${y}-${m}-${dd}`;
+    })();
+
+    for(let h=1; h<=23; h++){
+      const hh = String(h).padStart(2,'0');
+      const key = `${wantDate}T${hh}:00`;
+      const i = idxByTime.get(key);
+      if(i == null) continue;
+      const icon = _faForWeatherCode(codes[i], h);
+      const pop = Number.isFinite(pops?.[i]) ? `${pops[i]}%` : '';
+      rows.push(`
+        <div class="weather-hour">
+          <div class="w-time">${hh}:00</div>
+          <div class="w-icon"><i class="fas ${icon}"></i></div>
+          <div class="w-temp">${Math.round(temps[i])}°</div>
+          ${pop ? `<div class="w-pop">${pop}</div>` : ``}
+        </div>
+      `);
+    }
+
+    // 24:00
+    if(nextDate){
+      const key24 = `${nextDate}T00:00`;
+      const i24 = idxByTime.get(key24);
+      if(i24 != null){
+        const icon = _faForWeatherCode(codes[i24], 24);
+        const pop = Number.isFinite(pops?.[i24]) ? `${pops[i24]}%` : '';
+        rows.push(`
+          <div class="weather-hour">
+            <div class="w-time">24:00</div>
+            <div class="w-icon"><i class="fas ${icon}"></i></div>
+            <div class="w-temp">${Math.round(temps[i24])}°</div>
+            ${pop ? `<div class="w-pop">${pop}</div>` : ``}
+          </div>
+        `);
+      }
+    }
+
+    return rows.join('');
+  }
+
+  async function renderWeather(meta){
+    const strip = document.getElementById('weatherStrip');
+    if(!strip) return;
+
+    const lat = meta?.lat;
+    const lon = meta?.lon;
+
+    // no lat/lon → mock 01~24
+    if(lat == null || lon == null){
+      let weatherHTML = '';
+      for(let h=1; h<=24; h++) {
+        let icon = (h >= 19 || h <= 5) ? 'fa-moon' : 'fa-sun';
+        if(h >= 11 && h <= 16) icon = 'fa-cloud-sun';
+        let temp = 8 + Math.floor(Math.random()*8);
+        weatherHTML += `
+          <div class="weather-hour">
+            <div class="w-time">${String(h).padStart(2,'0')}:00</div>
+            <div class="w-icon"><i class="fas ${icon}"></i></div>
+            <div class="w-temp">${temp}°</div>
+          </div>`;
+      }
+      strip.innerHTML = weatherHTML;
+      return;
+    }
+
+    strip.innerHTML = `<div class="weather-note">讀取天氣中…</div>`;
+
+    try{
+      const data = await _fetchOpenMeteo(lat, lon);
+      const hourly = data?.hourly;
+      const times = hourly?.time || [];
+      const temps = hourly?.temperature_2m || [];
+      const pops  = hourly?.precipitation_probability || [];
+      const codes = hourly?.weather_code || [];
+
+      if(!times.length){
+        strip.innerHTML = `<div class="weather-note">天氣資料取得失敗（沒有 hourly 時間軸）</div>`;
+        return;
+      }
+
+      const want = _dateFromMeta(meta);
+      let wantDate = want;
+
+      // Open‑Meteo forecast is limited; if selected trip date isn't available, show the first available date.
+      const dates = Array.from(new Set(times.map(t => String(t).slice(0,10))));
+      if(wantDate && !dates.includes(wantDate)) wantDate = dates[0];
+
+      strip.innerHTML = _buildWeatherHTML(times, temps, pops, codes, wantDate);
+
+      if(want && wantDate !== want){
+        strip.insertAdjacentHTML('afterbegin',
+          `<div class="weather-note">※ Open‑Meteo 只提供近期預報，已改顯示可用日期：${wantDate}</div>`
+        );
+      }
+    }catch(err){
+      console.error(err);
+      strip.innerHTML = `<div class="weather-note">天氣資料取得失敗（${String(err).replace(/[<>&\"']/g, s => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[s]))}）</div>`;
+    }
+  }
+
+
+async function selectDay(idx) {
     currentDayIdx = idx;
 
     document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
@@ -1301,61 +1457,6 @@
     }
     const dayData = dayCache[idx];
     currentDayData = dayData;
-
-    let __heroTimer = null;
-
-    function renderDayHero(dayData, meta){
-        const el = document.getElementById('dayHero');
-        if(!el) return;
-
-        // ✅ 來源優先順序：
-        // 1) day json: dayData.photos (建議你每一天放 5 張)
-        // 2) fallback：用固定的 unsplash 圖（先讓你看到效果）
-        const photos = Array.isArray(dayData?.photos) && dayData.photos.length
-            ? dayData.photos.slice(0,5)
-            : [
-                "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80",
-                "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
-                "https://images.unsplash.com/photo-1526481280695-3c687fd5432c?auto=format&fit=crop&w=1200&q=80",
-                "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80",
-                "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80",
-            ];
-
-        const slides = photos.map((src, idx)=>`
-            <div class="hero-slide">
-            <img src="${escapeHtml(src)}" alt="day photo ${idx+1}">
-            <div class="hero-dots">
-                ${photos.map((_,d)=>`<span class="hero-dot ${d===0?'active':''}"></span>`).join('')}
-            </div>
-            </div>
-        `).join('');
-
-        el.innerHTML = `<div class="hero-track" id="heroTrack">${slides}</div>`;
-
-        // auto slide
-        const track = document.getElementById('heroTrack');
-        if(!track) return;
-
-        if(__heroTimer) clearInterval(__heroTimer);
-
-        const dotsAll = Array.from(el.querySelectorAll('.hero-dots'));
-        let cur = 0;
-
-        function setDot(i){
-            dotsAll.forEach((dotWrap, si)=>{
-            const dots = dotWrap.querySelectorAll('.hero-dot');
-            dots.forEach(d=>d.classList.remove('active'));
-            if(dots[i]) dots[i].classList.add('active');
-            });
-        }
-
-        __heroTimer = setInterval(()=>{
-            cur = (cur + 1) % photos.length;
-            track.scrollTo({ left: cur * track.clientWidth, behavior:'smooth' });
-            setDot(cur);
-        }, 3500);
-    }
-
     
     // timeline
     document.getElementById('timelineList').innerHTML = (dayData?.items || []).map((item, i) => {
@@ -1417,26 +1518,11 @@
       `;
     }).join('');
 
+    // ✅ day photos (每一天 5 張)
+    renderDayPhotos(dayData, meta);
 
-
-    // mock weather
-    let weatherHTML = '';
-    for(let h=1; h<=24; h++) {
-      let icon = 'fa-sun';
-      if(h >= 6 && h < 10) icon = 'fa-cloud-sun';
-      if(h >= 10 && h < 16) icon = 'fa-sun';
-      if(h >= 16 && h < 19) icon = 'fa-cloud-sun';
-      if(h >= 19 || h < 6) icon = 'fa-moon';
-      let temp = 10 + Math.floor(Math.random()*5);
-      const hh = String(h).padStart(2,'0');
-      weatherHTML += `
-        <div class="weather-hour">
-          <div class="w-time">${hh}:00</div>
-          <div class="w-icon"><i class="fas ${icon}"></i></div>
-          <div class="w-temp">${temp}°</div>
-        </div>`;
-    }
-    document.getElementById('weatherStrip').innerHTML = weatherHTML;
+    // ✅ weather：Open‑Meteo（需要 meta.lat/meta.lon），否則 fallback mock
+    await renderWeather(meta);
   }
 
   // ====== Google 導航：優先 geo，其次 addr/title ======
