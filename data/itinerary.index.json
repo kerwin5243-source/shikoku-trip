@@ -1,64 +1,64 @@
 [
   {
     "date": "02/27",
-    "day": "五",
-    "loc": "高松",
+    "day": "FRI",
+    "loc": "高松市",
     "hotel_id": "H1",
     "file": "data/itinerary/2026-02-27.json"
   },
   {
     "date": "02/28",
-    "day": "六",
+    "day": "SAT",
     "loc": "小豆島",
     "hotel_id": "H1",
     "file": "data/itinerary/2026-02-28.json"
   },
   {
     "date": "03/01",
-    "day": "日",
-    "loc": "德島",
+    "day": "SUN",
+    "loc": "德島市",
     "hotel_id": "H1",
     "file": "data/itinerary/2026-03-01.json"
   },
   {
     "date": "03/02",
-    "day": "一",
-    "loc": "松山",
+    "day": "MON",
+    "loc": "松山市",
     "hotel_id": "H2",
     "file": "data/itinerary/2026-03-02.json"
   },
   {
     "date": "03/03",
-    "day": "二",
-    "loc": "高知",
+    "day": "TUE",
+    "loc": "高知市",
     "hotel_id": "H3",
     "file": "data/itinerary/2026-03-03.json"
   },
   {
     "date": "03/04",
-    "day": "三",
-    "loc": "四萬十",
+    "day": "WED",
+    "loc": "四萬十川",
     "hotel_id": "H3",
     "file": "data/itinerary/2026-03-04.json"
   },
   {
     "date": "03/05",
-    "day": "四",
+    "day": "THU",
     "loc": "高知市",
     "hotel_id": "H3",
     "file": "data/itinerary/2026-03-05.json"
   },
   {
     "date": "03/06",
-    "day": "五",
+    "day": "FRI",
     "loc": "祖谷",
     "hotel_id": "H4",
     "file": "data/itinerary/2026-03-06.json"
   },
   {
     "date": "03/07",
-    "day": "六",
-    "loc": "返台",
+    "day": "SAT",
+    "loc": "高知市",
     "hotel_id": "H4",
     "file": "data/itinerary/2026-03-07.json"
   }
