@@ -540,26 +540,52 @@
     }
     /* ===== Route strip (for drive/walk/train/flight/boat) ===== */
     .route-strip{
-      display:flex;
-      gap:14px;
-      align-items:center;
-      padding:16px 18px;
-      border-radius:18px;
-      background:#F2F2F7;
-      border:1px solid rgba(0,0,0,.04);
-      box-shadow:0 6px 18px rgba(0,0,0,.06);
-      margin:8px 0 14px;
+        display:flex;
+        gap:14px;
+        align-items:center;
+        padding:12px 14px;        /* 更細長 */
+        border-radius:18px;
+        background:#F2F2F7;
+        border:1px solid rgba(0,0,0,.04);
+        box-shadow:0 6px 18px rgba(0,0,0,.06);
+
+        flex:1;                   /* ✅ 撐滿 */
+        width:100%;               /* ✅ 撐滿 */
+        margin:0;                 /* ✅ 不要自己縮排 */
     }
+    
+    .route-mins{
+        flex:0 0 auto;
+        font-family:'Roboto Mono', monospace;
+        font-size:.82rem;         /* ✅ 縮小 */
+        font-weight:900;
+        color:#444;
+        background:#ECECF0;
+        border-radius:999px;
+        padding:6px 10px;
+        white-space:nowrap;
+    }
+
     .route-ico{
-      width:44px; height:44px;
-      border-radius:16px;
-      display:flex; align-items:center; justify-content:center;
-      background:#EAF2FF;
-      flex:0 0 auto;
+        width:44px; height:44px;
+        border-radius:16px;
+        display:flex; align-items:center; justify-content:center;
+        background:#EAF2FF;
+        flex:0 0 auto;
     }
     .route-ico i{ font-size:18px; color:var(--primary); }
 
-    .route-main{ flex:1; min-width:0; }
+    /* 讓 route strip 內容左右分佈更漂亮 */
+    .route-main{
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* 想讓整張更「細長」一點就把 padding 降低 */
+    .route-strip{
+        padding: 12px 14px;     /* ✅ 比原本 16 18 更細長 */
+        border-radius: 18px;
+    }
     .route-title{
       font-weight:900;
       font-size:1.02rem;
@@ -578,6 +604,8 @@
       overflow:hidden;
       text-overflow:ellipsis;
     }
+
+
 
     /* duration / stay pill */
     .stay-pill{
@@ -600,71 +628,6 @@
       font-size:1rem;
     }
 
-    .route-pill{
-      flex:1;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding:10px 14px;
-      border-radius:999px;
-      background:#F2F2F7;
-      border:1px solid rgba(0,0,0,.04);
-      box-shadow:0 1px 6px rgba(0,0,0,.04);
-      cursor:pointer;
-    }
-
-    .route-left{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      min-width:0;
-    }
-
-    .route-icon{
-      width:30px; height:30px;
-      border-radius:999px;
-      display:grid; place-items:center;
-      background:#E5F1FB;
-      color:var(--primary);
-      flex:0 0 auto;
-    }
-
-    .route-text{
-      display:flex;
-      flex-direction:column;
-      min-width:0;
-    }
-
-    .route-title{
-      font-weight:800;
-      font-size:.95rem;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-
-    .route-sub{
-      font-size:.82rem;
-      color:var(--text-sec);
-      margin-top:2px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-
-    .route-right{
-      font-family:'Roboto Mono', monospace;
-      font-weight:800;
-      color:#444;
-      white-space:nowrap;
-      flex:0 0 auto;
-      padding-left:8px;
-    }
-
-    .route-pill:active{
-      transform:scale(.99);
-    }
     /* ===== Mobile layout guard ===== */
     .page, .app-header{
       max-width: 520px;
@@ -819,7 +782,7 @@
   let currentDayIdx = 0;
 
   // ====== Load Data ======
-  async function loadAllData(){
+  async function loadAllData(){ 
     [CONFIG, CHECKLISTS, TODOS, FLIGHTS, HOTELS, ITINERARY] = await Promise.all([
       fetch("./data/config.json").then(r=>r.json()),
       fetch("./data/checklists.json").then(r=>r.json()),
@@ -866,6 +829,17 @@
     (e) => e.preventDefault(),
     { passive: false }
   );
+  document.getElementById('timelineList').addEventListener('click', (e) => {
+    const el = e.target.closest('.route-click');
+    if(!el) return;
+
+    const from = decodeURIComponent(el.dataset.from || '');
+    const to   = decodeURIComponent(el.dataset.to || '');
+    const mode = decodeURIComponent(el.dataset.mode || 'drive');
+
+    openDirections(from, to, mode);
+   });
+
 
 
   function nav(pageId, el) {
@@ -1047,15 +1021,26 @@
       </div>
     `;
   }
-
-
-
-
-  function openDirections(from, to){
-    // Google Maps Directions
-    const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(from||'')}&destination=${encodeURIComponent(to||'')}&travelmode=driving`;
-    window.open(url, '_blank');
+  function openDirections(from, to, mode='drive'){
+    const tm = travelModeForRoute(mode); // 你下面已經有這個 function
+    const url = `https://www.google.com/maps/dir/?api=1`
+        + `&origin=${encodeURIComponent(from||'')}`
+        + `&destination=${encodeURIComponent(to||'')}`
+        + `&travelmode=${encodeURIComponent(tm)}`;
+    window.open(url, '_blank', 'noopener');
   }
+
+
+
+
+
+//   function openDirections(from, to){
+//     // Google Maps Directions
+//     const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(from||'')}&destination=${encodeURIComponent(to||'')}&travelmode=driving`;
+//     window.open(url, '_blank');
+//   }
+
+
 
 
   
@@ -1105,24 +1090,25 @@
         ? String(item.stay).trim()
         : (Number.isFinite(r.minutes) ? `${r.minutes} min` : '');
 
+      const enc = (s)=> encodeURIComponent(String(s ?? ''));
       return `
-        <div class="timeline-item">
-          <div class="tl-time">${escapeHtml(t)}</div>
+      <div class="timeline-item">
+            <div class="tl-time">${escapeHtml(t)}</div>
 
-          <div class="route-strip route-click"
-              data-from="${escapeHtml(r.from || '')}"
-              data-to="${escapeHtml(r.to || '')}"
-              data-mode="${escapeHtml(mode)}">
+            <div class="route-strip route-click"
+            data-from="${enc(r.from || '')}"
+            data-to="${enc(r.to || '')}"
+            data-mode="${enc(mode)}">
 
             <div class="route-ico"><i class="fas ${ico}"></i></div>
 
             <div class="route-main">
-              <div class="route-title">${escapeHtml(title)}</div>
-              ${dur ? `<div class="stay-pill" style="margin-top:10px;"><i class="fas fa-hourglass-half"></i>${escapeHtml(dur)}</div>` : ``}
+                <div class="route-title">${escapeHtml(title)}</div>
             </div>
 
-          </div>
-        </div>
+            ${dur ? `<div class="route-mins">${escapeHtml(dur)}</div>` : ``}
+            </div>
+      </div>
       `;
     }
 
