@@ -550,8 +550,6 @@
         background:#F2F2F7;
         border:1px solid rgba(0,0,0,.04);
         box-shadow:0 6px 18px rgba(0,0,0,.06);
-
-        flex:1;                   /* ✅ 撐滿 */
         width:100%;               /* ✅ 撐滿 */
         margin:0;                 /* ✅ 不要自己縮排 */
     }
@@ -681,6 +679,42 @@
 
     /* 建議加保險：砍掉水平 overflow */
     html, body{ overflow-x:hidden; }
+
+    /* ✅ Route item：時間一行 + 路線卡一行（卡片在 time 下方，且與其他卡片對齊） */
+    .timeline-item.route-item{
+        grid-template-rows: auto auto;   /* 兩行 */
+    }
+
+    /* 第 1 行：時間在左欄 */
+    .timeline-item.route-item .tl-time{
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    /* 第 1 行：右欄留空 */
+    .timeline-item.route-item .route-spacer{
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    /* 第 2 行：route 卡片放右欄（對齊其他卡片起點） */
+    .timeline-item.route-item .route-strip{
+        grid-column: 2;
+        grid-row: 2;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* ✅ 小保險：route-strip 內部不要把自己撐爆 */
+    .route-strip{
+        min-width: 0;
+    }
+
+    /* ✅ 讓中間標題欄位可被壓縮，確保右邊 minutes 不會被擠掉 */
+    .route-main{
+        min-width: 0;
+    }
+
 
 
 
@@ -1042,21 +1076,24 @@
     const line2 = `${r.from || ''} → ${r.to || ''}`.trim();
 
     return `
-      <div class="timeline-item" onclick="openModal(${i})">
-        <div class="tl-time">${escapeHtml(item.time || '')}</div>
-        <div class="tl-content" style="display:flex; gap:12px; align-items:center;">
-          <div style="width:44px;height:44px;border-radius:999px;background:#EEF3F7;display:flex;align-items:center;justify-content:center;flex:0 0 auto;">
-            <i class="fas ${icon}" style="color:#6B7280;font-size:18px;"></i>
-          </div>
-          <div style="flex:1; min-width:0;">
-            <div style="font-weight:900;font-size:1.05rem; margin-bottom:2px;">${escapeHtml(item.title || '移動')}</div>
-            <div style="color:var(--text-sec); font-weight:700;">${escapeHtml(line2)}</div>
-            ${mins ? `<div style="margin-top:8px; display:inline-flex; gap:8px; align-items:center; background:#F2F2F7; padding:6px 10px; border-radius:999px; font-weight:900; color:#4B5563;">
-              <i class="fas fa-hourglass-half" style="color:#9CA3AF;"></i>${escapeHtml(mins)}
-            </div>` : ``}
-          </div>
+    <div class="timeline-item route-item">
+        <div class="tl-time">${escapeHtml(t)}</div>
+        <div class="route-spacer"></div>
+
+        <div class="route-strip route-click"
+        data-from="${enc(r.from || '')}"
+        data-to="${enc(r.to || '')}"
+        data-mode="${enc(mode)}">
+
+        <div class="route-ico"><i class="fas ${ico}"></i></div>
+
+        <div class="route-main">
+            <div class="route-title">${escapeHtml(title)}</div>
         </div>
-      </div>
+
+        ${dur ? `<div class="route-mins">${escapeHtml(dur)}</div>` : ``}
+        </div>
+    </div>
     `;
   }
 
