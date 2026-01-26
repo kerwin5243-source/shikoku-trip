@@ -48,18 +48,37 @@
       padding:56px 20px 16px;
       background:linear-gradient(to bottom, rgba(246,243,238,1), rgba(246,243,238,.82));
     }
+    .app-header{ text-align:center; }
+
     .app-header h1{
-      margin:0;
-      font-family:'Noto Serif TC', serif;
-      font-size:2.2rem;
-      font-weight:900;
-      letter-spacing:.2px;
+        margin:0;
+        font-family:'Noto Serif TC', serif;
+        font-size:1.75rem;     /* 原本 2.2rem → 縮小 */
+        font-weight:900;
+        letter-spacing:.2px;
+        display:flex;
+        justify-content:center;
+        align-items:baseline;
+        gap:10px;
     }
+
+    .year-pill{
+        font-family:'Noto Sans TC',sans-serif;
+        font-size:.78rem;
+        font-weight:900;
+        padding:4px 10px;
+        border-radius:999px;
+        border:1px solid rgba(176,138,91,.55);
+        background:rgba(255,255,255,.65);
+        color:#7D5B34;
+    }
+
     .app-header p{
-      margin:8px 0 0;
-      font-size:.95rem;
-      color:var(--ink2);
-      font-weight:600;
+        margin:8px 0 0;
+        font-size:.92rem;
+        color:var(--ink2);
+        font-weight:700;
+        text-align:center;
     }
 
     .page{ display:none; padding:0 20px; animation:fadeIn .28s ease; }
@@ -147,31 +166,84 @@
 
     /* date scroller */
     .date-scroller{
-      display:flex; gap:12px; overflow-x:auto; padding:10px 20px 18px;
+      display:flex; gap:8px; overflow-x:auto; padding:8px 20px 14px;
       margin:0 -20px; scrollbar-width:none;
     }
     .date-scroller::-webkit-scrollbar{ display:none; }
+    .day-hero{
+        margin:6px 0 14px;
+        border-radius:24px;
+        overflow:hidden;
+        border:1px solid rgba(233,225,214,.9);
+        box-shadow:0 10px 26px rgba(0,0,0,.08);
+        background:rgba(255,255,255,.6);
+    }
+
+    .hero-track{
+        display:flex;
+        overflow-x:auto;
+        scroll-snap-type:x mandatory;
+        scrollbar-width:none;
+    }
+    .hero-track::-webkit-scrollbar{ display:none; }
+
+    .hero-slide{
+        flex:0 0 100%;
+        height:170px;
+        scroll-snap-align:start;
+        position:relative;
+    }
+    .hero-slide img{
+        width:100%;
+        height:100%;
+        object-fit:cover;
+        display:block;
+    }
+
+    .hero-dots{
+        position:absolute;
+        left:0; right:0; bottom:10px;
+        display:flex;
+        justify-content:center;
+        gap:6px;
+    }
+    .hero-dot{
+        width:6px; height:6px;
+        border-radius:50%;
+        background:rgba(255,255,255,.6);
+    }
+    .hero-dot.active{ background:rgba(255,255,255,.95); }
+
+
+
     .date-chip{
       flex:0 0 auto;
       background:rgba(255,255,255,.75);
       border:1px solid rgba(233,225,214,.9);
-      border-radius:22px;
-      padding:12px 18px;
+      border-radius:18px;
+      padding:10px 12px;
       text-align:center;
-      min-width:96px;
+      min-width:72px;
       box-shadow:0 10px 24px rgba(0,0,0,.08);
       transition:.2s;
       cursor:pointer;
     }
     .date-chip .day{
       font-family:'Noto Serif TC', serif;
-      font-size:1.2rem; font-weight:900; letter-spacing:.3px;
+      font-size:1.0rem; font-weight:900; letter-spacing:.3px;
     }
     .date-chip .date{
-      font-size:.78rem;
+      font-size:.72rem;
       font-weight:900;
       color:var(--ink2);
       margin-top:2px;
+    }
+    .date-chip .day .wk{
+        margin-left:6px;
+        font-size:.72rem;        /* 星期更小 */
+        font-weight:900;
+        color:var(--ink2);
+        letter-spacing:.06em;
     }
     .date-chip.active{
       background:#fff;
@@ -540,6 +612,30 @@
       color:var(--ink2); font-size:.9rem;
       font-weight:800;
     }
+    .wx-head{
+        display:flex;
+        justify-content:space-between;
+        align-items:baseline;
+        margin-bottom:14px;
+    }
+
+    .wx-city{
+        font-family:'Noto Serif TC', serif;
+        font-size:1.25rem;
+        font-weight:900;
+        color:var(--primary);
+    }
+
+    .wx-label{
+        font-size:.82rem;
+        font-weight:900;
+        color:var(--ink2);
+        display:flex;
+        align-items:center;
+        gap:8px;
+    }
+
+
     /* ===== Route strip (for drive/walk/train/flight/boat) ===== */
     .route-strip{
         display:flex;
@@ -697,22 +793,6 @@
         border-radius:16px;
         background:#EEF2FF;
         overflow:hidden;
-        position: relative;     /* ✅ 讓 chip 用 absolute 定位在卡片上 */
-        padding-top: 18px;      /* ✅ 預留上方空間給時間貼紙 */
-    }
-    /* 左上角時間貼紙 */
-    .route-time-chip{
-        position: absolute;
-        top: 8px;
-        left: 14px;
-        font-size: 12px;
-        font-weight: 800;
-        color: #6B7280;
-        line-height: 1;
-        padding: 4px 8px;
-        border-radius: 999px;
-        background: rgba(255,255,255,0.65);
-        border: 1px solid rgba(0,0,0,0.05);
     }
     /* 左側：小時間 + icon
     .route-left{
@@ -817,8 +897,8 @@
 
 <body>
   <header class="app-header">
-    <h1 id="hdrTitle">2026 四國巡禮</h1>
-    <p id="hdrSub">9天8夜自駕遊</p>
+    <h1 id="hdrTitle"></h1>
+    <p id="hdrSub"></p>
   </header>
 
   <!-- 行前 -->
@@ -848,9 +928,9 @@
     <div class="date-scroller" id="dayScroller"></div>
 
     <div class="card" style="margin-top: 18px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-        <div class="section-title" style="margin:0;"><i class="fas fa-cloud-sun"></i> 24H 預報</div>
-        <span id="weatherLoc" style="font-size:0.9rem; color:var(--ink2); font-weight:900;"></span>
+      <div class="wx-head">
+        <div id="weatherLoc" class="wx-city"></div>
+        <div class="wx-label"><i class="fas fa-cloud-sun"></i> 24H 預報</div>
       </div>
       <div class="weather-strip" id="weatherStrip"></div>
       <div style="text-align:right; font-size:0.86rem; color:var(--ink2); font-weight:800;">
@@ -945,8 +1025,11 @@
     hotels = HOTELS || [];
     itineraryIndex = ITINERARY || [];
 
-    document.getElementById('hdrTitle').innerText = CONFIG?.trip_title || '2026 四國巡禮';
-    const sub = `${CONFIG?.days || 9}天${CONFIG?.nights || 8}夜${CONFIG?.mode ? CONFIG.mode : ''} • ${users.join(', ')}`;
+    const title = (CONFIG?.trip_title || '四國巡禮').replace(/^2026\s*/,'');
+    document.getElementById('hdrTitle').innerHTML = `${escapeHtml(title)}<span class="year-pill">2026</span>`;
+
+    // 2) subtitle 不顯示 L,K,R,Y,J
+    const sub = `${CONFIG?.days || 9}天${CONFIG?.nights || 8}夜${CONFIG?.mode ? CONFIG.mode : ''}`;
     document.getElementById('hdrSub').innerText = sub;
   }
 
@@ -1078,8 +1161,11 @@
   function renderDateScroller() {
     document.getElementById('dayScroller').innerHTML = itineraryIndex.map((d, i) => `
       <div class="date-chip" id="chip-${i}" onclick="selectDay(${i})">
-        <div class="day">${escapeHtml(d.date || '')}</div>
-        <div class="date">Day ${i+1} • ${escapeHtml(d.day || '')}</div>
+      <div class="day">
+            ${escapeHtml(d.date || '')}
+            <span class="wk">${escapeHtml(d.day || '')}</span>
+       </div>
+       <div class="date">Day ${i+1}</div>
       </div>
     `).join('');
   }
@@ -1215,6 +1301,61 @@
     }
     const dayData = dayCache[idx];
     currentDayData = dayData;
+
+    let __heroTimer = null;
+
+    function renderDayHero(dayData, meta){
+        const el = document.getElementById('dayHero');
+        if(!el) return;
+
+        // ✅ 來源優先順序：
+        // 1) day json: dayData.photos (建議你每一天放 5 張)
+        // 2) fallback：用固定的 unsplash 圖（先讓你看到效果）
+        const photos = Array.isArray(dayData?.photos) && dayData.photos.length
+            ? dayData.photos.slice(0,5)
+            : [
+                "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1526481280695-3c687fd5432c?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80",
+            ];
+
+        const slides = photos.map((src, idx)=>`
+            <div class="hero-slide">
+            <img src="${escapeHtml(src)}" alt="day photo ${idx+1}">
+            <div class="hero-dots">
+                ${photos.map((_,d)=>`<span class="hero-dot ${d===0?'active':''}"></span>`).join('')}
+            </div>
+            </div>
+        `).join('');
+
+        el.innerHTML = `<div class="hero-track" id="heroTrack">${slides}</div>`;
+
+        // auto slide
+        const track = document.getElementById('heroTrack');
+        if(!track) return;
+
+        if(__heroTimer) clearInterval(__heroTimer);
+
+        const dotsAll = Array.from(el.querySelectorAll('.hero-dots'));
+        let cur = 0;
+
+        function setDot(i){
+            dotsAll.forEach((dotWrap, si)=>{
+            const dots = dotWrap.querySelectorAll('.hero-dot');
+            dots.forEach(d=>d.classList.remove('active'));
+            if(dots[i]) dots[i].classList.add('active');
+            });
+        }
+
+        __heroTimer = setInterval(()=>{
+            cur = (cur + 1) % photos.length;
+            track.scrollTo({ left: cur * track.clientWidth, behavior:'smooth' });
+            setDot(cur);
+        }, 3500);
+    }
+
     
     // timeline
     document.getElementById('timelineList').innerHTML = (dayData?.items || []).map((item, i) => {
@@ -1245,8 +1386,6 @@
             data-from="${enc(r.from || '')}"
             data-to="${enc(r.to || '')}"
             data-mode="${enc(mode)}">
-
-            <div class="route-time-chip">${escapeHtml(t)}</div>
             <div class="route-ico"><i class="fas ${ico}"></i></div>
 
 
@@ -1282,14 +1421,17 @@
 
     // mock weather
     let weatherHTML = '';
-    for(let h=9; h<=21; h++) {
+    for(let h=1; h<=24; h++) {
       let icon = 'fa-sun';
-      if(h > 12 && h < 16) icon = 'fa-cloud-sun';
-      if(h > 18) icon = 'fa-moon';
+      if(h >= 6 && h < 10) icon = 'fa-cloud-sun';
+      if(h >= 10 && h < 16) icon = 'fa-sun';
+      if(h >= 16 && h < 19) icon = 'fa-cloud-sun';
+      if(h >= 19 || h < 6) icon = 'fa-moon';
       let temp = 10 + Math.floor(Math.random()*5);
+      const hh = String(h).padStart(2,'0');
       weatherHTML += `
         <div class="weather-hour">
-          <div class="w-time">${h}:00</div>
+          <div class="w-time">${hh}:00</div>
           <div class="w-icon"><i class="fas ${icon}"></i></div>
           <div class="w-temp">${temp}°</div>
         </div>`;
@@ -1680,5 +1822,4 @@
 
 </script>
 </body>
-
 </html>
