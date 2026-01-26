@@ -1,65 +1,83 @@
 [
   {
-    "date": "02/27",
+    "date": "01/27",
     "day": "FRI",
     "loc": "高松市",
     "hotel_id": "H1",
-    "file": "data/itinerary/2026-02-27.json"
+    "file": "data/itinerary/2026-02-27.json",
+    "lat": 34.2034,
+    "lon": 134.0248
   },
   {
-    "date": "02/28",
+    "date": "01/28",
     "day": "SAT",
     "loc": "小豆島",
     "hotel_id": "H1",
-    "file": "data/itinerary/2026-02-28.json"
+    "file": "data/itinerary/2026-02-28.json",
+    "lat": 34.3049,
+    "lon": 134.1780
   },
   {
-    "date": "03/01",
+    "date": "02/01",
     "day": "SUN",
     "loc": "德島市",
     "hotel_id": "H1",
-    "file": "data/itinerary/2026-03-01.json"
+    "file": "data/itinerary/2026-03-01.json",
+    "lat": 34.0413,
+    "lon": 134.3318
   },
   {
-    "date": "03/02",
+    "date": "02/02",
     "day": "MON",
     "loc": "松山市",
     "hotel_id": "H2",
-    "file": "data/itinerary/2026-03-02.json"
+    "file": "data/itinerary/2026-03-02.json",
+    "lat": 33.5114,
+    "lon": 132.4760
   },
   {
-    "date": "03/03",
+    "date": "02/03",
     "day": "TUE",
     "loc": "高知市",
     "hotel_id": "H3",
-    "file": "data/itinerary/2026-03-03.json"
+    "file": "data/itinerary/2026-03-03.json",
+    "lat": 33.3333,
+    "lon": 133.3333
   },
   {
-    "date": "03/04",
+    "date": "02/04",
     "day": "WED",
     "loc": "四萬十川",
     "hotel_id": "H3",
-    "file": "data/itinerary/2026-03-04.json"
+    "file": "data/itinerary/2026-03-04.json",
+    "lat": 32.5929,
+    "lon": 132.5601
   },
   {
-    "date": "03/05",
+    "date": "02/05",
     "day": "THU",
     "loc": "高知市",
     "hotel_id": "H3",
-    "file": "data/itinerary/2026-03-05.json"
+    "file": "data/itinerary/2026-03-05.json",
+    "lat": 33.3333,
+    "lon": 133.3333
   },
   {
-    "date": "03/06",
+    "date": "02/06",
     "day": "FRI",
     "loc": "祖谷",
     "hotel_id": "H4",
-    "file": "data/itinerary/2026-03-06.json"
+    "file": "data/itinerary/2026-03-06.json",
+    "lat": 33.5810,
+    "lon": 133.4637
   },
   {
-    "date": "03/07",
+    "date": "02/07",
     "day": "SAT",
     "loc": "高知市",
     "hotel_id": "H4",
-    "file": "data/itinerary/2026-03-07.json"
+    "file": "data/itinerary/2026-03-07.json",
+    "lat": 34.2034,
+    "lon": 134.0248
   }
 ]
