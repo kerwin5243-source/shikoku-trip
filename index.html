@@ -699,7 +699,7 @@
         overflow:hidden;
     }
 
-    /* 左側：小時間 + icon */
+    /* 左側：小時間 + icon
     .route-left{
         flex:0 0 auto;
         display:flex;
@@ -713,7 +713,7 @@
         font-weight:800;
         color:#6B7280;
         line-height:1;
-    }
+    } */
 
     /* icon 尺寸（可微調） */
     .route-ico{
@@ -724,16 +724,26 @@
         align-items:center;
         justify-content:center;
         background:rgba(255,255,255,0.55);
+        flex:0 0 auto;
     }
     .route-ico i{ font-size:16px; }
 
     /* 中間標題：可縮 + ... */
     .route-main{ flex:1 1 auto; min-width:0; }
+    /* 文字區：上面時間，下面標題 */
+    .route-time-top{
+        font-size:12px;
+        font-weight:800;
+        color:#6B7280;
+        line-height:1.1;
+        margin-bottom:4px;
+    }
+
     .route-title{
+        font-weight:900;
         white-space:nowrap;
         overflow:hidden;
         text-overflow:ellipsis;
-        font-weight:900;
     }
 
     /* 右側分鐘：固定不被擠掉 */
@@ -1221,12 +1231,12 @@
             data-to="${enc(r.to || '')}"
             data-mode="${enc(mode)}">
 
-            <div class="route-left">
-                <div class="route-time-mini">${escapeHtml(t)}</div>
-                <div class="route-ico"><i class="fas ${ico}"></i></div>
-            </div>
+
+            <div class="route-ico"><i class="fas ${ico}"></i></div>
+
 
             <div class="route-main">
+                <div class="route-time-top">${escapeHtml(t)}</div>
                 <div class="route-title">${escapeHtml(title)}</div>
             </div>
 
