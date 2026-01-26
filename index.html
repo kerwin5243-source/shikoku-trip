@@ -48,37 +48,18 @@
       padding:56px 20px 16px;
       background:linear-gradient(to bottom, rgba(246,243,238,1), rgba(246,243,238,.82));
     }
-    .app-header{ text-align:center; }
-
     .app-header h1{
-        margin:0;
-        font-family:'Noto Serif TC', serif;
-        font-size:1.75rem;     /* 原本 2.2rem → 縮小 */
-        font-weight:900;
-        letter-spacing:.2px;
-        display:flex;
-        justify-content:center;
-        align-items:baseline;
-        gap:10px;
+      margin:0;
+      font-family:'Noto Serif TC', serif;
+      font-size:2.2rem;
+      font-weight:900;
+      letter-spacing:.2px;
     }
-
-    .year-pill{
-        font-family:'Noto Sans TC',sans-serif;
-        font-size:.78rem;
-        font-weight:900;
-        padding:4px 10px;
-        border-radius:999px;
-        border:1px solid rgba(176,138,91,.55);
-        background:rgba(255,255,255,.65);
-        color:#7D5B34;
-    }
-
     .app-header p{
-        margin:8px 0 0;
-        font-size:.92rem;
-        color:var(--ink2);
-        font-weight:700;
-        text-align:center;
+      margin:8px 0 0;
+      font-size:.95rem;
+      color:var(--ink2);
+      font-weight:600;
     }
 
     .page{ display:none; padding:0 20px; animation:fadeIn .28s ease; }
@@ -166,84 +147,31 @@
 
     /* date scroller */
     .date-scroller{
-      display:flex; gap:8px; overflow-x:auto; padding:8px 20px 14px;
+      display:flex; gap:12px; overflow-x:auto; padding:10px 20px 18px;
       margin:0 -20px; scrollbar-width:none;
     }
     .date-scroller::-webkit-scrollbar{ display:none; }
-    .day-hero{
-        margin:6px 0 14px;
-        border-radius:24px;
-        overflow:hidden;
-        border:1px solid rgba(233,225,214,.9);
-        box-shadow:0 10px 26px rgba(0,0,0,.08);
-        background:rgba(255,255,255,.6);
-    }
-
-    .hero-track{
-        display:flex;
-        overflow-x:auto;
-        scroll-snap-type:x mandatory;
-        scrollbar-width:none;
-    }
-    .hero-track::-webkit-scrollbar{ display:none; }
-
-    .hero-slide{
-        flex:0 0 100%;
-        height:170px;
-        scroll-snap-align:start;
-        position:relative;
-    }
-    .hero-slide img{
-        width:100%;
-        height:100%;
-        object-fit:cover;
-        display:block;
-    }
-
-    .hero-dots{
-        position:absolute;
-        left:0; right:0; bottom:10px;
-        display:flex;
-        justify-content:center;
-        gap:6px;
-    }
-    .hero-dot{
-        width:6px; height:6px;
-        border-radius:50%;
-        background:rgba(255,255,255,.6);
-    }
-    .hero-dot.active{ background:rgba(255,255,255,.95); }
-
-
-
     .date-chip{
       flex:0 0 auto;
       background:rgba(255,255,255,.75);
       border:1px solid rgba(233,225,214,.9);
-      border-radius:18px;
-      padding:10px 12px;
+      border-radius:22px;
+      padding:12px 18px;
       text-align:center;
-      min-width:72px;
+      min-width:96px;
       box-shadow:0 10px 24px rgba(0,0,0,.08);
       transition:.2s;
       cursor:pointer;
     }
     .date-chip .day{
       font-family:'Noto Serif TC', serif;
-      font-size:1.0rem; font-weight:900; letter-spacing:.3px;
+      font-size:1.2rem; font-weight:900; letter-spacing:.3px;
     }
     .date-chip .date{
-      font-size:.72rem;
+      font-size:.78rem;
       font-weight:900;
       color:var(--ink2);
       margin-top:2px;
-    }
-    .date-chip .day .wk{
-        margin-left:6px;
-        font-size:.72rem;        /* 星期更小 */
-        font-weight:900;
-        color:var(--ink2);
-        letter-spacing:.06em;
     }
     .date-chip.active{
       background:#fff;
@@ -292,7 +220,7 @@
       gap:6px;
       padding:6px 10px;
       border-radius:999px;
-      font-size:.72rem;
+      font-size:.64rem;
       font-weight:900;
       letter-spacing:.12em;
       margin-bottom:10px;
@@ -612,30 +540,6 @@
       color:var(--ink2); font-size:.9rem;
       font-weight:800;
     }
-    .wx-head{
-        display:flex;
-        justify-content:space-between;
-        align-items:baseline;
-        margin-bottom:14px;
-    }
-
-    .wx-city{
-        font-family:'Noto Serif TC', serif;
-        font-size:1.25rem;
-        font-weight:900;
-        color:var(--primary);
-    }
-
-    .wx-label{
-        font-size:.82rem;
-        font-weight:900;
-        color:var(--ink2);
-        display:flex;
-        align-items:center;
-        gap:8px;
-    }
-
-
     /* ===== Route strip (for drive/walk/train/flight/boat) ===== */
     .route-strip{
         display:flex;
@@ -653,12 +557,12 @@
     .route-mins{
         flex:0 0 auto;
         font-family:'Roboto Mono', monospace;
-        font-size:.65rem;         /* ✅ 縮小 */
+        font-size:.82rem;         /* ✅ 縮小 */
         font-weight:900;
         color:#444;
         background:#ECECF0;
         border-radius:999px;
-        padding:5px 8px;
+        padding:6px 10px;
         white-space:nowrap;
     }
 
@@ -704,7 +608,7 @@
         display:flex;
         align-items:center;
         gap:12px;
-        padding:10px 12px;
+        padding:8px 10px;
         border-radius:14px;
         max-width:100%;
         width:100%;
@@ -775,82 +679,43 @@
 
     /* 建議加保險：砍掉水平 overflow */
     html, body{ overflow-x:hidden; }
-    /* ✅ route 直接吃滿整個容器寬度 */
+
+    /* ✅ Route item：時間一行 + 路線卡一行（卡片在 time 下方，且與其他卡片對齊） */
     .timeline-item.route-item{
-        display:block;         /* route 不用兩欄 grid */
-        cursor: pointer;
-        margin-bottom:18px;
+        grid-template-rows: auto auto;   /* 兩行 */
     }
 
-    /* route 卡片本體 */
-    .route-item .route-strip{
-        width:100%;
-        max-width:100%;
-        display:flex;
-        align-items:center;
-        gap:12px;
-        padding:12px 16px;
-        border-radius:16px;
-        background:#EEF2FF;
-        overflow:hidden;
-    }
-    /* 左側：小時間 + icon
-    .route-left{
-        flex:0 0 auto;
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        gap:6px;
+    /* 第 1 行：時間在左欄 */
+    .timeline-item.route-item .tl-time{
+        grid-column: 1;
+        grid-row: 1;
     }
 
-    .route-time-mini{
-        font-size:12px;
-        font-weight:800;
-        color:#6B7280;
-        line-height:1;
-    } */
-
-    /* icon 尺寸（可微調） */
-    .route-ico{
-        width:38px;
-        height:38px;
-        border-radius:14px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        background:rgba(255,255,255,0.55);
-        flex:0 0 auto;
-    }
-    .route-ico i{ font-size:16px; }
-
-    /* 中間標題：可縮 + ... */
-    .route-main{ flex:1 1 auto; min-width:0; }
-    /* 文字區：上面時間，下面標題 */
-    .route-time-top{
-        font-size:12px;
-        font-weight:800;
-        color:#6B7280;
-        line-height:1.1;
-        margin-bottom:4px;
+    /* 第 1 行：右欄留空 */
+    .timeline-item.route-item .route-spacer{
+        grid-column: 2;
+        grid-row: 1;
     }
 
-    .route-title{
-        font-weight:900;
-        white-space:nowrap;
-        overflow:hidden;
-        text-overflow:ellipsis;
+    /* 第 2 行：route 卡片放右欄（對齊其他卡片起點） */
+    .timeline-item.route-item .route-strip{
+        grid-column: 2;
+        grid-row: 2;
+        width: 100%;
+        max-width: 100%;
     }
 
-    /* 右側分鐘：固定不被擠掉 */
-    .route-mins{
-        flex:0 0 auto;
-        white-space:nowrap;
-        font-size:12px;      /* 想更小就 11px */
-        padding:5px 8px;
-        border-radius:999px;
-        background:rgba(255,255,255,0.7);
-        font-weight:900;
+    /* ✅ 小保險：route-strip 內部不要把自己撐爆 */
+    .route-strip{
+        min-width: 0;
     }
+
+    /* ✅ 讓中間標題欄位可被壓縮，確保右邊 minutes 不會被擠掉 */
+    .route-main{
+        min-width: 0;
+    }
+
+
 
 
     /* ===== Mobile layout guard ===== */
@@ -897,8 +762,8 @@
 
 <body>
   <header class="app-header">
-    <h1 id="hdrTitle"></h1>
-    <p id="hdrSub"></p>
+    <h1 id="hdrTitle">2026 四國巡禮</h1>
+    <p id="hdrSub">9天8夜自駕遊</p>
   </header>
 
   <!-- 行前 -->
@@ -927,10 +792,14 @@
   <div id="page-itinerary" class="page active">
     <div class="date-scroller" id="dayScroller"></div>
 
+    
+    <!-- ✅ Day photos slideshow（獨立一個 block，放在天氣預報上方） -->
+    <div id="dayHero" class="day-hero" style="margin-top: 14px;"></div>
+
     <div class="card" style="margin-top: 18px;">
       <div class="wx-head">
-        <div id="weatherLoc" class="wx-city"></div>
         <div class="wx-label"><i class="fas fa-cloud-sun"></i> 24H 預報</div>
+        <div id="weatherLoc" class="wx-city"></div>
       </div>
       <div class="weather-strip" id="weatherStrip"></div>
       <div style="text-align:right; font-size:0.86rem; color:var(--ink2); font-weight:800;">
@@ -1025,11 +894,8 @@
     hotels = HOTELS || [];
     itineraryIndex = ITINERARY || [];
 
-    const title = (CONFIG?.trip_title || '四國巡禮').replace(/^2026\s*/,'');
-    document.getElementById('hdrTitle').innerHTML = `${escapeHtml(title)}<span class="year-pill">2026</span>`;
-
-    // 2) subtitle 不顯示 L,K,R,Y,J
-    const sub = `${CONFIG?.days || 9}天${CONFIG?.nights || 8}夜${CONFIG?.mode ? CONFIG.mode : ''}`;
+    document.getElementById('hdrTitle').innerText = CONFIG?.trip_title || '2026 四國巡禮';
+    const sub = `${CONFIG?.days || 9}天${CONFIG?.nights || 8}夜${CONFIG?.mode ? CONFIG.mode : ''} • ${users.join(', ')}`;
     document.getElementById('hdrSub').innerText = sub;
   }
 
@@ -1161,11 +1027,8 @@
   function renderDateScroller() {
     document.getElementById('dayScroller').innerHTML = itineraryIndex.map((d, i) => `
       <div class="date-chip" id="chip-${i}" onclick="selectDay(${i})">
-      <div class="day">
-            ${escapeHtml(d.date || '')}
-            <span class="wk">${escapeHtml(d.day || '')}</span>
-       </div>
-       <div class="date">Day ${i+1}</div>
+        <div class="day">${escapeHtml(d.date || '')}<span class="wk">${escapeHtml(d.day || '')}</span></div>
+        <div class="date">Day ${i+1}</div>
       </div>
     `).join('');
   }
@@ -1217,24 +1080,24 @@
     const line2 = `${r.from || ''} → ${r.to || ''}`.trim();
 
     return `
-        <div class="timeline-item route-item">
-            <div class="tl-time">${escapeHtml(t)}</div>
-            <div class="route-spacer"></div>
+    <div class="timeline-item route-item">
+        <div class="tl-time">${escapeHtml(t)}</div>
+        <div class="route-spacer"></div>
 
-            <div class="route-strip route-click"
-            data-from="${enc(r.from || '')}"
-            data-to="${enc(r.to || '')}"
-            data-mode="${enc(mode)}">
+        <div class="route-strip route-click"
+        data-from="${enc(r.from || '')}"
+        data-to="${enc(r.to || '')}"
+        data-mode="${enc(mode)}">
 
-            <div class="route-ico"><i class="fas ${ico}"></i></div>
+        <div class="route-ico"><i class="fas ${ico}"></i></div>
 
-            <div class="route-main">
-                <div class="route-title">${escapeHtml(title)}</div>
-            </div>
-
-            ${dur ? `<div class="route-mins">${escapeHtml(dur)}</div>` : ``}
-            </div>
+        <div class="route-main">
+            <div class="route-title">${escapeHtml(title)}</div>
         </div>
+
+        ${dur ? `<div class="route-mins">${escapeHtml(dur)}</div>` : ``}
+        </div>
+    </div>
     `;
   }
 
@@ -1280,7 +1143,7 @@
   
 
 
-  async function selectDay(idx) {
+  async async function selectDay(idx) {
     currentDayIdx = idx;
 
     document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
@@ -1302,60 +1165,8 @@
     const dayData = dayCache[idx];
     currentDayData = dayData;
 
-    let __heroTimer = null;
-
-    function renderDayHero(dayData, meta){
-        const el = document.getElementById('dayHero');
-        if(!el) return;
-
-        // ✅ 來源優先順序：
-        // 1) day json: dayData.photos (建議你每一天放 5 張)
-        // 2) fallback：用固定的 unsplash 圖（先讓你看到效果）
-        const photos = Array.isArray(dayData?.photos) && dayData.photos.length
-            ? dayData.photos.slice(0,5)
-            : [
-                "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80",
-                "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
-                "https://images.unsplash.com/photo-1526481280695-3c687fd5432c?auto=format&fit=crop&w=1200&q=80",
-                "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80",
-                "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80",
-            ];
-
-        const slides = photos.map((src, idx)=>`
-            <div class="hero-slide">
-            <img src="${escapeHtml(src)}" alt="day photo ${idx+1}">
-            <div class="hero-dots">
-                ${photos.map((_,d)=>`<span class="hero-dot ${d===0?'active':''}"></span>`).join('')}
-            </div>
-            </div>
-        `).join('');
-
-        el.innerHTML = `<div class="hero-track" id="heroTrack">${slides}</div>`;
-
-        // auto slide
-        const track = document.getElementById('heroTrack');
-        if(!track) return;
-
-        if(__heroTimer) clearInterval(__heroTimer);
-
-        const dotsAll = Array.from(el.querySelectorAll('.hero-dots'));
-        let cur = 0;
-
-        function setDot(i){
-            dotsAll.forEach((dotWrap, si)=>{
-            const dots = dotWrap.querySelectorAll('.hero-dot');
-            dots.forEach(d=>d.classList.remove('active'));
-            if(dots[i]) dots[i].classList.add('active');
-            });
-        }
-
-        __heroTimer = setInterval(()=>{
-            cur = (cur + 1) % photos.length;
-            track.scrollTo({ left: cur * track.clientWidth, behavior:'smooth' });
-            setDot(cur);
-        }, 3500);
-    }
-
+    // ✅ day photos
+    renderDayHero(dayData, meta);
     
     // timeline
     document.getElementById('timelineList').innerHTML = (dayData?.items || []).map((item, i) => {
@@ -1381,24 +1192,24 @@
 
       const enc = (s)=> encodeURIComponent(String(s ?? ''));
       return `
-        <div class="timeline-item route-item">
+      <div class="timeline-item">
+            <div class="tl-time">${escapeHtml(t)}</div>
+
             <div class="route-strip route-click"
             data-from="${enc(r.from || '')}"
             data-to="${enc(r.to || '')}"
             data-mode="${enc(mode)}">
+
             <div class="route-ico"><i class="fas ${ico}"></i></div>
 
-
             <div class="route-main">
-                <div class="route-time-top">${escapeHtml(t)}</div>
                 <div class="route-title">${escapeHtml(title)}</div>
             </div>
 
             ${dur ? `<div class="route-mins">${escapeHtml(dur)}</div>` : ``}
             </div>
-        </div>
-        `;
-
+      </div>
+      `;
     }
 
 
@@ -1419,27 +1230,127 @@
 
 
 
-    // mock weather
-    let weatherHTML = '';
-    for(let h=1; h<=24; h++) {
-      let icon = 'fa-sun';
-      if(h >= 6 && h < 10) icon = 'fa-cloud-sun';
-      if(h >= 10 && h < 16) icon = 'fa-sun';
-      if(h >= 16 && h < 19) icon = 'fa-cloud-sun';
-      if(h >= 19 || h < 6) icon = 'fa-moon';
-      let temp = 10 + Math.floor(Math.random()*5);
-      const hh = String(h).padStart(2,'0');
-      weatherHTML += `
-        <div class="weather-hour">
-          <div class="w-time">${hh}:00</div>
-          <div class="w-icon"><i class="fas ${icon}"></i></div>
-          <div class="w-temp">${temp}°</div>
-        </div>`;
-    }
-    document.getElementById('weatherStrip').innerHTML = weatherHTML;
+    // ✅ Weather (Open-Meteo / JMA) — 只顯示「未來 16 天」內的逐時預報
+    await renderWeatherStrip(meta);
+
   }
 
-  // ====== Google 導航：優先 geo，其次 addr/title ======
+  
+  // ====== Weather helpers ======
+  function _wmoToFa(code, hour){
+    // Simple WMO weather_code → FontAwesome icon
+    // hour: local hour (0-23) used for night/day
+    const night = (hour <= 5 || hour >= 19);
+    if(code === 0) return night ? 'fa-moon' : 'fa-sun';
+    if(code >= 1 && code <= 3) return night ? 'fa-cloud-moon' : 'fa-cloud-sun';
+    if(code === 45 || code === 48) return 'fa-smog';
+    if((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return 'fa-cloud-rain';
+    if(code >= 71 && code <= 77) return 'fa-snowflake';
+    if(code >= 95 && code <= 99) return 'fa-bolt';
+    return night ? 'fa-cloud-moon' : 'fa-cloud-sun';
+  }
+
+  function _getLatLon(meta){
+    // 優先：itinerary.index.json 內的 lat/lon
+    if(Number.isFinite(meta?.lat) && Number.isFinite(meta?.lon)){
+      return { lat: meta.lat, lon: meta.lon };
+    }
+    // 次選：hotels.json 內的 geo
+    const h = hotels.find(x => x.id === meta.hotel_id);
+    const lat = h?.geo?.lat;
+    const lon = h?.geo?.lng ?? h?.geo?.lon;
+    if(Number.isFinite(lat) && Number.isFinite(lon)){
+      return { lat, lon };
+    }
+    return null;
+  }
+
+  function _metaIsoDate(meta){
+    const m = String(meta?.file || '').match(/\d{4}-\d{2}-\d{2}/);
+    return m ? m[0] : '';
+  }
+
+  async function renderWeatherStrip(meta){
+    const el = document.getElementById('weatherStrip');
+    if(!el) return;
+
+    const iso = _metaIsoDate(meta);
+    if(!iso){
+      el.innerHTML = `<div style="padding:10px; color:var(--ink2); font-weight:800;">找不到日期（請確認 itinerary.index.json 的 file 命名含 YYYY-MM-DD）</div>`;
+      return;
+    }
+
+    const today = new Date();
+    const target = new Date(iso + 'T00:00:00');
+    const diffDays = Math.floor((target - new Date(today.getFullYear(), today.getMonth(), today.getDate())) / 86400000);
+
+    // Open-Meteo 預報最長 16 天；太久遠就提示（避免看起來「不准」）
+    if(diffDays < 0 || diffDays > 16){
+      el.innerHTML = `<div style="padding:10px; color:var(--ink2); font-weight:800;">
+        天氣預報只提供「未來 16 天」內的逐時資料。<br/>（目前選的是 ${iso}，請接近出發再看會更準）
+      </div>`;
+      return;
+    }
+
+    const ll = _getLatLon(meta);
+    if(!ll){
+      el.innerHTML = `<div style="padding:10px; color:var(--ink2); font-weight:800;">
+        尚未設定經緯度：請在 <code>data/itinerary.index.json</code> 這一天加上 <code>lat</code>, <code>lon</code>（或在 hotels.json 的 geo 放 lat/lng）
+      </div>`;
+      return;
+    }
+
+    // JMA 專用 API（日本較貼近），也可改成 /v1/forecast
+    const url =
+      `https://api.open-meteo.com/v1/jma?latitude=${encodeURIComponent(ll.lat)}&longitude=${encodeURIComponent(ll.lon)}`
+      + `&hourly=temperature_2m,weather_code`
+      + `&forecast_days=16`
+      + `&timezone=Asia%2FTokyo`;
+
+    try{
+      const data = await fetch(url).then(r=>r.json());
+      const times = data?.hourly?.time || [];
+      const temps = data?.hourly?.temperature_2m || [];
+      const codes = data?.hourly?.weather_code || [];
+
+      const pad2 = (n)=>String(n).padStart(2,'0');
+      const rows = [];
+
+      // 需要 01:00 ~ 24:00（24:00 用隔天 00:00 表示）
+      for(let h=1; h<=24; h++){
+        const hh = (h === 24) ? 0 : h;
+        const day = (h === 24) ? new Date(target.getTime() + 86400000) : target;
+        const y = day.getFullYear();
+        const m = pad2(day.getMonth()+1);
+        const d = pad2(day.getDate());
+        const tKey = `${y}-${m}-${d}T${pad2(hh)}:00`;
+
+        const idx = times.indexOf(tKey);
+        if(idx === -1){
+          rows.push({ time: pad2(h)+':00', icon:'fa-minus', temp:'—' });
+          continue;
+        }
+        const icon = _wmoToFa(Number(codes[idx] ?? 0), hh);
+        const temp = temps[idx] != null ? Math.round(temps[idx]) + '°' : '—';
+        rows.push({ time: pad2(h)+':00', icon, temp });
+      }
+
+      el.innerHTML = rows.map(r=>`
+        <div class="weather-hour">
+          <div class="w-time">${r.time}</div>
+          <div class="w-icon"><i class="fas ${r.icon}"></i></div>
+          <div class="w-temp">${r.temp}</div>
+        </div>
+      `).join('');
+    }catch(e){
+      el.innerHTML = `<div style="padding:10px; color:var(--ink2); font-weight:800;">
+        讀取天氣失敗（可能是網路/CORS/服務暫時不可用）。<br/>你可以先用 mock，或之後換成 OpenWeather/WeatherAPI（需 key）。
+      </div>`;
+    }
+  }
+
+
+// ====== Google 導航：優先 geo，其次 addr/title ======
   function buildGoogleNavUrl(item){
     const hasGeo = item?.geo?.lat != null && item?.geo?.lng != null;
     if(hasGeo){
