@@ -1185,23 +1185,23 @@
 
       const enc = (s)=> encodeURIComponent(String(s ?? ''));
       return `
-      <div class="timeline-item">
-            <div class="tl-time">${escapeHtml(t)}</div>
+        <div class="timeline-item">
+                <div class="tl-time">${escapeHtml(t)}</div>
 
-            <div class="route-strip route-click"
-            data-from="${enc(r.from || '')}"
-            data-to="${enc(r.to || '')}"
-            data-mode="${enc(mode)}">
+                <div class="route-strip route-click"
+                data-from="${enc(r.from || '')}"
+                data-to="${enc(r.to || '')}"
+                data-mode="${enc(mode)}">
 
-            <div class="route-ico"><i class="fas ${ico}"></i></div>
+                <div class="route-ico"><i class="fas ${ico}"></i></div>
 
-            <div class="route-main">
-                <div class="route-title">${escapeHtml(title)}</div>
-            </div>
+                <div class="route-main">
+                    <div class="route-title">${escapeHtml(title)}</div>
+                </div>
 
-            ${dur ? `<div class="route-mins">${escapeHtml(dur)}</div>` : ``}
-            </div>
-      </div>
+                ${dur ? `<div class="route-mins">${escapeHtml(dur)}</div>` : ``}
+                </div>
+        </div>
       `;
     }
 
