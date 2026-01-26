@@ -2,11 +2,13 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>2026 四國巡禮</title>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#F6F3EE" />
+
 
   <!-- ✅ Serif + Sans（標題日系感） -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
@@ -30,7 +32,7 @@
 
       --shadow-soft:0 10px 26px rgba(0,0,0,.08);
     }
-
+    *, *::before, *::after { box-sizing: border-box; }
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
     body{
       font-family:'Noto Sans TC',sans-serif;
@@ -553,7 +555,7 @@
         width:100%;               /* ✅ 撐滿 */
         margin:0;                 /* ✅ 不要自己縮排 */
     }
-    
+
     .route-mins{
         flex:0 0 auto;
         font-family:'Roboto Mono', monospace;
@@ -604,6 +606,42 @@
       overflow:hidden;
       text-overflow:ellipsis;
     }
+    .routeRow{
+        display:flex;
+        align-items:center;
+        gap:12px;
+        padding:10px 12px;
+        border-radius:14px;
+        max-width:100%;
+        width:100%;
+        overflow:hidden;            /* 防止內部東西撐破 */
+    }
+
+    .routeIcon{
+        flex:0 0 36px;
+        width:36px; height:36px;
+        border-radius:12px;
+        display:flex; align-items:center; justify-content:center;
+    }
+
+    .routeMain{
+        flex:1 1 auto;
+        min-width:0;                /* ✅ 超重要：允許中間欄位縮 */
+    }
+
+    .routeTitle{
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;     /* ✅ 長地名不撐破 */
+    }
+
+    .routeDuration{
+        flex:0 0 auto;
+        margin-left:auto;           /* ✅ 推到最右 */
+        white-space:nowrap;
+        padding:6px 10px;
+        border-radius:999px;
+    }
 
 
 
@@ -627,6 +665,24 @@
       min-width:56px;
       font-size:1rem;
     }
+
+    /* ✅ 讓每一列：左時間、右內容 固定對齊 */
+    .timeline-item{
+        display:grid;
+        grid-template-columns: 64px 1fr;
+        column-gap:12px;
+        align-items:start;
+    }
+
+    /* ✅ 右欄一定要能縮，才不會把整頁撐寬造成可左右滑/可縮小 */
+    .tl-content{
+        min-width:0;
+    }
+
+    /* 建議加保險：砍掉水平 overflow */
+    html, body{ overflow-x:hidden; }
+
+
 
     /* ===== Mobile layout guard ===== */
     .page, .app-header{
@@ -673,7 +729,7 @@
 <body>
   <header class="app-header">
     <h1 id="hdrTitle">2026 四國巡禮</h1>
-    <p id="hdrSub">9天8夜自駕遊 • L, K, R, Y, J</p>
+    <p id="hdrSub">9天8夜自駕遊</p>
   </header>
 
   <!-- 行前 -->
@@ -992,7 +1048,7 @@
           <div style="width:44px;height:44px;border-radius:999px;background:#EEF3F7;display:flex;align-items:center;justify-content:center;flex:0 0 auto;">
             <i class="fas ${icon}" style="color:#6B7280;font-size:18px;"></i>
           </div>
-          <div style="flex:1;">
+          <div style="flex:1; min-width:0;">
             <div style="font-weight:900;font-size:1.05rem; margin-bottom:2px;">${escapeHtml(item.title || '移動')}</div>
             <div style="color:var(--text-sec); font-weight:700;">${escapeHtml(line2)}</div>
             ${mins ? `<div style="margin-top:8px; display:inline-flex; gap:8px; align-items:center; background:#F2F2F7; padding:6px 10px; border-radius:999px; font-weight:900; color:#4B5563;">
