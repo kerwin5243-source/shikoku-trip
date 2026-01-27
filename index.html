@@ -245,7 +245,7 @@
 
 
 
-
+    /* date chip 是最上面日期 星期 Day */
     .date-chip{
       flex:0 0 auto;
       background:rgba(255,255,255,.75);
@@ -308,6 +308,8 @@
     .w-time{ font-size:.8rem; color:var(--ink2); margin-bottom:5px; font-weight:800; }
     .w-icon{ font-size:1.15rem; margin-bottom:5px; color:#8B8175; }
     .w-temp{ font-weight:900; font-size:.9rem; color:var(--primary); }
+
+
 
     /* ✅ 讓每一列：左時間、右內容 固定對齊 */
     .timeline-item{
@@ -475,7 +477,7 @@
 
 
 
-    /* sticky 區塊固定在 modal 內容滾動區頂端 */
+    /* sticky 區塊固定在 點開小行程內容滾動區頂端 */
     #modalSticky{
         position: sticky;
         top: 0;
@@ -639,20 +641,22 @@
 
     /* bottom nav */
     .bottom-nav{
-      position:fixed; bottom:20px; left:20px; right:20px;
+      position:fixed; 
+      bottom: calc(10px + env(safe-area-inset-bottom));
+      left:20px; right:20px;
       background:rgba(255,255,255,.72);
       backdrop-filter:blur(20px);
-      border-radius:30px;
+      border-radius:24px;
       display:flex;
       justify-content:space-around;
-      padding:14px 0;
-      box-shadow:0 16px 50px rgba(0,0,0,.13);
+      padding:10px 0;
+      box-shadow:0 16px 50px rgba(0,0,0,.12);
       z-index:1000;
       border:1px solid rgba(233,225,214,.9);
     }
-    .nav-item{ text-align:center; color:#B9B2AA; font-size:.7rem; cursor:pointer; flex:1; transition:.2s; }
-    .nav-item i{ display:block; font-size:1.35rem; margin-bottom:1px; }
-    .nav-item.active{ color:#2B2723; transform:translateY(-2px); }
+    .nav-item{ text-align:center; color:#B9B2AA; font-size:.66rem; cursor:pointer; flex:1; transition:.2s; }
+    .nav-item i{ display:block; font-size:1.18rem; margin-bottom:2px; }
+    .nav-item.active{ color:#2B2723; transform:translateY(-1px); }
 
     /* boarding */
     .boarding{
@@ -2008,9 +2012,4 @@
 
 </script>
 </body>
-
 </html>
-
-
-
-
