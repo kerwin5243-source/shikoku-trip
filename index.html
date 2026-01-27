@@ -338,7 +338,7 @@
       background:rgba(255,255,255,.78);
       border:1px solid rgba(233,225,214,.9);
       border-radius:var(--radius-M);
-      padding:16px 16px 14px;
+      padding:12px 16px 14px;
       box-shadow:0 14px 30px rgba(0,0,0,.07);
       transition:transform .12s ease;
     }
@@ -353,6 +353,8 @@
       font-weight:900;
       letter-spacing:.12em;
       margin-bottom:6px;
+      margin-top:-8px;   /* ✅ 往上貼近卡片上緣 */
+      line-height:1;     /* ✅ 讓高度更緊 */
       text-transform:uppercase;
       color:#a5a39f;
     }
@@ -1160,6 +1162,16 @@
     saved[k] = !saved[k];
     localStorage.setItem('global_todos', JSON.stringify(saved));
   }
+  function formatDuration(mins){
+    const m = Number(mins);
+    if(!Number.isFinite(m) || m <= 0) return '';
+    const h = Math.floor(m / 60);
+    const r = m % 60;
+    if(h <= 0) return `${m} min`;
+    if(r === 0) return `${h} hr`;
+    return `${h} hr ${r} min`;
+  }
+
 
   // ====== 個人清單 ======
   function renderUserTabs() {
@@ -1271,7 +1283,7 @@
     const r = item.route || {};
     const mode = (r.mode || 'route').toLowerCase();
     const icon = routeIcon(mode);
-    const mins = r.minutes ? `${r.minutes} min` : (item.stay || '');
+    const mins = r.minutes ? `${formatDuration(r.minutes)}` : (item.stay || '');
     const line2 = `${r.from || ''} → ${r.to || ''}`.trim();
 
     return `
@@ -1308,7 +1320,7 @@
           <div class="tl-tag ${tagClass(item.tag)}">${escapeHtml((item.tag||'').toUpperCase())}</div>
             <i class="fas ${tagIcon(item.tag)} tag-ico"></i>
           <div class="tl-title">${escapeHtml(item.title || '')}</div>
-          <div class="tl-desc">${escapeHtml(item.desc || '')}</div>
+          <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
           ${stayPill}
         </div>
       </div>
@@ -1478,7 +1490,7 @@
           <div class="tl-content">
             <div class="tl-tag ${tagClass(item.tag)}">${escapeHtml((item.tag||'').toUpperCase())}</div>
             <div class="tl-title">${escapeHtml(item.title || '')}</div>
-            <div class="tl-desc">${escapeHtml(item.desc || '')}</div>
+            <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
             ${stay}
           </div>
         </div>
@@ -1665,7 +1677,7 @@
     const stay  = item.stay  ? `<span class="pill"><i class="fas fa-hourglass-half"></i> ${escapeHtml(item.stay)}</span>` : '';
 
     const guideList = (item.guide || []).length
-      ? `<div class="block"><h4><i class="fas fa-headset"></i> 導遊介紹</h4><ul class="bullet">${item.guide.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul></div>`
+      ? `<div class="block"><h4><i class="fas fa-headset"></i> 導遊介紹</h4><ul class="bullet">${item.guide.map(x=>`<li>${escapeHtml(x).replace(/\n/g,'<br>').replace(/^\[(.+?)\]：/,'<strong>[$1]：</strong>')}</li>`).join('')}</ul></div>`
       : '';
 
     const avoidList = (item.avoid || []).length
