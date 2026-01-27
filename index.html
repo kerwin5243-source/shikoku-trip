@@ -259,8 +259,11 @@
       cursor:pointer;
     }
     .date-chip .day{
-      font-family:'Noto Serif TC', serif;
-      font-size:.70rem; font-weight:900; letter-spacing:.2px;
+      font-family:'Roboto Mono', monospace; 
+      font-size:.90rem;
+      font-weight:900;
+      letter-spacing:.02px;
+      line-height:1.05;
     }
     .date-chip .date{
       font-size:.60rem;
@@ -269,12 +272,14 @@
       margin-top:2px;
       line-height:1.05;
     }
-    .date-chip .day .wk{
-        margin-left:2px;
-        font-size:.40rem;        /* 星期更小 */
+    .date-chip .wk{
+        margin-top:2px;
+        font-family:'Roboto Mono', monospace;
+        font-size:.50rem;        /* 星期更小 */
         font-weight:900;
-        color:var(--ink2);
+        color:rgba(43,39,35,.45);
         letter-spacing:.14em;
+        text-transform:uppercase;
         line-height:1.05;
     }
     .date-chip.active{
@@ -462,7 +467,8 @@
     .modal-scroll{
       flex:1;
       overflow-y:auto;
-      padding:12px 18px 16px;
+      padding:0 18px 16px;
+      background:#FAF7F2;           /* ✅ 防止透出看到背後 */
       -webkit-overflow-scrolling:touch;
       overscroll-behavior:contain;
     }
@@ -473,10 +479,12 @@
     #modalSticky{
         position: sticky;
         top: 0;
-        z-index: 5;
+        z-index: 20;
         background:#FAF7F2;
-        padding: 6px 2px 6px;
+        margin:0 -18px;               /* ✅ 抵消左右 padding，貼齊邊 */
+        padding:10px 18px 10px;       /* ✅ 把原本的上方空間放回這裡 */
         border-bottom: 1px solid rgba(233,225,214,.75);
+        box-shadow:0 6px 18px rgba(0,0,0,.06); /* 「浮在上面」，可以再加一點淡陰影*/
     }
 
     /* 左邊彩色直槓（用 tag 類別控制顏色） */
