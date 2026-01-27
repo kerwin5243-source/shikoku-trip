@@ -269,11 +269,11 @@
       margin-top:2px;
     }
     .date-chip .day .wk{
-        margin-left:6px;
+        /* margin-left:6px; */
         font-size:.40rem;        /* 星期更小 */
         font-weight:900;
         color:var(--ink2);
-        letter-spacing:.06em;
+        letter-spacing:.2em; /* .06 */
     }
     .date-chip.active{
       background:#fff;
@@ -1019,10 +1019,10 @@
 
 
   <nav class="bottom-nav">
-    <div class="nav-item" onclick="nav('itinerary', this)"><i class="fas fa-map-location-dot"></i> 行程</div>
+    <div class="nav-item active" onclick="nav('itinerary', this)"><i class="fas fa-map-location-dot"></i> 行程</div>
     <div class="nav-item" onclick="nav('info', this)"><i class="fas fa-passport"></i> 資訊</div>
     <div class="nav-item" onclick="nav('money', this)"><i class="fas fa-yen-sign"></i> 記帳</div>
-    <div class="nav-item active" onclick="nav('pre', this)"><i class="fas fa-list-check"></i> 行前</div>
+    <div class="nav-item" onclick="nav('pre', this)"><i class="fas fa-list-check"></i> 行前</div>
   </nav>
 
 <script>
@@ -1193,14 +1193,15 @@
   }
 
   // ====== 行程 ======
+    //           ${escapeHtml(d.date || '')}
+    //         <span class="wk">${escapeHtml(d.day || '')}</span>
+    //    </div>
   function renderDateScroller() {
     document.getElementById('dayScroller').innerHTML = itineraryIndex.map((d, i) => `
       <div class="date-chip" id="chip-${i}" onclick="selectDay(${i})">
-      <div class="day">
-            ${escapeHtml(d.date || '')}
-            <span class="wk">${escapeHtml(d.day || '')}</span>
-       </div>
-       <div class="date">Day ${i+1}</div>
+      <div class="day"></div>
+       <div class="wk">Day ${i+1}</div>
+       <div class="date">Day ${i+2}</div>
       </div>
     `).join('');
   }
