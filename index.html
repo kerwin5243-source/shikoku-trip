@@ -39,16 +39,16 @@
       background:var(--bg-body);
       color:var(--ink);
       margin:0;
-      padding-bottom:110px;
+      padding-bottom:calc(110px + env(safe-area-inset-bottom));
       overscroll-behavior-y:none;
     }
     body.body-no-scroll{ overflow:hidden; }
 
     .app-header{
       padding:56px 20px 16px;
+      text-align:center;
       background:linear-gradient(to bottom, rgba(246,243,238,1), rgba(246,243,238,.82));
     }
-    .app-header{ text-align:center; }
 
     .app-header h1{
         margin:0;
@@ -302,8 +302,15 @@
     .w-icon{ font-size:1.15rem; margin-bottom:5px; color:#8B8175; }
     .w-temp{ font-weight:900; font-size:.9rem; color:var(--primary); }
 
-    /* timeline */
-    .timeline-item{ display:flex; gap:16px; margin-bottom:18px; cursor:pointer; }
+    /* ✅ 讓每一列：左時間、右內容 固定對齊 */
+    .timeline-item{
+        display:grid;
+        grid-template-columns: 64px 1fr;
+        column-gap:12px;
+        align-items:start;
+        margin-bottom:18px; 
+        cursor:pointer; 
+    }
     .tl-time{
       min-width:56px;
       font-family:'Roboto Mono', monospace;
@@ -311,9 +318,14 @@
       color:var(--ink2);
       text-align:right;
       padding-top:6px;
+      font-size:1rem;
     }
+    
+
+
     .tl-content{
       flex:1;
+      min-width:0;
       background:rgba(255,255,255,.78);
       border:1px solid rgba(233,225,214,.9);
       border-radius:var(--radius-M);
@@ -425,6 +437,7 @@
       background:#D8CFC4;
       border-radius:99px;
       margin:8px auto 6px;
+      flex-shrink:0;
     }
 
     /* ✅ X 永遠可見（在 header 內） */
@@ -452,13 +465,7 @@
     }
 
 
-    .modal-drag-handle{
-      width:44px; height:5px;
-      background:#D8CFC4;
-      border-radius:99px;
-      margin:10px auto 6px;
-      flex-shrink:0;
-    }
+
     /* sticky 區塊固定在 modal 內容滾動區頂端 */
     #modalSticky{
         position: sticky;
@@ -706,14 +713,15 @@
         display:flex;
         gap:14px;
         align-items:center;
-        padding:12px 14px;        /* 更細長 */
-        border-radius:18px;
+        padding:10px 12px;        /* 更細長 */
+        border-radius:16px;
         background:#F2F2F7;
         border:1px solid rgba(0,0,0,.04);
         box-shadow:0 6px 18px rgba(0,0,0,.06);
         width:100%;               /* ✅ 撐滿 */
         margin:0;                 /* ✅ 不要自己縮排 */
     }
+    /* 想讓整張更「細長」一點就把 padding 降低 */
 
     .route-mins{
         flex:0 0 auto;
@@ -721,20 +729,11 @@
         font-size:.65rem;         /* ✅ 縮小 */
         font-weight:900;
         color:#444;
-        background:#ECECF0;
+        background:rgba(255,255,255,0.7);
         border-radius:999px;
         padding:5px 8px;
         white-space:nowrap;
     }
-
-    .route-ico{
-        width:44px; height:44px;
-        border-radius:16px;
-        display:flex; align-items:center; justify-content:center;
-        background:#EAF2FF;
-        flex:0 0 auto;
-    }
-    .route-ico i{ font-size:18px; color:var(--primary); }
 
     /* 讓 route strip 內容左右分佈更漂亮 */
     .route-main{
@@ -742,11 +741,20 @@
         min-width: 0;
     }
 
-    /* 想讓整張更「細長」一點就把 padding 降低 */
-    .route-strip{
-        padding: 12px 14px;     /* ✅ 比原本 16 18 更細長 */
-        border-radius: 18px;
+        /* icon 尺寸（可微調） */
+    .route-ico{
+        width:38px;
+        height:38px;
+        border-radius:14px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        background:rgba(255,255,255,0.55);
+        flex:0 0 auto;
     }
+    .route-ico i{ font-size:16px; color:var(--primary); }
+
+
     .route-title{
       font-weight:900;
       font-size:1.02rem;
@@ -756,6 +764,7 @@
       overflow:hidden;
       text-overflow:ellipsis;
     }
+
     .route-sub{
       margin-top:4px;
       color:var(--text-sec);
@@ -819,24 +828,8 @@
     }
     .stay-pill i{ color:#8E8E93; }
 
-    /* time column better for mobile */
-    .tl-time{
-      min-width:56px;
-      font-size:1rem;
-    }
 
-    /* ✅ 讓每一列：左時間、右內容 固定對齊 */
-    .timeline-item{
-        display:grid;
-        grid-template-columns: 64px 1fr;
-        column-gap:12px;
-        align-items:start;
-    }
 
-    /* ✅ 右欄一定要能縮，才不會把整頁撐寬造成可左右滑/可縮小 */
-    .tl-content{
-        min-width:0;
-    }
 
     /* 建議加保險：砍掉水平 overflow */
     html, body{ overflow-x:hidden; }
@@ -875,18 +868,7 @@
         line-height:1;
     } */
 
-    /* icon 尺寸（可微調） */
-    .route-ico{
-        width:38px;
-        height:38px;
-        border-radius:14px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        background:rgba(255,255,255,0.55);
-        flex:0 0 auto;
-    }
-    .route-ico i{ font-size:16px; }
+
 
     /* 中間標題：可縮 + ... */
     .route-main{ flex:1 1 auto; min-width:0; }
@@ -899,23 +881,8 @@
         margin-bottom:4px;
     }
 
-    .route-title{
-        font-weight:900;
-        white-space:nowrap;
-        overflow:hidden;
-        text-overflow:ellipsis;
-    }
 
-    /* 右側分鐘：固定不被擠掉 */
-    .route-mins{
-        flex:0 0 auto;
-        white-space:nowrap;
-        font-size:12px;      /* 想更小就 11px */
-        padding:5px 8px;
-        border-radius:999px;
-        background:rgba(255,255,255,0.7);
-        font-weight:900;
-    }
+
 
 
     /* ===== Mobile layout guard ===== */
@@ -929,9 +896,6 @@
       padding-bottom: calc(14px + env(safe-area-inset-bottom));
     }
 
-    body{
-      padding-bottom: calc(110px + env(safe-area-inset-bottom));
-    }
     /* 右側：時間 + 導航按鈕（把 15min 移到這裡） */
     .route-cta{
       display:flex;
