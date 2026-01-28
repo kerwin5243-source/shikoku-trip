@@ -92,6 +92,10 @@
         "addr": "3388-1 Konancho Yusa, Takamatsu, Kagawa 761-1402 日本",
         "mapcode": "60182543*34",
         "parking": "",
+        "reservations": [
+          { "label": "租車預約 No.", "value": "XXXXXX" },
+          { "label": "Klook 訂單", "value": "KK123456" }
+        ],
         "hours": "",
         "price": "",
         "stay": "",
@@ -233,6 +237,7 @@
         "addr": "892-1, Kotohira, Nakatado District, Kagawa 766-8501日本",
         "mapcode": "77 353 678*81",
         "parking": "琴平公園停車場",
+        "highlight": true,
         "hours": "06:00–17:00（10–3月) –18:00（4–9月）",
         "price": "門票:$200",
         "stay": "3 hr",
