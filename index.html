@@ -352,8 +352,7 @@
       font-size:.55rem;
       font-weight:900;
       letter-spacing:.12em;
-      margin-bottom:6px;
-      margin-top:-12px;   /* ✅ 往上貼近卡片上緣 */
+      margin:0 0 6px 0;   /* 只留底部一點點距離 */
       line-height:1;     /* ✅ 讓高度更緊 */
       text-transform:uppercase;
       color:#a5a39f;
@@ -1407,7 +1406,7 @@
   }
 
   function renderNormalItem(item, i){
-    const stayPill = item.stay ? `<div style="margin-top:5px; display:inline-flex; gap:8px; align-items:center; background:#F2F2F7; padding:6px 6px; border-radius:999px; font-weight:900; color:#4B5563;">
+    const stayPill = item.stay ? `<div style="margin-top:6px; display:inline-flex; gap:8px; align-items:center; background:#F2F2F7; padding:4px 10px; border-radius:999px; font-weight:900; font-size:.82rem; line-height:1.1; color:#4B5563;">
       <i class="fas fa-hourglass-half" style="color:#9CA3AF;"></i>${escapeHtml(item.stay)}
     </div>` : '';
 
@@ -1415,8 +1414,10 @@
       <div class="timeline-item" onclick='openModal(${i})'>
         <div class="tl-time">${escapeHtml(item.time || '')}</div>
         <div class="tl-content">
-          <div class="tl-tag ${tagClass(item.tag)}">${escapeHtml((item.tag||'').toUpperCase())}</div>
-            <i class="fas ${tagIcon(item.tag)} tag-ico"></i>
+          <div class="tl-tag ${tagClass(item.tag)}">
+            ${escapeHtml((item.tag||'').toUpperCase())}
+            <i class="fas ${tagIcon(item.tag)} style="opacity:.35; font-size:.72rem; margin-left:2px;"></i>
+          </div>
           <div class="tl-title">${escapeHtml(item.title || '')}</div>
           <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
           ${stayPill}
@@ -2138,5 +2139,4 @@
 
 </script>
 </body>
-
 </html>
