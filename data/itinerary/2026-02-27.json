@@ -5,8 +5,8 @@
     "loc": "高松",
     "hotel_id": "H1",
     "photos": [
-      { "src": "/photos/day1/01.jpg", "loc": "高松市", "caption": "" },
-      { "src": "/photos/day1/02.jpg", "loc": "Kawata Udon", "caption": "鍋燒烏龍麵+關東煮" }
+      { "src": "/photos/day1/01.png", "loc": "高松市", "caption": "" },
+      { "src": "/photos/day1/02.png", "loc": "Kawata Udon", "caption": "鍋燒烏龍麵+關東煮" }
     ],
     "items": [
       {
