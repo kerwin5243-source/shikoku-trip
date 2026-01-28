@@ -1806,9 +1806,11 @@
 
     // ✅ 用 JSON.stringify 避免引號/特殊字元把 onclick 撐爆
     const linkBtns = [
-        links.official ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.official))})'>官方網站</button>` : '',
-        links.reserve  ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.reserve))})'>訂位 / 購票</button>` : '',
-        links.menu     ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.menu))})'>菜單</button>` : '',
+        links.official ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.official))})'>官網</button>` : '',
+        links.reserve  ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.reserve))})'>reserveseat</button>` : '',
+        links.menu     ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.menu))})'>meun</button>` : '',
+        links.cupon    ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.cupon))})'>cupon</button>` : '',
+        links.floormap      ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.floormap))})'>樓層地圖</button>` : '',
     ].filter(Boolean).join('');
 
     const linkBtnsHtml = linkBtns ? `<div class="link-grid">${linkBtns}</div>` : '';
