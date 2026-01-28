@@ -498,7 +498,7 @@
     /* 左邊彩色直槓（用 tag 類別控制顏色） */
     .modal-sticky-wrap{
         position: relative;
-        padding-left: 0;
+        padding-left: 14px;
     }
     .modal-sticky-wrap::before{
         content:'';
@@ -523,15 +523,39 @@
       gap:10px; 
       /* padding:6px 2px 10px; */
     }
-    .sheet-head .tl-tag::before{
-        width:7px;
-        height:7px;
+    /* === Modal tag：水印感（不加框）=== */
+    .sheet-tag{
+        display:inline-flex;
+        align-items:center;
+        gap:6px;
+
+        /* 拿掉框框感 */
+        padding:0;
+        border:none;
+        background:transparent;
+
+        font-size:.62rem;
+        font-weight:900;
+        letter-spacing:.14em;
+        text-transform:uppercase;
+        color:#A5A39F;
+        line-height:1;
     }
-    .sheet-head .tl-tag.tag-food::before{ background:#D28A3A; }
-    .sheet-head .tl-tag.tag-sight::before{ background:#2F8F5B; }
-    .sheet-head .tl-tag.tag-transport::before{ background:#3D6EA9; }
-    .sheet-head .tl-tag.tag-hotel::before{ background:#7A4FA8; }
-    .sheet-head .tl-tag.tag-shop::before{ background:#e1c820; }
+
+    .sheet-tag::before{
+        content:"";
+        width:8px; height:8px;
+        border-radius:50%;
+        background:#B9B2AA;
+        display:inline-block;
+    }
+
+    /* 直接沿用你原本的 tag 顏色點 */
+    .sheet-tag.tag-food::before{ background:#D28A3A; }
+    .sheet-tag.tag-sight::before{ background:#2F8F5B; }
+    .sheet-tag.tag-transport::before{ background:#3D6EA9; }
+    .sheet-tag.tag-hotel::before{ background:#7A4FA8; }
+    .sheet-tag.tag-shop::before{ background:#2A6FA0; }
 
     /* ✅ 只縮 modal 內的 tag（不影響外面列表） */
     .sheet-head .tl-tag{
@@ -602,19 +626,20 @@
     }
 
     .mini-btn{
-      margin-left:0;
+      margin-left:auto;
+      align-self:flex-start;  /* ✅ 讓它貼齊第一行 */
       border:1px solid rgba(233,225,214,.95);
       justify-self:end;
       background:#fff;
       border-radius:10px;
-      padding:5px 10px;
+      padding:5px 9px;
       font-size:.78rem;         /* ✅ 更小 */
       cursor:pointer;
       font-weight:900;
       color:#5F5A52;
       flex:0 0 auto;
     }
-    
+
 
     .detail{
       font-size:1rem;
@@ -623,19 +648,24 @@
       white-space:pre-wrap;
     }
 
-    .pill-row{ margin:8px 0 4px; display:flex; flex-wrap:wrap; gap:8px; }
+    .pill-row{ 
+        margin:6px 0 2px; 
+        display:flex; 
+        flex-wrap:wrap; 
+        gap:6px; 
+    }
     .pill{
       display:inline-flex;
       gap:6px; align-items:center;
-      padding:6px 8px;
+      padding:5px 8px;
       border-radius:999px;
       background:#fff;
       border:1px solid rgba(233,225,214,.95);
-      font-size:.86rem;
+      font-size:.78rem;
       font-weight:900;
       color:#5F5A52;
     }
-    .pill i{ color:#8B8175; font-size:.9em;}
+    .pill i{ color:#8B8175; font-size:.85em;}
 
     .block{
       background:rgba(255,255,255,.72);
@@ -1763,7 +1793,7 @@
         <div class="modal-sticky-wrap ${tagClass(item.tag)}">
             <div class="sheet-head">
                 <div class="tag-chip">
-                    <div class="tl-tag ${tagClass(item.tag)}">${escapeHtml((item.tag||'').toUpperCase())}</div>
+                    <div class="sheet-tag ${tagClass(item.tag)}">${escapeHtml((item.tag||'').toUpperCase())}</div>
                 </div>
             <div class="sheet-time"><i class="fa-regular fa-clock" style="color:#8B8175; margin-right:6px;"></i>${escapeHtml(item.time || '—')}</div>
             </div>
