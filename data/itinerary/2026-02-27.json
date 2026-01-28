@@ -4,6 +4,10 @@
     "day": "五",
     "loc": "高松",
     "hotel_id": "H1",
+    "photos": [
+      { "src": "https://.../day1-1.jpg", "loc": "高松市", "caption": "第一天落地，香川第一碗！" },
+      { "src": "https://.../day1-2.jpg", "loc": "Kawata Udon", "caption": "鍋燒烏龍麵+關東煮" }
+    ],
     "items": [
       {
         "type": "route",
