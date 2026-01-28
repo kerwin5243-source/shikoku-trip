@@ -131,6 +131,76 @@
       box-shadow:0 6px 16px rgba(0,0,0,.10);
     }
 
+    /* ===== Money: participant chips + type segmented ===== */
+    .chip-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin:10px 0 12px;
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(233,225,214,.9);
+      background:rgba(255,255,255,.78);
+      font-weight:900;
+      font-size:.85rem;
+      color:var(--primary);
+      cursor:pointer;
+      user-select:none;
+      transition:transform .08s ease, box-shadow .12s ease, border-color .12s ease;
+    }
+    .chip:active{ transform:scale(.98); }
+    .chip.on{
+      border-color:rgba(176,138,91,.65);
+      box-shadow:0 10px 22px rgba(0,0,0,.08);
+    }
+    .chip.off{
+      opacity:.45;
+    }
+    .seg{
+      display:flex;
+      gap:6px;
+      background:rgba(233,225,214,.9);
+      padding:4px;
+      border-radius:14px;
+      margin:8px 0 12px;
+    }
+    .seg-btn{
+      flex:1;
+      text-align:center;
+      padding:10px 0;
+      border-radius:10px;
+      font-weight:900;
+      font-size:.9rem;
+      color:var(--ink2);
+      cursor:pointer;
+      transition:.2s;
+      user-select:none;
+    }
+    .seg-btn.active{
+      background:#fff;
+      color:var(--primary);
+      box-shadow:0 6px 16px rgba(0,0,0,.10);
+    }
+    .exp-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:5px 10px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:.78rem;
+      border:1px solid rgba(233,225,214,.9);
+      background:rgba(255,255,255,.7);
+      color:rgba(43,39,35,.72);
+    }
+    .exp-badge.prepaid{ border-color:rgba(176,138,91,.35); background:rgba(255,247,229,.9); }
+    .exp-badge.trip{ background:rgba(242,242,247,.92); }
+
     /* checklist */
     .checklist-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
     .check-item{
@@ -201,12 +271,11 @@
         display:flex;
         justify-content:center;
         gap:6px;
-        pointer-events:auto;
     }
     .hero-dot{
         width:6px; height:6px;
         border-radius:50%;
-        background:rgba(255,255,255,.55);
+        background:rgba(255,255,255,.6);
     }
     .hero-dot.active{ background:rgba(255,255,255,.95); }
 
@@ -224,20 +293,19 @@
         display:inline-flex;
         align-items:center;
         gap:8px;
-        padding:0;
+        padding:8px 10px;
         border-radius:999px;
-        background:transparent;
+        background:rgba(0,0,0,.28);
         color:#fff;
         font-weight:900;
         font-size:.85rem;
-        /* backdrop-filter: blur(8px); */
-        text-shadow:0 2px 10px rgba(0,0,0,.55); /* ✅ 可讀性 */
+        backdrop-filter: blur(8px);
     }
 
     .hero-caption{
         padding:10px 12px;
         border-radius:16px;
-        background:transparent;    /* ✅ 透明 */
+        background:rgba(0,0,0,.20);
         color:rgba(255,255,255,.92);
         font-weight:700;
         font-size:.88rem;
@@ -259,7 +327,6 @@
       box-shadow:0 10px 24px rgba(0,0,0,.08);
       transition:.2s;
       cursor:pointer;
-      position:relative; /*new*/
     }
     .date-chip .day{
       font-family:'Roboto Mono', monospace; 
@@ -286,10 +353,9 @@
         line-height:1.05;
     }
     .date-chip.active{
-        background:#fff;
-        border-color:rgba(176,138,91,.75);
-        box-shadow:0 16px 34px rgba(0,0,0,.12);
-        transform:translateY(-2px) scale(1.03);
+      background:#fff;
+      border-color:rgba(150, 104, 49, 0.55);
+      box-shadow:0 14px 30px rgba(0,0,0,.10);
     }
     .date-chip.active .day{ color:#724b1d; }
 
@@ -405,37 +471,6 @@
       font-weight:800;
     }
     .tl-chip i{ color:#8E8E93; }
-
-
-    .tl-content.highlight{
-        position:relative;
-        border-color: rgba(176,138,91,.65);
-        box-shadow:
-            0 14px 30px rgba(0,0,0,.10),
-            0 0 0 1px rgba(176,138,91,.22),
-            0 0 22px rgba(176,138,91,.35);
-    }
-
-    .tl-content.highlight::after{
-        content:"★";
-        position:absolute;
-        top:10px;
-        right:12px;
-        width:26px; height:26px;
-        border-radius:999px;
-        display:flex; align-items:center; justify-content:center;
-        background:rgba(176,138,91,.95);
-        color:#fff;
-        font-size:14px;
-        box-shadow:0 10px 20px rgba(176,138,91,.35);
-    }
-
-    .tl-tag .tag-ico{
-        opacity:.35;
-        font-size:.78rem;
-        margin-left:2px;
-    }
-
 
 
     /* ===== Modal: bottom sheet ===== */
@@ -1139,7 +1174,23 @@
         <input type="number" id="exCost" placeholder="金額 (¥)" style="padding:12px; border:1px solid rgba(233,225,214,.9); border-radius:14px; width:110px; background:rgba(255,255,255,.8);">
       </div>
       <div class="user-tabs" id="payerSwitch" style="background:rgba(233,225,214,.9); margin-bottom:15px;"></div>
-      <button class="btn" onclick="addExpense()">加入紀錄 (平分)</button>
+
+      <!-- 類型：行中 / 預付 -->
+      <div class="seg" id="expTypeSwitch" aria-label="expense type">
+        <div class="seg-btn active" data-type="trip" onclick="setExpenseType('trip')">行中支出</div>
+        <div class="seg-btn" data-type="prepaid" onclick="setExpenseType('prepaid')">預付費用</div>
+      </div>
+
+      <!-- 參與者：可多選（預設全選） -->
+      <div style="font-weight:900; color:var(--ink2); font-size:.9rem; margin-top:2px;">分攤成員</div>
+      <div class="chip-row" id="partSwitch"></div>
+
+      <button class="btn" onclick="addExpense()">加入紀錄</button>
+    </div>
+
+    <div class="card">
+      <div class="section-title">小記</div>
+      <div id="expenseSummary"></div>
     </div>
 
     <div class="card">
@@ -1226,6 +1277,7 @@
     await selectDay(0);
     renderHotels();
     renderFlights();
+    normalizeExpenses();
     renderExpenseUI();
   });
 
@@ -1448,7 +1500,7 @@
     return `
       <div class="timeline-item" onclick='openModal(${i})'>
         <div class="tl-time">${escapeHtml(item.time || '')}</div>
-        <div class="tl-content ${item.highlight ? 'highlight' : ''}">
+        <div class="tl-content">
           <div class="tl-tag ${tagClass(item.tag)}">
             ${escapeHtml((item.tag||'').toUpperCase())}
             <i class="fas ${tagIcon(item.tag)} style="opacity:.35; font-size:.72rem; margin-left:2px;"></i>
@@ -1515,89 +1567,58 @@
         const el = document.getElementById('dayHero');
         if(!el) return;
 
-        // ✅ 支援兩種格式：
-        // 1) 新格式：[{src,loc,caption}]
-        // 2) 舊格式：[ "url1", "url2" ]
-        let photosRaw = Array.isArray(dayData?.photos) ? dayData.photos.slice(0,5) : [];
-        if(!photosRaw.length){
-            photosRaw = [
-            "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1526481280695-3c687fd5432c?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80",
+        // ✅ 來源優先順序：
+        // 1) day json: dayData.photos (建議你每一天放 5 張)
+        // 2) fallback：用固定的 unsplash 圖（先讓你看到效果）
+        const photos = Array.isArray(dayData?.photos) && dayData.photos.length
+            ? dayData.photos.slice(0,5)
+            : [
+                "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1526481280695-3c687fd5432c?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80",
+                "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80",
             ];
-        }
 
-        const photos = photosRaw.map(p=>{
-            if(typeof p === 'string'){
-                return { src:p, loc: (meta?.loc||''), caption:'' };
-            }
-            return {
-                src: p.src || p.url || '',
-                loc: p.loc || meta?.loc || '',
-                caption: p.caption || ''
-            };
-        }).filter(x=>x.src);
+            const locText = dayData?.hero?.loc || meta?.loc || '';
+            const caption = dayData?.hero?.caption || '';
 
-        const slides = photos.map((p, idx)=>`
-          <div class="hero-slide">
-            <img
-                src="${escapeHtml(p.src)}"
-                alt="day photo ${idx+1}"
-                loading="lazy"
-                decoding="async"
-                referrerpolicy="no-referrer"
-                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80';"
-            >
-            <div class="hero-overlay">
-                ${p.loc ? `<div class="hero-loc"><i class="fas fa-location-dot"></i>${escapeHtml(p.loc)}</div>` : ``}
-                ${p.caption ? `<div class="hero-caption">${escapeHtml(p.caption)}</div>` : ``}
+            const slides = photos.map((src, idx)=>`
+            <div class="hero-slide">
+                <img src="${escapeHtml(src)}" alt="day photo ${idx+1}">
+                <div class="hero-overlay">
+                ${locText ? `<div class="hero-loc"><i class="fas fa-location-dot"></i>${escapeHtml(locText)}</div>` : ``}
+                ${caption ? `<div class="hero-caption">${escapeHtml(caption)}</div>` : ``}
+                </div>
+            <div class="hero-dots">
+                ${photos.map((_,d)=>`<span class="hero-dot ${d===0?'active':''}"></span>`).join('')}
             </div>
-           </div>
+            </div>
         `).join('');
 
-        const dots = `
-            <div class="hero-dots" id="heroDots">
-              ${photos.map((_,i)=>`<span class="hero-dot ${i===0?'active':''}" data-i="${i}"></span>`).join('')}
-            </div>
-        `;
+        el.innerHTML = `<div class="hero-track" id="heroTrack">${slides}</div>`;
 
-        el.innerHTML = `<div class="hero-track" id="heroTrack">${slides}</div>${dots}`;
-
+        // auto slide
         const track = document.getElementById('heroTrack');
-        const dotsEl = document.getElementById('heroDots');
-        if(!track || !dotsEl) return;
+        if(!track) return;
 
         if(__heroTimer) clearInterval(__heroTimer);
 
-        function setActive(i){
-            dotsEl.querySelectorAll('.hero-dot').forEach(d=>d.classList.remove('active'));
-            const t = dotsEl.querySelector(`.hero-dot[data-i="${i}"]`);
-            if(t) t.classList.add('active');
+        const dotsAll = Array.from(el.querySelectorAll('.hero-dots'));
+        let cur = 0;
+
+        function setDot(i){
+            dotsAll.forEach((dotWrap, si)=>{
+            const dots = dotWrap.querySelectorAll('.hero-dot');
+            dots.forEach(d=>d.classList.remove('active'));
+            if(dots[i]) dots[i].classList.add('active');
+            });
         }
 
-        // ✅ 點 dot 可跳頁
-        dotsEl.addEventListener('click', (e)=>{
-            const d = e.target.closest('.hero-dot');
-            if(!d) return;
-            const i = parseInt(d.dataset.i,10);
-            track.scrollTo({ left: i * track.clientWidth, behavior:'smooth' });
-            setActive(i);
-        });
-
-        // ✅ 滑動時同步 dot
-        track.addEventListener('scroll', ()=>{
-            const i = Math.round(track.scrollLeft / track.clientWidth);
-            setActive(Math.max(0, Math.min(i, photos.length-1)));
-        }, { passive:true });
-
-        // auto slide
-        let cur = 0;
         __heroTimer = setInterval(()=>{
             cur = (cur + 1) % photos.length;
             track.scrollTo({ left: cur * track.clientWidth, behavior:'smooth' });
-            setActive(cur);
+            setDot(cur);
         }, 8000);
     }
 
@@ -1653,10 +1674,7 @@
         <div class="timeline-item" onclick='openModal(${i})'>
           <div class="tl-time">${escapeHtml(t)}</div>
           <div class="tl-content">
-            <div class="tl-tag ${tagClass(item.tag)}">
-                ${escapeHtml((item.tag||'').toUpperCase())}
-                <i class="fas ${tagIcon(item.tag)} tag-ico"></i>
-            </div>
+            <div class="tl-tag ${tagClass(item.tag)}">${escapeHtml((item.tag||'').toUpperCase())}</div>
             <div class="tl-title">${escapeHtml(item.title || '')}</div>
             <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
             ${stay}
@@ -1867,19 +1885,6 @@
             </div>`).join('')}
         </div>`
       : '';
-    const reserveBlock = (item.reservations || []).length
-      ? `<div class="block">
-            <h4><i class="fas fa-receipt"></i> 預約資訊</h4>
-            ${(item.reservations||[]).map(r=>`
-                <div class="meta-row" style="padding:6px 0; border-bottom:1px dashed rgba(233,225,214,.85);">
-                <span class="meta-ico"><i class="fas fa-hashtag"></i></span>
-                <span class="meta-val"><b>${escapeHtml(r.label||'')}</b>：${escapeHtml(r.value||'')}</span>
-                <button class="mini-btn" onclick="copyText('${escapeHtml(r.value||'')}')">複製</button>
-                </div>
-            `).join('')}
-        </div>`
-    : '';
-
 
     const detailText = item.detail || item.desc || '';
 
@@ -1891,7 +1896,7 @@
         links.official ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.official))})'>官網</button>` : '',
         links.reserve  ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.reserve))})'>reserveseat</button>` : '',
         links.menu     ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.menu))})'>meun</button>` : '',
-        links.coupon    ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.cupon))})'>coupon</button>` : '',
+        links.cupon    ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.cupon))})'>cupon</button>` : '',
         links.floormap      ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.floormap))})'>樓層地圖</button>` : '',
     ].filter(Boolean).join('');
 
@@ -1963,7 +1968,6 @@
           <span class="meta-val">（此行程尚未填：到達/地址/停車/Mapcode）</span>
         </div>` : ''}
       </div>
-      ${reserveBlock}
       ${menuBlock}
       <div class="detail">${escapeHtml(detailText)}</div>
 
@@ -2086,12 +2090,12 @@
           <div class="boarding-mid">
             <div style="text-align:left;">
               <div class="code">${escapeHtml(f.from?.code || '')}</div>
-              <div class="t"><i class="fas fa-plane-departure" style="opacity:.55;"></i>${escapeHtml(f.from?.city || '')} • ${escapeHtml(f.depart_time || '')} ${escapeHtml(terminal)}</div>
+              <div class="t">${escapeHtml(f.from?.city || '')} • ${escapeHtml(f.depart_time || '')} ${escapeHtml(terminal)}</div>
             </div>
             <i class="fas fa-arrow-right" style="color:#B9B2AA; font-size:1.1rem;"></i>
             <div style="text-align:right;">
               <div class="code">${escapeHtml(f.to?.code || '')}</div>
-              <div class="t"><i class="fas fa-plane-arrival" style="opacity:.55;"></i>${escapeHtml(f.to?.city || '')} • ${escapeHtml(f.arrive_time || '')}</div>
+              <div class="t">${escapeHtml(f.to?.city || '')} • ${escapeHtml(f.arrive_time || '')}</div>
             </div>
           </div>
 
@@ -2105,61 +2109,190 @@
     }).join('');
   }
 
-  // 記帳：沿用你原版（只有視覺已套入上方 CSS）
+  // ====== 記帳（支援：參與者多選 / 行中 vs 預付） ======
   let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+  let curParticipants = new Set();
+  let curExpenseType = 'trip'; // 'trip' | 'prepaid'
+
+  // 兼容舊資料（沒有 participants/type 時補上）
+  function normalizeExpenses(){
+    expenses = (Array.isArray(expenses) ? expenses : []).map(e => {
+      const payer = (e?.payer || users[0] || 'L');
+      const cost = Number(e?.cost);
+      const name = String(e?.name || '').trim();
+      const participants = Array.isArray(e?.participants) && e.participants.length
+        ? e.participants.filter(x => users.includes(x))
+        : users.slice();
+      const type = (e?.type === 'prepaid') ? 'prepaid' : 'trip';
+      return {
+        name,
+        cost: Number.isFinite(cost) ? cost : 0,
+        payer,
+        participants,
+        type,
+        ts: e?.ts || Date.now()
+      };
+    }).filter(e => e.name && e.cost > 0);
+    localStorage.setItem('expenses', JSON.stringify(expenses));
+  }
+
+  function setExpenseType(type){
+    curExpenseType = (type === 'prepaid') ? 'prepaid' : 'trip';
+    renderExpenseUI();
+  }
+
+  function toggleParticipant(u){
+    if(curParticipants.has(u)){
+      // 至少留 1 個
+      if(curParticipants.size <= 1) return;
+      curParticipants.delete(u);
+    }else{
+      curParticipants.add(u);
+    }
+    renderExpenseUI();
+  }
+
   function renderExpenseUI() {
+    // 初始化 participants：預設全選
+    if(curParticipants.size === 0){
+      users.forEach(u => curParticipants.add(u));
+    }
+
+    // payer tabs
     document.getElementById('payerSwitch').innerHTML = users.map(u =>
-      `<div class="user-tab ${u===curPayer?'active':''}" onclick="curPayer='${u}'; renderExpenseUI();">${u}</div>`
+      `<div class="user-tab ${u===curPayer?'active':''}" onclick="curPayer='${u}'; renderExpenseUI();">${escapeHtml(u)}</div>`
     ).join('');
 
-    document.getElementById('expenseList').innerHTML = expenses.map((e,i) => `
-      <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid rgba(233,225,214,.8);">
-        <div>
-          <div style="font-weight:900;">${escapeHtml(e.name)}</div>
-          <div style="font-size:0.8rem; color:var(--ink2); font-weight:800;">${escapeHtml(e.payer)} 付款</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-weight:900;">¥${escapeHtml(String(e.cost))}</div>
-          <div style="font-size:0.8rem; color:#B42318; cursor:pointer; font-weight:900;" onclick="delExp(${i})">刪除</div>
-        </div>
-      </div>
-    `).join('');
+    // type segmented
+    const typeEl = document.getElementById('expTypeSwitch');
+    if(typeEl){
+      typeEl.querySelectorAll('.seg-btn').forEach(btn => {
+        const t = btn.getAttribute('data-type');
+        btn.classList.toggle('active', t === curExpenseType);
+      });
+    }
 
+    // participants chips
+    const partEl = document.getElementById('partSwitch');
+    if(partEl){
+      partEl.innerHTML = users.map(u => {
+        const on = curParticipants.has(u);
+        return `<span class="chip ${on?'on':'off'}" onclick="toggleParticipant('${escapeHtml(u)}')">
+          <i class="fas ${on?'fa-user-check':'fa-user'}" style="opacity:${on?0.55:0.35};"></i>${escapeHtml(u)}
+        </span>`;
+      }).join('');
+    }
+
+    // list
+    const listEl = document.getElementById('expenseList');
+    if(listEl){
+      listEl.innerHTML = expenses
+        .slice()
+        .sort((a,b)=> (b.ts||0) - (a.ts||0))
+        .map((e,i) => {
+          const parts = Array.isArray(e.participants) && e.participants.length ? e.participants : users;
+          const typeLabel = e.type === 'prepaid' ? '預付' : '行中';
+          const typeCls = e.type === 'prepaid' ? 'prepaid' : 'trip';
+          return `
+            <div style="display:flex; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid rgba(233,225,214,.8);">
+              <div style="min-width:0;">
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                  <div style="font-weight:900;">${escapeHtml(e.name)}</div>
+                  <span class="exp-badge ${typeCls}"><i class="fas ${e.type==='prepaid'?'fa-receipt':'fa-bag-shopping'}" style="opacity:.55;"></i>${typeLabel}</span>
+                </div>
+                <div style="font-size:0.8rem; color:var(--ink2); font-weight:800; margin-top:4px;">
+                  ${escapeHtml(e.payer)} 付款 · 分攤：${escapeHtml(parts.join('、'))}
+                </div>
+              </div>
+              <div style="text-align:right; flex:0 0 auto;">
+                <div style="font-weight:900;">¥${escapeHtml(String(e.cost))}</div>
+                <div style="font-size:0.8rem; color:#B42318; cursor:pointer; font-weight:900;" onclick="delExpByTs(${escapeHtml(String(e.ts))})">刪除</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+    }
+
+    // balances
     let bal = {};
     users.forEach(u => bal[u]=0);
 
     expenses.forEach(e => {
-      let share = e.cost / users.length;
-      users.forEach(u => {
-        if(u===e.payer) bal[u] += (e.cost - share);
-        else bal[u] -= share;
+      const parts = Array.isArray(e.participants) && e.participants.length ? e.participants : users;
+      const share = e.cost / parts.length;
+
+      // payer 先拿回全部
+      if(users.includes(e.payer)) bal[e.payer] += e.cost;
+
+      // 參與者分攤
+      parts.forEach(u => {
+        if(users.includes(u)) bal[u] -= share;
       });
     });
 
-    document.getElementById('debtList').innerHTML = users.map(u => {
-      let val = Math.round(bal[u]);
-      let color = val>=0 ? '#2F8F5B' : '#B42318';
-      return `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(233,225,214,.8); font-weight:900;">
-        <span>${escapeHtml(u)}</span>
-        <span style="color:${color}; font-weight:900;">${val>=0?'收':'付'} ¥${Math.abs(val)}</span>
-      </div>`;
-    }).join('');
+    const debtEl = document.getElementById('debtList');
+    if(debtEl){
+      debtEl.innerHTML = users.map(u => {
+        let val = Math.round(bal[u]);
+        let color = val>=0 ? '#2F8F5B' : '#B42318';
+        return `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(233,225,214,.8); font-weight:900;">
+          <span>${escapeHtml(u)}</span>
+          <span style="color:${color}; font-weight:900;">${val>=0?'收':'付'} ¥${Math.abs(val)}</span>
+        </div>`;
+      }).join('');
+    }
+
+    // summary
+    const sumEl = document.getElementById('expenseSummary');
+    if(sumEl){
+      const totalAll = expenses.reduce((a,e)=>a+Number(e.cost||0),0);
+      const totalTrip = expenses.filter(e=>e.type!=='prepaid').reduce((a,e)=>a+Number(e.cost||0),0);
+      const totalPre = expenses.filter(e=>e.type==='prepaid').reduce((a,e)=>a+Number(e.cost||0),0);
+
+      sumEl.innerHTML = `
+        <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(233,225,214,.8); font-weight:900;">
+          <span>行中支出</span><span>¥${Math.round(totalTrip)}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(233,225,214,.8); font-weight:900;">
+          <span>預付費用</span><span>¥${Math.round(totalPre)}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:10px 0; font-weight:900;">
+          <span>目前總花費</span><span>¥${Math.round(totalAll)}</span>
+        </div>
+        <div style="margin-top:10px; color:var(--ink2); font-size:.86rem; font-weight:800; line-height:1.45;">
+          ✅ 分攤規則：只對「分攤成員」平均分攤（可 1 人、2–3 人…）。<br>
+          ✅ 預付費用：可先記機票 / 飯店 / 預約票券，方便掌握總額。
+        </div>
+      `;
+    }
   }
 
   function addExpense() {
     const name = document.getElementById('exName').value.trim();
-    const cost = parseInt(document.getElementById('exCost').value, 10);
-    if(!name || !cost) return alert('請輸入資料');
-    expenses.push({name, cost, payer:curPayer});
+    const cost = Number(document.getElementById('exCost').value);
+    const participants = Array.from(curParticipants);
+    if(!name || !Number.isFinite(cost) || cost<=0) return alert('請輸入正確項目與金額');
+    if(participants.length<=0) return alert('請至少選一位分攤成員');
+
+    expenses.push({
+      name,
+      cost: Math.round(cost),
+      payer: curPayer,
+      participants,
+      type: curExpenseType,
+      ts: Date.now()
+    });
     localStorage.setItem('expenses', JSON.stringify(expenses));
     document.getElementById('exName').value = '';
     document.getElementById('exCost').value = '';
     renderExpenseUI();
   }
 
-  function delExp(i) {
-    if(confirm('刪除?')) {
-      expenses.splice(i,1);
+  function delExpByTs(ts){
+    const t = Number(ts);
+    if(!Number.isFinite(t)) return;
+    if(confirm('刪除這筆紀錄?')){
+      expenses = expenses.filter(e => Number(e.ts) !== t);
       localStorage.setItem('expenses', JSON.stringify(expenses));
       renderExpenseUI();
     }
