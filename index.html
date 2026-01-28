@@ -487,10 +487,10 @@
     #modalSticky{
         position: sticky;
         top: 0;
-        z-index: 20;
+        z-index: 30;
         background:#FAF7F2;
         margin:0 -18px;               /* ✅ 抵消左右 padding，貼齊邊 */
-        padding:10px 18px;       /* ✅ 把原本的上方空間放回這裡 */
+        padding:10px 18px 8px;       /* ✅ 把原本的上方空間放回這裡 */
         border-bottom: 1px solid rgba(233,225,214,.75);
         box-shadow:0 6px 18px rgba(0,0,0,.06); /* 「浮在上面」，可以再加一點淡陰影*/
     }
@@ -522,6 +522,24 @@
       align-items:center;
       gap:10px; 
       /* padding:6px 2px 10px; */
+    }
+    .sheet-head .tl-tag::before{
+        width:7px;
+        height:7px;
+    }
+    .sheet-head .tl-tag.tag-food::before{ background:#D28A3A; }
+    .sheet-head .tl-tag.tag-sight::before{ background:#2F8F5B; }
+    .sheet-head .tl-tag.tag-transport::before{ background:#3D6EA9; }
+    .sheet-head .tl-tag.tag-hotel::before{ background:#7A4FA8; }
+    .sheet-head .tl-tag.tag-shop::before{ background:#e1c820; }
+
+    /* ✅ 只縮 modal 內的 tag（不影響外面列表） */
+    .sheet-head .tl-tag{
+        padding:4px 8px;
+        margin:0;                 /* ✅ 取消原本 margin-bottom:10px */
+        font-size:.52rem;
+        letter-spacing:.10em;
+        border-radius:999px;
     }
     .sheet-time{
       font-family:'Noto Serif TC', serif;
@@ -556,7 +574,7 @@
       border-top:1px solid var(--divider);
       border-bottom:1px solid var(--divider);
       padding:7px 0;
-      margin:10px 0 12px;
+      margin:8px 0 10px;
       gap:10px;               /* 左右間距縮 */
       color:var(--ink2);
     }
@@ -564,29 +582,33 @@
       display:flex;
       align-items:flex-start;
       gap:10px;
-      padding:7px 0;
-      font-size:.95rem;
+      padding:6px 0;
+      font-size:.90rem;
       line-height:1.35;
     }
     .meta-ico{ 
-        width:22px; 
+        width:auto; 
         text-align:center; 
         flex:0 0 auto; 
-        padding-top:1px;
+        padding-top:0px;
         font-size:1.05rem;      /* icon 稍微小 */
     }
     .meta-val{
         font-size:.92rem;       /* ✅ 字小一點 */
         line-height:1.25;
-        color:#6f6a62; 
+        color:#6f6a62;
+        min-width:0;              /* ✅ 允許正常換行，不把按鈕擠掉 */
+        word-break:break-word;
     }
 
     .mini-btn{
-      margin-left:auto;
+      margin-left:0;
       border:1px solid rgba(233,225,214,.95);
+      justify-self:end;
       background:#fff;
       border-radius:10px;
-      padding:6px 10px;
+      padding:5px 10px;
+      font-size:.78rem;         /* ✅ 更小 */
       cursor:pointer;
       font-weight:900;
       color:#5F5A52;
