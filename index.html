@@ -266,16 +266,17 @@
     }
 
     .hero-dots{
-        position:absolute;
-        left:0; right:0; bottom:10px;
-        display:flex;
-        justify-content:center;
-        gap:6px;
+		  position:absolute;
+		  left:0; right:0; bottom:10px;
+		  display:flex;
+		  justify-content:center;
+		  gap:6px;
+		  pointer-events:auto;
     }
     .hero-dot{
         width:6px; height:6px;
         border-radius:50%;
-        background:rgba(255,255,255,.6);
+        background:transparent;
     }
     .hero-dot.active{ background:rgba(255,255,255,.95); }
 
@@ -293,19 +294,19 @@
         display:inline-flex;
         align-items:center;
         gap:8px;
-        padding:8px 10px;
+        padding:0;
         border-radius:999px;
-        background:rgba(0,0,0,.28);
+        background:transparent;
         color:#fff;
         font-weight:900;
         font-size:.85rem;
-        backdrop-filter: blur(8px);
+        text-shadow:0 2px 10px rgba(0,0,0,.55); /* ✅ 可讀性 */
     }
 
     .hero-caption{
         padding:10px 12px;
         border-radius:16px;
-        background:rgba(0,0,0,.20);
+        background:transparent;
         color:rgba(255,255,255,.92);
         font-weight:700;
         font-size:.88rem;
@@ -327,6 +328,7 @@
       box-shadow:0 10px 24px rgba(0,0,0,.08);
       transition:.2s;
       cursor:pointer;
+	  position:relative;
     }
     .date-chip .day{
       font-family:'Roboto Mono', monospace; 
@@ -353,9 +355,10 @@
         line-height:1.05;
     }
     .date-chip.active{
-      background:#fff;
-      border-color:rgba(150, 104, 49, 0.55);
-      box-shadow:0 14px 30px rgba(0,0,0,.10);
+        background:#fff;
+        border-color:rgba(176,138,91,.75);
+        box-shadow:0 16px 34px rgba(0,0,0,.12);
+        transform:translateY(-2px) scale(1.03);
     }
     .date-chip.active .day{ color:#724b1d; }
 
@@ -471,6 +474,36 @@
       font-weight:800;
     }
     .tl-chip i{ color:#8E8E93; }
+
+	    .tl-content.highlight{
+        position:relative;
+        border-color: rgba(176,138,91,.65);
+        box-shadow:
+            0 14px 30px rgba(0,0,0,.10),
+            0 0 0 1px rgba(176,138,91,.22),
+            0 0 22px rgba(176,138,91,.35);
+    }
+
+    .tl-content.highlight::after{
+        content:"★";
+        position:absolute;
+        top:10px;
+        right:12px;
+        width:26px; height:26px;
+        border-radius:999px;
+        display:flex; align-items:center; justify-content:center;
+        background:rgba(176,138,91,.95);
+        color:#fff;
+        font-size:14px;
+        box-shadow:0 10px 20px rgba(176,138,91,.35);
+    }
+
+    .tl-tag .tag-ico{
+        opacity:.35;
+        font-size:.78rem;
+        margin-left:2px;
+    }
+
 
 
     /* ===== Modal: bottom sheet ===== */
@@ -1500,7 +1533,7 @@
     return `
       <div class="timeline-item" onclick='openModal(${i})'>
         <div class="tl-time">${escapeHtml(item.time || '')}</div>
-        <div class="tl-content">
+        <div class="tl-content ${item.highlight ? 'highlight' : ''}">
           <div class="tl-tag ${tagClass(item.tag)}">
             ${escapeHtml((item.tag||'').toUpperCase())}
             <i class="fas ${tagIcon(item.tag)} style="opacity:.35; font-size:.72rem; margin-left:2px;"></i>
@@ -1567,61 +1600,97 @@
         const el = document.getElementById('dayHero');
         if(!el) return;
 
-        // ✅ 來源優先順序：
-        // 1) day json: dayData.photos (建議你每一天放 5 張)
-        // 2) fallback：用固定的 unsplash 圖（先讓你看到效果）
-        const photos = Array.isArray(dayData?.photos) && dayData.photos.length
-            ? dayData.photos.slice(0,5)
-            : [
-                "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80",
-                "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
-                "https://images.unsplash.com/photo-1526481280695-3c687fd5432c?auto=format&fit=crop&w=1200&q=80",
-                "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80",
-                "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80",
+        // ✅ 支援兩種格式：
+        // 1) 新格式：[{src,loc,caption}]
+        // 2) 舊格式：[ "url1", "url2" ]
+        let photosRaw = Array.isArray(dayData?.photos) ? dayData.photos.slice(0,5) : [];
+        if(!photosRaw.length){
+            photosRaw = [
+            "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1526481280695-3c687fd5432c?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80",
             ];
+        }
 
-            const locText = dayData?.hero?.loc || meta?.loc || '';
-            const caption = dayData?.hero?.caption || '';
+        const photos = photosRaw.map(p=>{
+            if(typeof p === 'string'){
+                return { src:p, loc: (meta?.loc||''), caption:'' };
+            }
+            return {
+                src: p.src || p.url || '',
+                loc: p.loc || meta?.loc || '',
+                caption: p.caption || ''
+            };
+        }).filter(x=>x.src);
 
-            const slides = photos.map((src, idx)=>`
-            <div class="hero-slide">
-                <img src="${escapeHtml(src)}" alt="day photo ${idx+1}">
-                <div class="hero-overlay">
-                ${locText ? `<div class="hero-loc"><i class="fas fa-location-dot"></i>${escapeHtml(locText)}</div>` : ``}
-                ${caption ? `<div class="hero-caption">${escapeHtml(caption)}</div>` : ``}
-                </div>
-            <div class="hero-dots">
-                ${photos.map((_,d)=>`<span class="hero-dot ${d===0?'active':''}"></span>`).join('')}
+        const slides = photos.map((p, idx)=>`
+          <div class="hero-slide">
+            <img
+                src="${escapeHtml(p.src)}"
+                alt="day photo ${idx+1}"
+                loading="lazy"
+                decoding="async"
+                referrerpolicy="no-referrer"
+                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80';"
+            >
+            <div class="hero-overlay">
+                ${p.loc ? `<div class="hero-loc"><i class="fas fa-location-dot"></i>${escapeHtml(p.loc)}</div>` : ``}
+                ${p.caption ? `<div class="hero-caption">${escapeHtml(p.caption)}</div>` : ``}
+					  
+								   
+																									
             </div>
-            </div>
+           </div>
         `).join('');
 
-        el.innerHTML = `<div class="hero-track" id="heroTrack">${slides}</div>`;
+        const dots = `
+            <div class="hero-dots" id="heroDots">
+              ${photos.map((_,i)=>`<span class="hero-dot ${i===0?'active':''}" data-i="${i}"></span>`).join('')}
+            </div>
+        `;
 
-        // auto slide
+        el.innerHTML = `<div class="hero-track" id="heroTrack">${slides}</div>${dots}`;
+
+					 
         const track = document.getElementById('heroTrack');
-        if(!track) return;
+        const dotsEl = document.getElementById('heroDots');
+        if(!track || !dotsEl) return;
 
         if(__heroTimer) clearInterval(__heroTimer);
 
-        const dotsAll = Array.from(el.querySelectorAll('.hero-dots'));
-        let cur = 0;
-
-        function setDot(i){
-            dotsAll.forEach((dotWrap, si)=>{
-            const dots = dotWrap.querySelectorAll('.hero-dot');
-            dots.forEach(d=>d.classList.remove('active'));
-            if(dots[i]) dots[i].classList.add('active');
-            });
+        function setActive(i){
+            dotsEl.querySelectorAll('.hero-dot').forEach(d=>d.classList.remove('active'));
+            const t = dotsEl.querySelector(`.hero-dot[data-i="${i}"]`);
+            if(t) t.classList.add('active');
         }
 
+        // ✅ 點 dot 可跳頁
+        dotsEl.addEventListener('click', (e)=>{
+            const d = e.target.closest('.hero-dot');
+            if(!d) return;
+            const i = parseInt(d.dataset.i,10);
+            track.scrollTo({ left: i * track.clientWidth, behavior:'smooth' });
+            setActive(i);
+        });
+
+        // ✅ 滑動時同步 dot
+        track.addEventListener('scroll', ()=>{
+            const i = Math.round(track.scrollLeft / track.clientWidth);
+            setActive(Math.max(0, Math.min(i, photos.length-1)));
+        }, { passive:true });
+			   
+		 
+
+        // auto slide
+        let cur = 0;
         __heroTimer = setInterval(()=>{
             cur = (cur + 1) % photos.length;
             track.scrollTo({ left: cur * track.clientWidth, behavior:'smooth' });
-            setDot(cur);
+            setActive(cur);
         }, 8000);
     }
-
     
     // timeline
     document.getElementById('timelineList').innerHTML = (dayData?.items || []).map((item, i) => {
@@ -1674,7 +1743,10 @@
         <div class="timeline-item" onclick='openModal(${i})'>
           <div class="tl-time">${escapeHtml(t)}</div>
           <div class="tl-content">
-            <div class="tl-tag ${tagClass(item.tag)}">${escapeHtml((item.tag||'').toUpperCase())}</div>
+            <div class="tl-tag ${tagClass(item.tag)}">
+                ${escapeHtml((item.tag||'').toUpperCase())}
+                <i class="fas ${tagIcon(item.tag)} tag-ico"></i>
+            </div>	  
             <div class="tl-title">${escapeHtml(item.title || '')}</div>
             <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
             ${stay}
@@ -1885,6 +1957,18 @@
             </div>`).join('')}
         </div>`
       : '';
+    const reserveBlock = (item.reservations || []).length
+      ? `<div class="block">
+            <h4><i class="fas fa-receipt"></i> 預約資訊</h4>
+            ${(item.reservations||[]).map(r=>`
+                <div class="meta-row" style="padding:6px 0; border-bottom:1px dashed rgba(233,225,214,.85);">
+                <span class="meta-ico"><i class="fas fa-hashtag"></i></span>
+                <span class="meta-val"><b>${escapeHtml(r.label||'')}</b>：${escapeHtml(r.value||'')}</span>
+                <button class="mini-btn" onclick="copyText('${escapeHtml(r.value||'')}')">複製</button>
+                </div>
+            `).join('')}
+        </div>`
+    : '';							
 
     const detailText = item.detail || item.desc || '';
 
@@ -1968,6 +2052,7 @@
           <span class="meta-val">（此行程尚未填：到達/地址/停車/Mapcode）</span>
         </div>` : ''}
       </div>
+      ${reserveBlock}	 
       ${menuBlock}
       <div class="detail">${escapeHtml(detailText)}</div>
 
@@ -2101,8 +2186,8 @@
 
           <div class="boarding-bottom">
             <div><i class="fas fa-suitcase-rolling"></i> 行李：${escapeHtml(baggage)}</div>
-            <div><i class="fas fa-building"></i> 出發：${escapeHtml(f.from?.city || '')} ${escapeHtml(f.from?.terminal || '')}</div>
-            <div><i class="fas fa-location-dot"></i> 抵達：${escapeHtml(f.to?.city || '')}</div>
+            <div><i class="fas fa-plane-departure"></i> 出發：${escapeHtml(f.from?.city || '')} ${escapeHtml(f.from?.terminal || '')}</div>
+            <div><i class="fas fa-plane-arrival"></i> 抵達：${escapeHtml(f.to?.city || '')}</div>
           </div>
         </div>
       `;
