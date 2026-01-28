@@ -353,7 +353,7 @@
       font-weight:900;
       letter-spacing:.12em;
       margin-bottom:6px;
-      margin-top:-8px;   /* ✅ 往上貼近卡片上緣 */
+      margin-top:-12px;   /* ✅ 往上貼近卡片上緣 */
       line-height:1;     /* ✅ 讓高度更緊 */
       text-transform:uppercase;
       color:#a5a39f;
@@ -1407,7 +1407,7 @@
   }
 
   function renderNormalItem(item, i){
-    const stayPill = item.stay ? `<div style="margin-top:10px; display:inline-flex; gap:8px; align-items:center; background:#F2F2F7; padding:6px 10px; border-radius:999px; font-weight:900; color:#4B5563;">
+    const stayPill = item.stay ? `<div style="margin-top:5px; display:inline-flex; gap:8px; align-items:center; background:#F2F2F7; padding:6px 6px; border-radius:999px; font-weight:900; color:#4B5563;">
       <i class="fas fa-hourglass-half" style="color:#9CA3AF;"></i>${escapeHtml(item.stay)}
     </div>` : '';
 
@@ -1800,16 +1800,17 @@
 
     const detailText = item.detail || item.desc || '';
 
+    // ✅ 支援 links 是「物件」或「陣列包一個物件」
     const links = Array.isArray(item.links) ? (item.links[0] || {}) : (item.links || {});
+
+    // ✅ 用 JSON.stringify 避免引號/特殊字元把 onclick 撐爆
     const linkBtns = [
-        links.official ? `<button class="btn btn-outline" onclick="openUrl('${enc(links.official)}')">官方網站</button>` : '',
-        links.reserve  ? `<button class="btn btn-outline" onclick="openUrl('${enc(links.reserve)}')">訂位 / 購票</button>` : '',
-        links.menu     ? `<button class="btn btn-outline" onclick="openUrl('${enc(links.menu)}')">菜單</button>` : '',
+        links.official ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.official))})'>官方網站</button>` : '',
+        links.reserve  ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.reserve))})'>訂位 / 購票</button>` : '',
+        links.menu     ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.menu))})'>菜單</button>` : '',
     ].filter(Boolean).join('');
 
-    const linkBtnsHtml = linkBtns
-        ? `<div class="link-grid">${linkBtns}</div>`
-        : '';
+    const linkBtnsHtml = linkBtns ? `<div class="link-grid">${linkBtns}</div>` : '';
 
     // ✅ 你要的欄位（eta/arrive/arrival 皆可）
     const eta = item.eta || item.arrive || item.arrival || '';
