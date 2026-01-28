@@ -503,11 +503,11 @@
     .modal-sticky-wrap::before{
         content:'';
         position:absolute;
-        left:0;
+        left:-18px;
         top:6px;
         bottom:6px;
         width:4px;
-        border-radius:999px;
+        border-radius:0 999px 999px 0;
         background:#B9B2AA; /* default */
     }
     .modal-sticky-wrap.tag-food::before{ background:#D28A3A; }
@@ -573,16 +573,16 @@
     }
     /* FOOD 外框 */
     .tag-chip{
-        padding:6px 10px;
+        padding:4px 8px;
         border-radius:999px;
         border:1px solid rgba(233,225,214,.9);
         background:rgba(255,255,255,.55);
     }
-    .tag-chip.tag-food{ background:#D28A3A; }
-    .tag-chip.tag-sight{ background:#2F8F5B; }
-    .tag-chip.tag-transport{ background:#3D6EA9; }
-    .tag-chip.tag-hotel{ background:#7A4FA8; }
-    .tag-chip.tag-shop{ background:#e1c820; }
+.tag-chip.tag-food{ border-color:rgba(210,138,58,.55); }
+.tag-chip.tag-sight{ border-color:rgba(47,143,91,.55); }
+.tag-chip.tag-transport{ border-color:rgba(61,110,169,.55); }
+.tag-chip.tag-hotel{ border-color:rgba(122,79,168,.55); }
+.tag-chip.tag-shop{ border-color:rgba(225,200,32,.55); }
 
     .modal-title{
       font-family:'Noto Serif TC', serif;
@@ -804,6 +804,14 @@
         align-items:center;
         gap:8px;
     }
+
+    .link-grid{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+        margin-top:10px;
+    }
+
 
 
     /* ===== Route strip (for drive/walk/train/flight/boat) ===== */
@@ -1649,6 +1657,11 @@
             { enableHighAccuracy:true, timeout:8000, maximumAge:60000 }
         );
     }
+    function openUrl(url){
+        if(!url) return;
+        window.open(url, '_blank', 'noopener');
+    }
+
 
 
 
@@ -1792,7 +1805,7 @@
     sticky.innerHTML = `
         <div class="modal-sticky-wrap ${tagClass(item.tag)}">
             <div class="sheet-head">
-                <div class="tag-chip">
+                <div class="tag-chip ${tagClass(item.tag)}">
                     <div class="sheet-tag ${tagClass(item.tag)}">${escapeHtml((item.tag||'').toUpperCase())}</div>
                 </div>
             <div class="sheet-time"><i class="fa-regular fa-clock" style="color:#8B8175; margin-right:6px;"></i>${escapeHtml(item.time || '—')}</div>
@@ -1806,32 +1819,43 @@
         </div>
     `;
 
+    const links = item.links || {};
+    const linkBtns = [
+        links.official ? `<button class="btn btn-outline" onclick="openUrl('${enc(links.official)}')">官方網站</button>` : '',
+        links.reserve  ? `<button class="btn btn-outline" onclick="openUrl('${enc(links.reserve)}')">訂位 / 購票</button>` : '',
+        links.menu     ? `<button class="btn btn-outline" onclick="openUrl('${enc(links.menu)}')">菜單</button>` : '',
+    ].filter(Boolean).join('');
+
+    const linkBtnsHtml = linkBtns
+        ? `<div class="link-grid">${linkBtns}</div>`
+        : '';
+
     body.innerHTML = `
       <div class="meta-box">
         ${eta ? `
         <div class="meta-row">
-          <span class="meta-ico">⏱️</span>
+          <span class="meta-ico"><i class="fa-regular fa-clock"></i></span>
           <span class="meta-val">預計到達：${escapeHtml(eta)}</span>
           <button class="mini-btn" onclick="copyText('${escapeHtml(eta)}')">複製</button>
         </div>` : ''}
 
         ${addr ? `
         <div class="meta-row">
-          <span class="meta-ico">📍</span>
+          <span class="meta-ico"><i class="fas fa-location-dot"></i></span>
           <span class="meta-val">${escapeHtml(addr)}</span>
           <button class="mini-btn" onclick="copyText('${escapeHtml(addr)}')">複製</button>
         </div>` : ''}
 
         ${parking ? `
         <div class="meta-row">
-          <span class="meta-ico">🅿️</span>
+          <span class="meta-ico"><i class="fas fa-square-parking"></i></span>
           <span class="meta-val">${escapeHtml(parking)}</span>
           <button class="mini-btn" onclick="copyText('${escapeHtml(parking)}')">複製</button>
         </div>` : ''}
 
         ${mapcode ? `
         <div class="meta-row">
-          <span class="meta-ico">🧭</span>
+          <span class="meta-ico">🗾</span>
           <span class="meta-val">Mapcode：${escapeHtml(mapcode)}</span>
           <button class="mini-btn" onclick="copyText('${escapeHtml(mapcode)}')">複製</button>
         </div>` : ''}
@@ -1848,14 +1872,10 @@
       ${menuBlock}
       ${avoidList}
       ${guideList}
+      ${linkBtnsHtml}
 
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
-        <button class="btn btn-outline" onclick="copyText('${escapeHtml(item.title || '')}')">複製名稱</button>
 
-        ${item.mapcode
-          ? `<button class="btn btn-outline" onclick="copyText('${escapeHtml(item.mapcode)}')">複製 Mapcode</button>`
-          : `<button class="btn btn-outline" onclick="copyText('${escapeHtml(item.addr || item.title || '')}')">複製地址</button>`}
-      </div>
+      
 
 
       <div class="sheet-actions">
@@ -2107,6 +2127,4 @@
 
 </script>
 </body>
-
 </html>
-
