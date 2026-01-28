@@ -364,8 +364,8 @@
           "如果金刀比羅宮走很累：晚餐就走『快速補能量』路線，省時間回住宿休息。"
         ],
         "links": [
-            "reserve": "https://shop.saizeriya.co.jp/sz_restaurant/spot/detail?code=1577",
-            "menu": "https://maps.app.goo.gl/LcQ5FC8W5mmr2ewC6"
+            {"reserve": "https://shop.saizeriya.co.jp/sz_restaurant/spot/detail?code=1577",
+            "menu": "https://maps.app.goo.gl/LcQ5FC8W5mmr2ewC6"}
         ],
         "img": ""
       },
