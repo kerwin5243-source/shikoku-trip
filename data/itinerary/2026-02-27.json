@@ -75,8 +75,8 @@
         "stay": "30 min",
         "menu": [],
         "avoid": [          
-          "[香川優惠]:/n",
-          "[租車中心櫃檯]:/n櫃檯確認訂單後會載我們前往租車中心辦理手續及取車"
+          "[香川優惠]:\n",
+          "[租車中心櫃檯]:\n櫃檯確認訂單後會載我們前往租車中心辦理手續及取車"
         ],
         "guide": [],
         "links": [],
@@ -342,16 +342,17 @@
         "avoid": [],
         "guide": [
           "Tax-free",
-          "[服飾]\n1F:UNIQLO、GU、GLOBAL WORK、H&M、studio CLIP",
-          "[戶外]\n1F:mont-bell、2F:MEGA Sports、ABC-MART",
-          "[眼鏡]\n1F:田中眼鏡、3F:Jins",
-          "[藥妝]\n1F:cocokarafine",
+          "[服飾]\n1F: UNIQLO、GU、GLOBAL WORK、H&M、studio CLIP",
+          "[戶外]\n1F: mont-bell、2F: MEGA Sports、ABC-MART",
+          "[眼鏡]\n1F: 田中眼鏡、3F: Jins",
+          "[藥妝]\n1F: cocokarafine",
           "NO Tax-free",
-          "[娛樂]\n2F:GiGo",
-          "[雜貨]\n3F:DAISO"
+          "[娛樂]\n2F: GiGo",
+          "[雜貨]\n3F: DAISO"
         ],
         "links": [
-          { "title": "AEON 參考影片", "url": "https://www.youtube.com/watch?v=hdEU3BwcaYg" }
+            {"floormap": "https://tw.aeonmall.global/catalog/floormap/takamatsu/tw/index.html#page=1",
+             "cupon": "https://tw-img.vpon.com/img/campaigns/aeon/aeon_2025campaign_en/index.html"}
         ],
         "img": ""
       },
@@ -374,8 +375,8 @@
           "如果金刀比羅宮走很累：晚餐就走『快速補能量』路線，省時間回住宿休息。"
         ],
         "links": [
-            {"reserve": "https://shop.saizeriya.co.jp/sz_restaurant/spot/detail?code=1577",
-              "menu": "https://maps.app.goo.gl/LcQ5FC8W5mmr2ewC6"}
+            {"floormap": "https://tw.aeonmall.global/catalog/floormap/takamatsu/tw/index.html#page=1",
+             "cupon": "https://tw-img.vpon.com/img/campaigns/aeon/aeon_2025campaign_en/index.html"}
         ],
         "img": ""
       },
