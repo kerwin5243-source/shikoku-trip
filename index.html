@@ -546,7 +546,8 @@
         content:"";
         width:8px; height:8px;
         border-radius:50%;
-        top:-2px;    
+        position:relative;
+        top:-2px;
         background:#B9B2AA;
         display:inline-block;
     }
@@ -558,22 +559,27 @@
     .sheet-tag.tag-hotel::before{ background:#7A4FA8; }
     .sheet-tag.tag-shop::before{ background:#2A6FA0; }
 
-    /* ✅ 只縮 modal 內的 tag（不影響外面列表） */
+    /* /* ✅ 只縮 modal 內的 tag（不影響外面列表）
     .sheet-head .tl-tag{
         padding:4px 8px;
         margin:0;                 /* ✅ 取消原本 margin-bottom:10px */
-        font-size:.52rem;
+        /* font-size:.52rem;
         letter-spacing:.10em;
         border-radius:999px;
-    }
+    } */
     .sheet-time{
       font-family:'Noto Serif TC', serif;
+      display:inline-flex;
+      align-items:center; 
       font-size:.86rem;
       font-weight:900;
       color:#2B2723;
+      line-height:1;
     }
     /* FOOD 外框 */
     .tag-chip{
+        display:inline-flex;
+        align-items:center;
         padding:.5px 4px;
         border-radius:999px;
         border:1px solid rgba(233,225,214,.9);
@@ -1809,7 +1815,7 @@
                 <div class="tag-chip ${tagClass(item.tag)}">
                     <div class="sheet-tag ${tagClass(item.tag)}">${escapeHtml((item.tag||'').toUpperCase())}</div>
                 </div>
-            <div class="sheet-time"><i class="fa-regular fa-clock" style="color:#8B8175; margin-right:6px;"></i>${escapeHtml(item.time || '—')}</div>
+            <div class="sheet-time"><i class="fa-regular fa-clock" style="color:#8B8175;"></i>${escapeHtml(item.time || '—')}</div>
             </div>
 
             <div class="modal-title">${escapeHtml(item.title || '')}</div>
@@ -2128,9 +2134,4 @@
 
 </script>
 </body>
-
 </html>
-
-
-
-
