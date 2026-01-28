@@ -412,9 +412,13 @@
       opacity:0; pointer-events:none;
       transition:opacity .2s ease;
     }
+
+    /* 點開小程式懸浮的 */
     .modal-sheet{
       position:fixed;
       left:50%;
+      background:#FAF7F2;     /* ✅ 一定要有 */
+      box-shadow:0 18px 70px rgba(0,0,0,.22); /* ✅ 讓它像真的浮起來 */
       bottom:max(14px, env(safe-area-inset-bottom));
       transform:translateX(-50%) translateY(120%);
       width:min(760px, calc(100vw - 24px));
@@ -486,7 +490,7 @@
         z-index: 20;
         background:#FAF7F2;
         margin:0 -18px;               /* ✅ 抵消左右 padding，貼齊邊 */
-        padding:10px 18px 10px;       /* ✅ 把原本的上方空間放回這裡 */
+        padding:10px 18px;       /* ✅ 把原本的上方空間放回這裡 */
         border-bottom: 1px solid rgba(233,225,214,.75);
         box-shadow:0 6px 18px rgba(0,0,0,.06); /* 「浮在上面」，可以再加一點淡陰影*/
     }
@@ -494,7 +498,7 @@
     /* 左邊彩色直槓（用 tag 類別控制顏色） */
     .modal-sticky-wrap{
         position: relative;
-        padding-left: 14px;
+        padding-left: 0;
     }
     .modal-sticky-wrap::before{
         content:'';
@@ -517,14 +521,26 @@
       display:flex;
       align-items:center;
       gap:10px; 
-      padding:6px 2px 10px;
+      /* padding:6px 2px 10px; */
     }
     .sheet-time{
       font-family:'Noto Serif TC', serif;
-      font-size:.90rem;
+      font-size:.86rem;
       font-weight:900;
       color:#2B2723;
     }
+    /* FOOD 外框 */
+    .tag-chip{
+        padding:6px 10px;
+        border-radius:999px;
+        border:1px solid rgba(233,225,214,.9);
+        background:rgba(255,255,255,.55);
+    }
+    .tag-chip.tag-food{ background:#D28A3A; }
+    .tag-chip.tag-sight{ background:#2F8F5B; }
+    .tag-chip.tag-transport{ background:#3D6EA9; }
+    .tag-chip.tag-hotel{ background:#7A4FA8; }
+    .tag-chip.tag-shop{ background:#e1c820; }
 
     .modal-title{
       font-family:'Noto Serif TC', serif;
@@ -535,11 +551,13 @@
       letter-spacing:.2px;
     }
 
+    /* 地址/停車場/Mapcode */
     .meta-box{
       border-top:1px solid var(--divider);
       border-bottom:1px solid var(--divider);
-      padding:10px 0;
+      padding:7px 0;
       margin:10px 0 12px;
+      gap:10px;               /* 左右間距縮 */
       color:var(--ink2);
     }
     .meta-row{
@@ -550,8 +568,18 @@
       font-size:.95rem;
       line-height:1.35;
     }
-    .meta-ico{ width:22px; text-align:center; flex:0 0 auto; padding-top:1px; }
-    .meta-val{ flex:1; }
+    .meta-ico{ 
+        width:22px; 
+        text-align:center; 
+        flex:0 0 auto; 
+        padding-top:1px;
+        font-size:1.05rem;      /* icon 稍微小 */
+    }
+    .meta-val{
+        font-size:.92rem;       /* ✅ 字小一點 */
+        line-height:1.25;
+        color:#6f6a62; 
+    }
 
     .mini-btn{
       margin-left:auto;
@@ -584,7 +612,7 @@
       font-weight:900;
       color:#5F5A52;
     }
-    .pill i{ color:#8B8175; }
+    .pill i{ color:#8B8175; font-size:.9em;}
 
     .block{
       background:rgba(255,255,255,.72);
@@ -1711,7 +1739,9 @@
     sticky.innerHTML = `
         <div class="modal-sticky-wrap ${tagClass(item.tag)}">
             <div class="sheet-head">
-            <div class="tl-tag ${tagClass(item.tag)}">${escapeHtml((item.tag||'').toUpperCase())}</div>
+                <div class="tag-chip">
+                    <div class="tl-tag ${tagClass(item.tag)}">${escapeHtml((item.tag||'').toUpperCase())}</div>
+                </div>
             <div class="sheet-time"><i class="fa-regular fa-clock" style="color:#8B8175; margin-right:6px;"></i>${escapeHtml(item.time || '—')}</div>
             </div>
 
