@@ -574,6 +574,7 @@
       font-weight:900;
       color:#2B2723;
       line-height:1;
+      gap:6px;  
     }
     /* FOOD 外框 */
     .tag-chip{
@@ -592,7 +593,7 @@
 
     .modal-title{
       font-family:'Noto Serif TC', serif;
-      font-size:1.40rem;
+      font-size:1.20rem;
       font-weight:900;
       line-height:1.18;
       margin:10px 0 10px 0;
@@ -610,7 +611,7 @@
     }
     .meta-row{
       display:flex;
-      align-items:flex-start;
+      align-items:center; 
       gap:10px;
       padding:6px 0;
       font-size:.90rem;
@@ -633,7 +634,7 @@
 
     .mini-btn{
       margin-left:auto;
-      align-self:flex-start;  /* ✅ 讓它貼齊第一行 */
+      align-self:center;   /* ✅ 讓它貼齊第一行 */
       border:1px solid rgba(233,225,214,.95);
       justify-self:end;
       background:#fff;
@@ -652,6 +653,8 @@
       color:#3A352E;
       line-height:1.7;
       white-space:pre-wrap;
+      padding-left:1.05em;     /* ✅ 整段往右一點 */
+      text-indent:-1.05em;     /* ✅ 第一行往左拉回來，形成「凸排」效果 */
     }
 
     .pill-row{ 
@@ -1777,16 +1780,16 @@
     const stay  = item.stay  ? `<span class="pill"><i class="fas fa-hourglass-half"></i> ${escapeHtml(item.stay)}</span>` : '';
 
     const guideList = (item.guide || []).length
-      ? `<div class="block"><h4><i class="fas fa-headset"></i> 導遊介紹</h4><ul class="bullet">${item.guide.map(x=>`<li>${escapeHtml(x).replace(/\n/g,'<br>').replace(/^\[(.+?)\]：/,'<strong>[$1]：</strong>')}</li>`).join('')}</ul></div>`
+      ? `<div class="block"><h4><i class="fas fa-headset"></i> 特色介紹</h4><ul class="bullet">${item.guide.map(x=>`<li>${escapeHtml(x).replace(/\n/g,'<br>').replace(/^\[(.+?)\]：/,'<strong>[$1]：</strong>')}</li>`).join('')}</ul></div>`
       : '';
 
     const avoidList = (item.avoid || []).length
-      ? `<div class="block"><h4><i class="fas fa-triangle-exclamation"></i> 避雷指南</h4><ul class="bullet">${item.avoid.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul></div>`
+      ? `<div class="block"><h4><i class="fas fa-triangle-exclamation"></i> 注意事項</h4><ul class="bullet">${item.avoid.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul></div>`
       : '';
 
     const menuBlock = (item.menu || []).length
       ? `<div class="menu-recommend">
-          <div style="font-weight:900; margin-bottom:10px; color:#8C6B43;"><i class="fas fa-thumbs-up"></i> 必吃菜單（中日對照）</div>
+          <div style="font-weight:900; margin-bottom:10px; color:#8C6B43;"><i class="fas fa-thumbs-up"></i> 必吃美食（中日對照）</div>
           ${(item.menu||[]).map(m=>`
             <div class="menu-item">
               <span class="jp-text">${escapeHtml(m.jp || '')}</span>
@@ -1796,6 +1799,17 @@
       : '';
 
     const detailText = item.detail || item.desc || '';
+
+    const links = Array.isArray(item.links) ? (item.links[0] || {}) : (item.links || {});
+    const linkBtns = [
+        links.official ? `<button class="btn btn-outline" onclick="openUrl('${enc(links.official)}')">官方網站</button>` : '',
+        links.reserve  ? `<button class="btn btn-outline" onclick="openUrl('${enc(links.reserve)}')">訂位 / 購票</button>` : '',
+        links.menu     ? `<button class="btn btn-outline" onclick="openUrl('${enc(links.menu)}')">菜單</button>` : '',
+    ].filter(Boolean).join('');
+
+    const linkBtnsHtml = linkBtns
+        ? `<div class="link-grid">${linkBtns}</div>`
+        : '';
 
     // ✅ 你要的欄位（eta/arrive/arrival 皆可）
     const eta = item.eta || item.arrive || item.arrival || '';
@@ -1825,16 +1839,7 @@
         </div>
     `;
 
-    const links = item.links || {};
-    const linkBtns = [
-        links.official ? `<button class="btn btn-outline" onclick="openUrl('${enc(links.official)}')">官方網站</button>` : '',
-        links.reserve  ? `<button class="btn btn-outline" onclick="openUrl('${enc(links.reserve)}')">訂位 / 購票</button>` : '',
-        links.menu     ? `<button class="btn btn-outline" onclick="openUrl('${enc(links.menu)}')">菜單</button>` : '',
-    ].filter(Boolean).join('');
 
-    const linkBtnsHtml = linkBtns
-        ? `<div class="link-grid">${linkBtns}</div>`
-        : '';
 
     body.innerHTML = `
       <div class="meta-box">
@@ -1872,10 +1877,9 @@
           <span class="meta-val">（此行程尚未填：到達/地址/停車/Mapcode）</span>
         </div>` : ''}
       </div>
-
+      ${menuBlock}
       <div class="detail">${escapeHtml(detailText)}</div>
 
-      ${menuBlock}
       ${avoidList}
       ${guideList}
       ${linkBtnsHtml}
@@ -2133,10 +2137,4 @@
 
 </script>
 </body>
-
 </html>
-
-
-
-
-
