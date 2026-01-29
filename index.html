@@ -511,18 +511,19 @@
     .tl-content:active{ transform:scale(.985); }
 
     .reserve-badge{
-      position:absolute;
-      top:10px;
-      right:12px;
-      padding:4px 8px;
-      border-radius:8px;
-      font-size:.72rem;
-      font-weight:900;
-      color:#7D5B34;
-      background:rgba(255,255,255,.85);
-      border:1px solid rgba(176,138,91,.35);
-      box-shadow:0 8px 18px rgba(0,0,0,.08);
-    }
+  display:inline-block;
+  font-size:.66rem;
+  line-height:1;
+  letter-spacing:.08em;
+  padding:4px 8px;
+  border:1.6px solid rgba(180,35,24,.72);
+  color:rgba(180,35,24,.92);
+  background:rgba(255,255,255,.86);
+  border-radius:8px;
+  transform:rotate(-8deg);
+  transform-origin:left center;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+}
 
 
     .tl-tag{
@@ -584,27 +585,32 @@
     .tl-chip i{ color:#8E8E93; }
 
 	    .tl-content.highlight{
-        position:relative;
-        border-color: rgba(176,138,91,.65);
-        box-shadow:
-            0 14px 30px rgba(0,0,0,.10),
-            0 0 0 1px rgba(176,138,91,.22),
-            0 0 22px rgba(176,138,91,.35);
-    }
-
-    .tl-content.highlight::after{
-        content:"★";
-        position:absolute;
-        top:10px;
-        right:12px;
-        width:26px; height:26px;
-        border-radius:999px;
-        display:flex; align-items:center; justify-content:center;
-        background:rgba(176,138,91,.95);
-        color:#fff;
-        font-size:14px;
-        box-shadow:0 10px 20px rgba(176,138,91,.35);
-    }
+  position:relative;
+  border-color: rgba(70,120,210,.42);
+  box-shadow:
+    0 18px 34px rgba(0,0,0,.10),
+    0 0 0 1px rgba(70,120,210,.18),
+    0 0 46px rgba(70,120,210,.34);
+}
+.tl-content.highlight::before{
+  content:"";
+  position:absolute;
+  inset:-18px;
+  border-radius:calc(var(--radius-M) + 18px);
+  background: radial-gradient(closest-side, rgba(70,120,210,.26), rgba(70,120,210,0) 70%);
+  filter: blur(8px);
+  opacity:.95;
+  pointer-events:none;
+  z-index:-1;
+}
+.tl-content.highlight::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:var(--radius-M);
+  background: linear-gradient(135deg, rgba(70,120,210,.10), rgba(70,120,210,0));
+  pointer-events:none;
+}
 
     .tl-tag .tag-ico{
         color:#7E7469;
@@ -1335,6 +1341,35 @@
       white-space:nowrap;
     }
 
+/* mini-map pins */
+.rm-pin{
+  border-radius:999px;
+  background:rgba(255,255,255,.92);
+  border:2px solid rgba(60,110,210,.80);
+  box-shadow:0 10px 22px rgba(0,0,0,.16);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.rm-pin span{
+  font-family:'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight:800;
+  font-size:.74rem;
+  color:rgba(40,70,150,.95);
+}
+.rm-pin.rm-start{
+  border-color:rgba(34,139,34,.85);
+}
+.rm-pin.rm-start span{ color:rgba(22,110,22,.95); }
+.rm-pin.rm-end{
+  border-color:rgba(180,35,24,.80);
+}
+.rm-pin.rm-end span{ color:rgba(180,35,24,.92); }
+.rm-pin.rm-stop{
+  border-color:rgba(60,110,210,.78);
+}
+
+
 
 
   </style>
@@ -1881,11 +1916,7 @@
     currentDayData = dayData;
     // ✅ 顯示上方 5 張輪播圖（獨立 block）
     renderDayHero(dayData, meta);
-    renderDayRouteCard(dayData);
-
-
-
-
+    await renderDayRouteCard(dayData);
     function renderDayHero(dayData, meta){
         const el = document.getElementById('dayHero');
         if(!el) return;
@@ -2070,7 +2101,7 @@
     }
     return null;
    }
-  function renderDayRouteCard(dayData){
+  async function renderDayRouteCard(dayData){
     const el = document.getElementById('dayRouteCard');
     if(!el) return;
 
@@ -2084,13 +2115,15 @@
     // 3) { q:"地點名稱", lat:34.12, lng:134.56 } (物件：Google + 縮圖都能用)
     const pts = rawPts.map(p=>{
       if(p == null) return null;
+
       if(typeof p === 'string'){
         const s = p.trim();
         if(!s) return null;
         const ll = parseLatLng(s);
-        if(ll) return { q: s, lat: ll[0], lng: ll[1] }; // 直接用座標當 query
-        return { q: s }; // 只有文字（縮圖沒法畫）
+        if(ll) return { q: `${ll.lat},${ll.lng}`, lat: ll.lat, lng: ll.lng };
+        return { q: s };
       }
+
       if(typeof p === 'object'){
         const q = (p.q || p.name || p.title || '').toString().trim();
         const lat = (p.lat != null) ? Number(p.lat) : null;
@@ -2098,50 +2131,70 @@
         const hasLL = Number.isFinite(lat) && Number.isFinite(lng);
         return { q: q || (hasLL ? `${lat},${lng}` : ''), lat: hasLL ? lat : null, lng: hasLL ? lng : null };
       }
+
       return null;
     }).filter(Boolean);
 
-    if(pts.length < 2){
+    if(!route || pts.length < 2){
       el.innerHTML = '';
       return;
     }
 
-    // ✅ Google 導航：用 api=1，waypoints 更穩定（iOS 也比較常成功）
-    const gUrl = buildGoogleDirUrlFromPoints(pts, mode);
+    const gUrl = buildGoogleDirUrl(pts, mode);
 
-    // ✅ 估算公里數：用「直線」haversine + 係數（道路通常比直線長）
-// ✅ 今日預計行駛公里數：
-// - 你可在 JSON 直接指定 route.km（最準）
-// - 沒填就用「直線距離 + 係數」估算（大約值）
-const kmManual = (route?.km != null) ? Number(route.km) : null;
-const factor = 1.25;                // 你可調：1.15~1.35
-const km0 = estimateRouteKm(pts.map(p => (p.lat!=null && p.lng!=null) ? `${p.lat},${p.lng}` : '').filter(Boolean));
-const kmEst = (km0!=null) ? (km0 * factor) : null;
-const km = Number.isFinite(kmManual) ? kmManual : kmEst;
-const kmText = (km!=null) ? `・預計行駛 ${Math.round(km)} km` : '';
+    // --- Stops (中間的停靠點數量) ---
+    const stopCount = Math.max(0, pts.length - 2);
 
+    // --- 先準備座標點（只有有 lat/lng 的才拿來畫縮圖 + OSRM）---
+    const stopLatLngs = pts.filter(p=>Number.isFinite(p.lat) && Number.isFinite(p.lng)).map(p=>({lat:p.lat, lng:p.lng}));
+
+    // --- center / zoom ---
+    const centerObj = parseLatLng(route?.preview?.center || '') || (stopLatLngs[0] || null);
+    const centerStr = centerObj ? `${centerObj.lat},${centerObj.lng}` : '';
+    const zoom = route?.preview?.zoom || 11;
+
+    // --- Road distance (優先：route.distance_km > OSRM > (不顯示/直線估算)) ---
+    let roadKm = (route?.distance_km != null) ? Number(route.distance_km) : null;
+    if(!Number.isFinite(roadKm)) roadKm = null;
+
+    // OSRM 取得道路路徑 + 距離（不需要 API Key；但可能因網路/CORS 失敗）
+    let pathLatLngs = null;
+    if(roadKm == null && stopLatLngs.length >= 2){
+      try{
+        const osrm = await fetchOsrmRoute(stopLatLngs, mode);
+        if(osrm?.distanceKm != null) roadKm = osrm.distanceKm;
+        if(osrm?.pathLatLngs?.length) pathLatLngs = osrm.pathLatLngs;
+      }catch(e){
+        // 失敗就不顯示 km（避免再回到直線 65km 那種誤差）
+        console.warn('OSRM route failed:', e);
+      }
+    }
+
+    // 沒有 OSRM 路徑就用停靠點直線（至少能畫出大概）
+    if(!pathLatLngs) pathLatLngs = stopLatLngs;
+
+    const meta = `${stopCount} 個停留點` + (roadKm != null ? ` · 預計行駛 ${roadKm} km` : '');
+
+    // --- UI：維持你第 3 張那個卡片排版 ---
     el.innerHTML = `
       <div class="route-card">
-        <div class="route-thumb">
-          <div id="routeMiniMap" aria-label="route preview"></div>
-        </div>
-
-        <div class="route-footer">
-          <div class="route-title">Google Map 導航</div>
-          <div class="route-sub">${pts.length} 個停留點${kmText}</div>
-          <a class="route-open" href="${gUrl}" target="_blank" rel="noopener">
-            <i class="fas fa-location-arrow"></i> 開啟
-          </a>
+        <div class="route-thumb" id="routeMiniMap"></div>
+        <div class="route-head">
+          <div>
+            <div class="route-title">Google Map 導航</div>
+            <div class="route-meta">${meta}</div>
+          </div>
+          <a class="route-btn" href="${gUrl}" target="_blank" rel="noopener">開啟</a>
         </div>
       </div>
     `;
 
-    // ✅ 縮圖：只畫有座標的點；若都沒有座標，就顯示提示
-    const llPts = pts.filter(p => p.lat!=null && p.lng!=null).map(p => [p.lat, p.lng]);
-    const centerStr = route?.preview?.center || '';
-    const zoom = route?.preview?.zoom ?? 12;
-    renderRouteMiniMap(llPts, centerStr, zoom);
+    // --- 縮圖地圖（用 OSRM 的道路路徑畫出「像第4張」的走法）---
+    if(stopLatLngs.length){
+      renderRouteMiniMap(pathLatLngs, stopLatLngs, centerStr, zoom);
+    }
   }
+
 
   function buildGoogleDirUrlFromPoints(points, mode='drive'){
     // points: [{q,lat,lng}, ...]
@@ -2198,6 +2251,33 @@ const kmText = (km!=null) ? `・預計行駛 ${Math.round(km)} km` : '';
     for(let i=0;i<coords.length-1;i++){
       sum += haversineKm(coords[i], coords[i+1]);
     }
+
+  async function fetchOsrmRoute(latlngPoints, mode){
+    const profile = (mode === 'walk' || mode === 'walking') ? 'walking'
+                   : (mode === 'bike' || mode === 'bicycle' || mode === 'cycling') ? 'cycling'
+                   : 'driving';
+
+    const coords = latlngPoints
+      .filter(p=>Number.isFinite(p.lat) && Number.isFinite(p.lng))
+      .map(p=>`${p.lng},${p.lat}`)
+      .join(';');
+
+    if(!coords || coords.split(';').length < 2) return null;
+
+    const url = `https://router.project-osrm.org/route/v1/${profile}/${coords}?overview=full&geometries=geojson&steps=false`;
+    const r = await fetch(url, { method:'GET' });
+    if(!r.ok) throw new Error(`OSRM HTTP ${r.status}`);
+    const data = await r.json();
+
+    const route = data?.routes?.[0];
+    if(!route) return null;
+
+    const distanceKm = Math.round((route.distance || 0) / 1000);
+    const pathLatLngs = (route.geometry?.coordinates || []).map(([lng, lat])=>({lat, lng}));
+
+    return { distanceKm, pathLatLngs };
+  }
+
     return sum; // 直線估算公里數
   }
 
@@ -2240,105 +2320,76 @@ const kmText = (km!=null) ? `・預計行駛 ${Math.round(km)} km` : '';
 
   let __routeMap = null;
 
-  function renderRouteMiniMap(latlngPoints, fallbackCenterStr, zoom=12){
-    const el = document.getElementById('routeMiniMap');
-    if(!el) return;
+  
+function renderRouteMiniMap(pathLatLngs, stopLatLngs, fallbackCenterStr, zoom){
+  if(!window.L) return;
 
-    // 重複切換日期時：清掉舊 map
-    if(__routeMap){
-      __routeMap.remove();
-      __routeMap = null;
-    }
+  const container = document.getElementById('routeMiniMap');
+  if(!container) return;
 
-    // ✅ 若沒有座標點：顯示提示（因為無法畫縮圖）
-    if(!Array.isArray(latlngPoints) || latlngPoints.length < 2){
-      el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9a938a;font-weight:700;">Map preview unavailable (need coordinates)</div>';
-      return;
-    }
-
-    __routeMap = L.map(el, {
-      zoomControl:false,
-      attributionControl:false,
-      dragging:false,
-      scrollWheelZoom:false,
-      doubleClickZoom:false,
-      boxZoom:false,
-      keyboard:false,
-      tap:false
-    });
-
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(__routeMap);
-
-    // ✅ 路線線段
-    const line = L.polyline(latlngPoints, { weight:4, opacity:0.9 }).addTo(__routeMap);
-
-    // ✅ 起點/終點 marker（小圓點）
-    const start = latlngPoints[0];
-    const end   = latlngPoints[latlngPoints.length-1];
-    L.circleMarker(start, { radius:5, weight:2, fillOpacity:0.8 }).addTo(__routeMap);
-    L.circleMarker(end,   { radius:5, weight:2, fillOpacity:0.8 }).addTo(__routeMap);
-
-    // ✅ 其餘停靠點（更小）
-    for(let i=1;i<latlngPoints.length-1;i++){
-      L.circleMarker(latlngPoints[i], { radius:4, weight:1, fillOpacity:0.7, opacity:0.7 }).addTo(__routeMap);
-    }
-
-    // ✅ 視野自動 fit
-    try{
-      __routeMap.fitBounds(line.getBounds(), { padding:[18,18] });
-    }catch(e){
-      // fallback: 用 preview center
-      const parts = (fallbackCenterStr || '').split(',').map(s=>parseFloat(s.trim()));
-      if(parts.length===2 && parts.every(n=>Number.isFinite(n))){
-        __routeMap.setView([parts[0], parts[1]], zoom);
-      }else{
-        __routeMap.setView(start, zoom);
-      }
-    }
+  // reset old map instance
+  if(window.__routeMap){
+    try{ window.__routeMap.remove(); }catch(e){}
+    window.__routeMap = null;
   }
 
+  const centerObj = parseLatLng(fallbackCenterStr) || stopLatLngs?.[0] || pathLatLngs?.[0] || {lat:34.25, lng:134.105};
+  const map = L.map(container, {
+    zoomControl:false,
+    attributionControl:false,
+    dragging:false,
+    scrollWheelZoom:false,
+    doubleClickZoom:false,
+    boxZoom:false,
+    keyboard:false,
+    tap:false
+  }).setView([centerObj.lat, centerObj.lng], zoom || 11);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+  // --- route line (用 OSRM 的道路 polyline 會更像 Google 那種走法) ---
+  if(Array.isArray(pathLatLngs) && pathLatLngs.length >= 2){
+    const line = L.polyline(pathLatLngs.map(p=>[p.lat,p.lng]), {
+      weight: 5,
+      opacity: .95,
+      lineCap: 'round',
+      lineJoin: 'round'
+    }).addTo(map);
+
+    // subtle outline
+    L.polyline(pathLatLngs.map(p=>[p.lat,p.lng]), {
+      weight: 10,
+      opacity: .18,
+      lineCap: 'round',
+      lineJoin: 'round'
+    }).addTo(map);
+
+    try{ map.fitBounds(line.getBounds(), {padding:[14,14]}); }catch(e){}
+  }else if(Array.isArray(stopLatLngs) && stopLatLngs.length >= 2){
+    const line = L.polyline(stopLatLngs.map(p=>[p.lat,p.lng]), { weight: 4, opacity: .75 }).addTo(map);
+    try{ map.fitBounds(line.getBounds(), {padding:[14,14]}); }catch(e){}
+  }
+
+  // --- stop markers (只放停靠點，不要把整條 polyline 每點都變 marker) ---
+  (stopLatLngs || []).forEach((p, i)=>{
+    const isStart = (i === 0);
+    const isEnd   = (i === (stopLatLngs.length - 1));
+    const cls = isStart ? 'rm-start' : (isEnd ? 'rm-end' : 'rm-stop');
+
+    const icon = L.divIcon({
+      className: `rm-pin ${cls}`,
+      html: `<span>${isStart ? 'S' : (isEnd ? 'G' : (i))}</span>`,
+      iconSize: [24,24],
+      iconAnchor: [12,12]
+    });
+    L.marker([p.lat, p.lng], { icon }).addTo(map);
+  });
+
+  window.__routeMap = map;
+}
 
 
-
-    function wmoToFa(code, hour){
-        // WMO weather_code → FontAwesome
-        const night = (hour <= 5 || hour >= 19);
-        if(code === 0) return night ? 'fa-moon' : 'fa-sun';
-        if(code >= 1 && code <= 3) return night ? 'fa-cloud-moon' : 'fa-cloud-sun';
-        if(code === 45 || code === 48) return 'fa-smog';
-        if((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return 'fa-cloud-rain';
-        if(code >= 71 && code <= 77) return 'fa-snowflake';
-        if(code >= 95 && code <= 99) return 'fa-bolt';
-        return night ? 'fa-cloud-moon' : 'fa-cloud-sun';
-    }
-
-    function nowInJST(){
-        const s = new Intl.DateTimeFormat('sv-SE', {
-            timeZone: 'Asia/Tokyo',
-            year:'numeric', month:'2-digit', day:'2-digit',
-            hour:'2-digit', minute:'2-digit', second:'2-digit',
-            hour12:false
-        }).format(new Date());
-        // sv-SE 會是 "2026-02-27 09:00:00"
-        return new Date(s.replace(' ', 'T'));
-    }
-
-    function requestGPS(){
-        navigator.geolocation.getCurrentPosition(
-            (pos)=>{ console.log(pos.coords.latitude, pos.coords.longitude); },
-            (err)=>{ console.log(err); },
-            { enableHighAccuracy:true, timeout:8000, maximumAge:60000 }
-        );
-    }
-    function openUrl(url){
-        if(!url) return;
-        window.open(url, '_blank', 'noopener');
-    }
-
-
-
-
-    async function renderWeatherJMA(meta){
+function renderWeatherJMA(meta){
         const el = document.getElementById('weatherStrip');
         if(!el) return;
 
