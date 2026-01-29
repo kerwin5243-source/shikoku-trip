@@ -52,21 +52,38 @@
 
     .app-header h1{
         margin:0;
-        font-family:'Noto Serif TC', serif;
+        font-family:'Noto Serif JP', serif;
         font-size:1.75rem;     /* 原本 2.2rem → 縮小 */
         font-weight:900;
-        letter-spacing:.2px;
+        letter-spacing:.12em;
         display:flex;
         justify-content:center;
         align-items:baseline;
         gap:10px;
     }
+    /* subtitle + year 同列：置中、左右排列 */
+    .hdr-subrow{
+      margin-top:8px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:10px;
+    }
+
+    #hdrSub{
+      margin:0;
+      font-size:.92rem;
+      color:var(--ink2);
+      font-weight:700;
+      text-align:center;
+    }
+
 
     .year-pill{
         font-family:'Noto Sans TC',sans-serif;
-        font-size:.78rem;
+        font-size:.70rem;
         font-weight:900;
-        padding:4px 10px;
+        padding:3px 8px;
         border-radius:999px;
         border:1px solid rgba(176,138,91,.55);
         background:rgba(255,255,255,.65);
@@ -79,6 +96,15 @@
         color:var(--ink2);
         font-weight:700;
         text-align:center;
+    }
+    /* 假名小一行淡淡置中 */
+    .hdr-kana{
+      margin-top:6px;
+      text-align:center;
+      font-size:.72rem;
+      letter-spacing:.06em;
+      color:rgba(43,39,35,.35);
+      font-weight:600;
     }
 
     .page{ display:none; padding:0 20px; animation:fadeIn .28s ease; }
@@ -355,9 +381,10 @@
 
     .hero-caption{
       pointer-events:auto;            /* 若 caption 需要可點擊 */
-      padding:0;                      /* ✅ 不要底、不要內距，視覺更貼底 */
-      background:transparent;         /* ✅ 不要底色 */
+      padding:3px 8px;                      /* ✅ 不要底、不要內距，視覺更貼底 */
+      background:rgba(0,0,0,.18);         /* ✅ 不要底色 */
       border-radius:0;
+      border:1px solid rgba(255,255,255,.18); /* ✅ 淡外框 */
 
       color:#fff;                     /* ✅ 白色 */
       font-weight:900;
@@ -365,9 +392,11 @@
       line-height:1.15;               /* ✅ 讓文字更緊湊不會浮起來 */
 
       text-align:right;               /* ✅ 右下角對齊 */
-      text-shadow:0 2px 12px rgba(0,0,0,.75); /* ✅ 保持清楚 */
+      text-shadow:0 2px 10px rgba(0,0,0,.65); /* ✅ 保持清楚 */
+      transform:translateY(-2px);             /* ✅ 上移 2px */
 
       margin:0;                       /* ✅ 避免被預設 margin 撐開 */
+      -webkit-text-stroke: .4px rgba(0,0,0,.35);
       /* backdrop-filter: blur(6px); */     /* ❌ 取消毛玻璃 */
       /* -webkit-backdrop-filter: blur(6px); */
     }
@@ -478,6 +507,21 @@
     }
     .tl-content:active{ transform:scale(.985); }
 
+    .reserve-badge{
+      position:absolute;
+      top:10px;
+      right:12px;
+      padding:4px 8px;
+      border-radius:8px;
+      font-size:.72rem;
+      font-weight:900;
+      color:#7D5B34;
+      background:rgba(255,255,255,.85);
+      border:1px solid rgba(176,138,91,.35);
+      box-shadow:0 8px 18px rgba(0,0,0,.08);
+    }
+
+
     .tl-tag{
       display:inline-flex;
       align-items:center;
@@ -565,6 +609,30 @@
         font-size:.78rem;
         margin-left:2px;
     }
+    .day-route-card{
+      margin:10px 0 12px;
+      background:rgba(255,255,255,.72);
+      border:1px solid rgba(233,225,214,.9);
+      border-radius:24px;
+      padding:14px 16px;
+      box-shadow:0 10px 26px rgba(0,0,0,.08);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .day-route-card .txt{
+      font-weight:900;
+      line-height:1.2;
+    }
+    .day-route-card .sub{
+      margin-top:4px;
+      font-size:.86rem;
+      color:var(--ink2);
+      font-weight:700;
+    }
+
 
 
 
@@ -1206,7 +1274,11 @@
 <body>
   <header class="app-header">
     <h1 id="hdrTitle"></h1>
-    <p id="hdrSub"></p>
+    <div class="hdr-subrow">
+      <p id="hdrSub"></p>
+      <span class="year-pill" id="hdrYear">2026</span>
+    </div>
+    <div class="hdr-kana" id="hdrKana"></div>
   </header>
 
   <!-- 行前 -->
@@ -1246,6 +1318,7 @@
       <div style="text-align:right; font-size:0.86rem; color:var(--ink2); font-weight:800;">
         今晚住宿：<strong id="stayHotelName" style="color:var(--primary);"></strong>
       </div>
+      <div id="dayRouteCard"></div>
     </div>
 
     <div id="timelineList" style="padding-bottom: 20px;"></div>
@@ -1355,8 +1428,12 @@
     hotels = HOTELS || [];
     itineraryIndex = ITINERARY || [];
 
-    const title = (CONFIG?.trip_title || '四國巡禮').replace(/^2026\s*/,'');
-    document.getElementById('hdrTitle').innerHTML = `${escapeHtml(title)}<span class="year-pill">2026</span>`;
+    const title = (CONFIG?.trip_title || '四國巡禮');
+    document.getElementById('hdrTitle').innerText = title;
+    document.getElementById('hdrSub').innerText = sub;
+    document.getElementById('hdrYear').innerText = '2026';
+    document.getElementById('hdrKana').innerText = 'とくしまけん、かがわけん、えひめけん、こうちけん';
+
 
     // 2) subtitle 不顯示 L,K,R,Y,J
     const sub = `${CONFIG?.days || 9}天${CONFIG?.nights || 8}夜${CONFIG?.mode ? CONFIG.mode : ''}`;
@@ -1707,6 +1784,13 @@
     document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
     const chip = document.getElementById('chip-'+idx);
     if(chip) chip.classList.add('active');
+    const scroller = document.getElementById('dayScroller');
+    if(scroller && chip){
+      const left = chip.offsetLeft - (scroller.clientWidth - chip.clientWidth)/2;
+      scroller.scrollTo({ left, behavior:'smooth' });
+}
+
+    
 
     const meta = itineraryIndex[idx];
     if(!meta) return;
@@ -1724,6 +1808,8 @@
     currentDayData = dayData;
     // ✅ 顯示上方 5 張輪播圖（獨立 block）
     renderDayHero(dayData, meta);
+    renderDayRouteCard(dayData);
+
 
 
 
@@ -1804,7 +1890,7 @@
         __heroTimer = setInterval(()=>{
             cur = (cur + 1) % photos.length;
             track.scrollTo({ left: cur * track.clientWidth, behavior:'smooth' });
-        }, 8000);
+        }, 12000);
     }
     
     // timeline
@@ -1857,7 +1943,8 @@
       return `
         <div class="timeline-item" onclick='openModal(${i})'>
           <div class="tl-time">${escapeHtml(t)}</div>
-          <div class="tl-content">
+          <div class="tl-content ${item.highlight ? 'highlight' : ''}" style="position:relative;">
+            ${item.reserved ? `<div class="reserve-badge">予約済</div>` : ``}
             <div class="tl-tag ${tagClass(item.tag)}">
                 ${escapeHtml((item.tag||'').toUpperCase())}
                 <i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"></i>
@@ -1910,6 +1997,49 @@
     }
     return null;
    }
+
+   function renderDayRouteCard(dayData){
+      const el = document.getElementById('dayRouteCard');
+      if(!el) return;
+
+      // 收集今天所有可導航點：優先 geo，其次 addr/title
+      const pts = (dayData?.items || [])
+        .map(it=>{
+          if(it?.geo?.lat != null && it?.geo?.lng != null) return `${it.geo.lat},${it.geo.lng}`;
+          const q = (it?.addr || it?.title || '').trim();
+          return q ? q : null;
+        })
+        .filter(Boolean);
+
+      if(pts.length < 2){
+        el.innerHTML = ''; // 點太少就不顯示
+        return;
+      }
+
+      const origin = pts[0];
+      const dest   = pts[pts.length - 1];
+      const waypts = pts.slice(1, -1).join('|');
+
+      const url =
+        `https://www.google.com/maps/dir/?api=1`
+        + `&origin=${encodeURIComponent(origin)}`
+        + `&destination=${encodeURIComponent(dest)}`
+        + (waypts ? `&waypoints=${encodeURIComponent(waypts)}` : ``)
+        + `&travelmode=driving`;
+
+      el.innerHTML = `
+        <div class="day-route-card">
+          <div>
+            <div class="txt">也可以直接 Google Map 導航</div>
+            <div class="sub">${pts.length} 個停留點</div>
+          </div>
+          <a class="btn-primary" style="height:44px; width:auto; padding:0 14px;" href="${url}" target="_blank" rel="noopener">
+            <i class="fas fa-location-arrow"></i> 開啟
+          </a>
+        </div>
+      `;
+    }
+
 
     function wmoToFa(code, hour){
         // WMO weather_code → FontAwesome
