@@ -583,34 +583,50 @@
       font-weight:800;
     }
     .tl-chip i{ color:#8E8E93; }
+    /* ===== highlight（加厚光暈 + 星星）===== */
+    .tl-content.highlight{
+      position:relative;
+      border-color: rgba(176,138,91,.70);
+      /* 保留原本白底 + 加一層淡淡日系金色角落漸層 */
+      background:
+        linear-gradient(135deg, rgba(176,138,91,.14), rgba(176,138,91,0) 55%),
+        rgba(255,255,255,.78);
+      box-shadow:
+        0 14px 30px rgba(0,0,0,.10),
+        0 0 0 1px rgba(176,138,91,.22),
+        0 0 28px rgba(176,138,91,.40); /* ✅光暈更厚 */
+    }
 
-	    .tl-content.highlight{
-  position:relative;
-  border-color: rgba(70,120,210,.42);
-  box-shadow:
-    0 18px 34px rgba(0,0,0,.10),
-    0 0 0 1px rgba(70,120,210,.18),
-    0 0 46px rgba(70,120,210,.34);
-}
-.tl-content.highlight::before{
-  content:"";
-  position:absolute;
-  inset:-18px;
-  border-radius:calc(var(--radius-M) + 18px);
-  background: radial-gradient(closest-side, rgba(70,120,210,.26), rgba(70,120,210,0) 70%);
-  filter: blur(8px);
-  opacity:.95;
-  pointer-events:none;
-  z-index:-1;
-}
-.tl-content.highlight::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:var(--radius-M);
-  background: linear-gradient(135deg, rgba(70,120,210,.10), rgba(70,120,210,0));
-  pointer-events:none;
-}
+    /* 外層光暈（你想要更厚就調 blur / opacity / inset） */
+    .tl-content.highlight::before{
+      content:"";
+      position:absolute;
+      inset:-12px;                 /* ✅更外擴 */
+      border-radius: calc(var(--radius-M) + 14px);
+      background:
+        radial-gradient(circle at 30% 20%,
+          rgba(176,138,91,.45), rgba(176,138,91,0) 60%);
+      filter: blur(14px);          /* ✅更厚 */
+      opacity: .95;
+      z-index:-1;
+      pointer-events:none;
+    }
+
+    /* 星星 badge（用 ::after 放回來） */
+    .tl-content.highlight::after{
+      content:"★";
+      position:absolute;
+      top:10px;
+      right:12px;
+      width:26px; height:26px;
+      border-radius:999px;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(176,138,91,.95);
+      color:#fff;
+      font-size:14px;
+      box-shadow:0 10px 22px rgba(176,138,91,.45);
+    }
+
 
     .tl-tag .tag-ico{
         color:#7E7469;
@@ -1339,6 +1355,10 @@
       font-weight:900;
       color:#6E4B2A;
       white-space:nowrap;
+    }
+    .route-btn i{
+      font-size:14px;
+      transform: translateY(-.5px);
     }
 
 /* mini-map pins */
@@ -2190,7 +2210,10 @@
             <div class="route-title">Google Map 導航</div>
             <div class="route-meta">${meta}</div>
           </div>
-          <a class="route-btn" href="${gUrl}" target="_blank" rel="noopener">開啟</a>
+          <a class="route-btn" href="${gUrl}" target="_blank" rel="noopener">
+            <i class="fas fa-location-arrow" aria-hidden="true"></i>
+            <span>開啟</span>
+          </a>
         </div>
       </div>
     `;
@@ -2233,6 +2256,20 @@
     if(Number.isNaN(lat) || Number.isNaN(lng)) return null;
     return {lat, lng};
   }
+  function normalizeLatLng(p){
+    if(!p) return null;
+    if(typeof p === 'string') return parseLatLng(p);
+    if(Array.isArray(p) && p.length>=2){
+      const lat = Number(p[0]), lng = Number(p[1]);
+      if(Number.isFinite(lat) && Number.isFinite(lng)) return {lat,lng};
+      return null;
+    }
+    if(typeof p === 'object' && Number.isFinite(p.lat) && Number.isFinite(p.lng)){
+      return {lat:Number(p.lat), lng:Number(p.lng)};
+    }
+    return null;
+  }
+
 
   function haversineKm(a, b){
     const R = 6371; // Earth radius km
@@ -2264,7 +2301,7 @@ function estimateRouteKm(points){
 async function fetchOsrmRoute(latlngPoints, mode){
   try{
     const coords = (latlngPoints||[])
-      .map(parseLatLng)
+      .map(normalizeLatLng)
       .filter(Boolean)
       .map(p => `${p[1]},${p[0]}`) // lon,lat
       .join(';');
