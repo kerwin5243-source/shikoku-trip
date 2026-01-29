@@ -327,34 +327,30 @@
     }
 
     .hero-loc{
-      pointer-events:auto;            /* 若你 loc 需要可點擊，跟 overlay 的 none 配合 */
+      pointer-events:auto;
       display:inline-flex;
       align-items:center;
       gap:8px;
 
-      padding:0;                      /* ✅ 不要底 */
-      background:transparent;         /* ✅ 透明：不要毛玻璃底 */
-      border-radius:0;                /* ✅ 不需要膠囊 */
+      /* ✅ 橢圓膠囊底：很淡，但可讀性大幅提升 */
+      padding:4px 10px;                 /* 讓膠囊有呼吸空間 */
+      border-radius:999px;              /* 橢圓 */
+      background: rgba(0,0,0,.18);      /* 很淡的黑底（你可在 .14~.24 間調） */
 
-      color:#ffffff;                     /* ✅ 白色 */
-      font-size:.90rem;               /* 可微調 */
-      font-weight:500;
+      /* ✅ 字不要太粗，但要清楚 */
+      color: rgba(255,255,255,.95);
+      font-size:.90rem;
+      font-weight:400;                  /* 700 → 600 更自然 */
 
+      /* ✅ 淡描邊：讓亮背景上也不會消失 */
+      border: 1px solid rgba(255,255,255,.18);
 
-      backdrop-filter:none;           /* ✅ 明確關閉毛玻璃 */
+      /* ✅ 文字陰影：補強對比 */
+      text-shadow: 0 2px 10px rgba(0,0,0,.60);
+
+      /* ✅ 取消毛玻璃（維持你需求） */
+      backdrop-filter:none;
       -webkit-backdrop-filter:none;
-        /* ✅ 文字本身：一近一遠，讓深底淺底都能讀 */
-      text-shadow:
-        0 1px 2px rgba(0,0,0,.60),
-        0 6px 16px rgba(0,0,0,.35);
-
-      /* ✅ 讓整個 loc 區塊有「超淡描邊」：不突兀但可讀性更穩 */
-      padding:2px 6px;                 /* 不算有底，只是給描邊留空間 */
-      border-radius:10px;
-      border:1px solid rgba(255,255,255,.22);
-
-      /* ✅ 再加一點點「很淡的底」(可選但很推)：幾乎看不出來卻很有效 */
-      background: rgba(0,0,0,.10);
     }
 
     .hero-caption{
