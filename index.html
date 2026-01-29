@@ -2074,59 +2074,90 @@
     const el = document.getElementById('dayRouteCard');
     if(!el) return;
 
-    // ✅ 只吃你自定義的 route.points（不再自動抓 items）
     const route = dayData?.route;
-    const pts = (route?.points || []).map(s => (s||'').trim()).filter(Boolean);
-    const factor = 1.25; // 你可調
-    return sum * factor;
-    const km = estimateRouteKm(pts);      // ✅ 估算總公里數（直線）
-    const kmText = (km != null) ? `・預計行駛 ${Math.round(km)} km` : '';
+    const rawPts = route?.points || [];
+    const mode = route?.mode || 'drive';
 
+    // ✅ 支援三種格式：
+    // 1) "lat,lng"  (字串)
+    // 2) "地點名稱" (字串：只用於 Google，縮圖不畫點)
+    // 3) { q:"地點名稱", lat:34.12, lng:134.56 } (物件：Google + 縮圖都能用)
+    const pts = rawPts.map(p=>{
+      if(p == null) return null;
+      if(typeof p === 'string'){
+        const s = p.trim();
+        if(!s) return null;
+        const ll = parseLatLng(s);
+        if(ll) return { q: s, lat: ll[0], lng: ll[1] }; // 直接用座標當 query
+        return { q: s }; // 只有文字（縮圖沒法畫）
+      }
+      if(typeof p === 'object'){
+        const q = (p.q || p.name || p.title || '').toString().trim();
+        const lat = (p.lat != null) ? Number(p.lat) : null;
+        const lng = (p.lng != null) ? Number(p.lng) : null;
+        const hasLL = Number.isFinite(lat) && Number.isFinite(lng);
+        return { q: q || (hasLL ? `${lat},${lng}` : ''), lat: hasLL ? lat : null, lng: hasLL ? lng : null };
+      }
+      return null;
+    }).filter(Boolean);
 
     if(pts.length < 2){
       el.innerHTML = '';
       return;
     }
 
-    const mode = route?.mode || 'drive';
-    const gUrl = buildGoogleDirPathUrl(pts);
+    // ✅ Google 導航：用 api=1，waypoints 更穩定（iOS 也比較常成功）
+    const gUrl = buildGoogleDirUrlFromPoints(pts, mode);
 
-    // ✅ 縮圖：用 OSM 靜態地圖（免 key）
-    const center = route?.preview?.center; // "lat,lng"
-    const zoom = route?.preview?.zoom ?? 12;
-    const thumb = buildOsmStaticThumb(center, zoom, pts);
+    // ✅ 估算公里數：用「直線」haversine + 係數（道路通常比直線長）
+// ✅ 今日預計行駛公里數：
+// - 你可在 JSON 直接指定 route.km（最準）
+// - 沒填就用「直線距離 + 係數」估算（大約值）
+const kmManual = (route?.km != null) ? Number(route.km) : null;
+const factor = 1.25;                // 你可調：1.15~1.35
+const km0 = estimateRouteKm(pts.map(p => (p.lat!=null && p.lng!=null) ? `${p.lat},${p.lng}` : '').filter(Boolean));
+const kmEst = (km0!=null) ? (km0 * factor) : null;
+const km = Number.isFinite(kmManual) ? kmManual : kmEst;
+const kmText = (km!=null) ? `・預計行駛 ${Math.round(km)} km` : '';
 
     el.innerHTML = `
       <div class="route-card">
         <div class="route-thumb">
-          <div id="routeMiniMap"></div>
+          <div id="routeMiniMap" aria-label="route preview"></div>
         </div>
-        <div class="route-head">
-          <div>
-            <div class="route-title">Google Map 導航</div>
-            <div class="route-sub">${pts.length} 個停留點 ${kmText}</div>
-          </div>
-          <a class="route-btn" href="${gUrl}" target="_blank" rel="noopener">
+
+        <div class="route-footer">
+          <div class="route-title">Google Map 導航</div>
+          <div class="route-sub">${pts.length} 個停留點${kmText}</div>
+          <a class="route-open" href="${gUrl}" target="_blank" rel="noopener">
             <i class="fas fa-location-arrow"></i> 開啟
           </a>
         </div>
       </div>
     `;
-    renderRouteMiniMap(route?.preview?.center, route?.preview?.zoom ?? 12);
+
+    // ✅ 縮圖：只畫有座標的點；若都沒有座標，就顯示提示
+    const llPts = pts.filter(p => p.lat!=null && p.lng!=null).map(p => [p.lat, p.lng]);
+    const centerStr = route?.preview?.center || '';
+    const zoom = route?.preview?.zoom ?? 12;
+    renderRouteMiniMap(llPts, centerStr, zoom);
   }
 
-  function buildGoogleDirUrl(points, mode='drive'){
-    // points: ["A","B","C"] → origin=A, destination=C, waypoints=B
-    const origin = points[0];
-    const dest = points[points.length - 1];
-    const waypoints = points.slice(1, -1).map(p => encodeURIComponent(p)).join('|');
+  function buildGoogleDirUrlFromPoints(points, mode='drive'){
+    // points: [{q,lat,lng}, ...]
+    const list = points.map(p => (p?.q || (p?.lat!=null && p?.lng!=null ? `${p.lat},${p.lng}` : '')).trim()).filter(Boolean);
+    if(list.length < 2) return 'https://www.google.com/maps';
 
-    const tm = travelModeForRoute(mode); // 你原本就有這個
+    const origin = list[0];
+    const dest   = list[list.length - 1];
+    const wps    = list.slice(1, -1).join('|');  // pipe-separated
+
+    const tm = travelModeForRoute(mode);
     return `https://www.google.com/maps/dir/?api=1`
       + `&origin=${encodeURIComponent(origin)}`
       + `&destination=${encodeURIComponent(dest)}`
-      + (waypoints ? `&waypoints=${waypoints}` : ``)
-      + `&travelmode=${encodeURIComponent(tm)}`;
+      + (wps ? `&waypoints=${encodeURIComponent(wps)}` : '')
+      + `&travelmode=${tm}`;
   }
   function buildGoogleDirPathUrl(points){
     // https://www.google.com/maps/dir/點1/點2/點3/點4
@@ -2209,17 +2240,9 @@
 
   let __routeMap = null;
 
-  function renderRouteMiniMap(centerStr, zoom=12){
+  function renderRouteMiniMap(latlngPoints, fallbackCenterStr, zoom=12){
     const el = document.getElementById('routeMiniMap');
     if(!el) return;
-
-    // 解析 "lat,lng"
-    const parts = (centerStr || '').split(',').map(s=>parseFloat(s.trim()));
-    if(parts.length !== 2 || parts.some(n=>Number.isNaN(n))){
-      el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9a938a;font-weight:700;">No preview center</div>';
-      return;
-    }
-    const center = [parts[0], parts[1]];
 
     // 重複切換日期時：清掉舊 map
     if(__routeMap){
@@ -2227,15 +2250,51 @@
       __routeMap = null;
     }
 
-    __routeMap = L.map(el, { zoomControl:false, attributionControl:false, dragging:false, scrollWheelZoom:false, doubleClickZoom:false, boxZoom:false, keyboard:false, tap:false });
-    __routeMap.setView(center, zoom);
+    // ✅ 若沒有座標點：顯示提示（因為無法畫縮圖）
+    if(!Array.isArray(latlngPoints) || latlngPoints.length < 2){
+      el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9a938a;font-weight:700;">Map preview unavailable (need coordinates)</div>';
+      return;
+    }
 
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19
-    }).addTo(__routeMap);
+    __routeMap = L.map(el, {
+      zoomControl:false,
+      attributionControl:false,
+      dragging:false,
+      scrollWheelZoom:false,
+      doubleClickZoom:false,
+      boxZoom:false,
+      keyboard:false,
+      tap:false
+    });
 
-    // 你想加一個中心點 marker 也可以：
-    L.circleMarker(center, { radius:6, weight:2, fillOpacity:0.7 }).addTo(__routeMap);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(__routeMap);
+
+    // ✅ 路線線段
+    const line = L.polyline(latlngPoints, { weight:4, opacity:0.9 }).addTo(__routeMap);
+
+    // ✅ 起點/終點 marker（小圓點）
+    const start = latlngPoints[0];
+    const end   = latlngPoints[latlngPoints.length-1];
+    L.circleMarker(start, { radius:5, weight:2, fillOpacity:0.8 }).addTo(__routeMap);
+    L.circleMarker(end,   { radius:5, weight:2, fillOpacity:0.8 }).addTo(__routeMap);
+
+    // ✅ 其餘停靠點（更小）
+    for(let i=1;i<latlngPoints.length-1;i++){
+      L.circleMarker(latlngPoints[i], { radius:4, weight:1, fillOpacity:0.7, opacity:0.7 }).addTo(__routeMap);
+    }
+
+    // ✅ 視野自動 fit
+    try{
+      __routeMap.fitBounds(line.getBounds(), { padding:[18,18] });
+    }catch(e){
+      // fallback: 用 preview center
+      const parts = (fallbackCenterStr || '').split(',').map(s=>parseFloat(s.trim()));
+      if(parts.length===2 && parts.every(n=>Number.isFinite(n))){
+        __routeMap.setView([parts[0], parts[1]], zoom);
+      }else{
+        __routeMap.setView(start, zoom);
+      }
+    }
   }
 
 
@@ -2362,7 +2421,7 @@
 
 
 
-  function buildGoogleDirUrl(item){
+  function buildGoogleDirUrlForItem(item){
     // route item：用 directions
     const r = item?.route;
     if(r?.from && r?.to){
@@ -2437,7 +2496,7 @@
     const parking = item.parking || '';
     const mapcode = item.mapcode || '';
 
-    const navUrl = buildGoogleDirUrl(item);
+    const navUrl = buildGoogleDirUrlForItem(item);
 
     const sticky = document.getElementById('modalSticky');
     const body   = document.getElementById('modalBody');
