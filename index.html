@@ -511,19 +511,19 @@
     .tl-content:active{ transform:scale(.985); }
 
     .reserve-badge{
-  display:inline-block;
-  font-size:.66rem;
-  line-height:1;
-  letter-spacing:.08em;
-  padding:4px 8px;
-  border:1.6px solid rgba(180,35,24,.72);
-  color:rgba(180,35,24,.92);
-  background:rgba(255,255,255,.86);
-  border-radius:8px;
-  transform:rotate(-8deg);
-  transform-origin:left center;
-  box-shadow:0 6px 18px rgba(0,0,0,.08);
-}
+      display:inline-block;
+      font-size:.66rem;
+      line-height:1;
+      letter-spacing:.08em;
+      padding:4px 8px;
+      border:1.6px solid rgba(180,35,24,.72);
+      color:rgba(180,35,24,.92);
+      background:rgba(255,255,255,.86);
+      border-radius:8px;
+      transform:rotate(-8deg);
+      transform-origin:right center;
+      box-shadow:0 6px 18px rgba(0,0,0,.08);
+    }
 
 
     .tl-tag{
@@ -2297,25 +2297,35 @@ function estimateRouteKm(points){
   return sum;
 }
 
-// ✅ Preferred: get road route from OSRM (driving) and return { distanceKm, pathLatLngs }
+// ✅ Preferred: get road route from OSRM and return { distanceKm, pathLatLngs }
 async function fetchOsrmRoute(latlngPoints, mode){
   try{
-    const coords = (latlngPoints||[])
-      .map(normalizeLatLng)
-      .filter(Boolean)
-      .map(p => `${p[1]},${p[0]}`) // lon,lat
-      .join(';');
-    if(!coords || coords.split(';').length < 2) return null;
+    // latlngPoints 目前在 renderDayRouteCard 給的是 [{lat,lng}, ...]
+    const pts = (latlngPoints || [])
+      .map(normalizeLatLng)     // -> {lat,lng}
+      .filter(Boolean);
 
-    // OSRM public demo server: good for preview. (Rate limits / availability not guaranteed.)
-    const url = `https://router.project-osrm.org/route/v1/${(mode||'drive')==='walk'?'foot':(mode||'drive')==='drive'?'driving':'driving'}/${coords}?overview=full&geometries=geojson`;
+    if(pts.length < 2) return null;
+
+    // OSRM 需要 lon,lat
+    const coords = pts.map(p => `${p.lng},${p.lat}`).join(';');
+
+    // OSRM demo server profiles: driving / walking / cycling
+    const m = (mode || 'drive').toLowerCase();
+    const profile = (m === 'walk') ? 'walking' : 'driving';
+
+    const url = `https://router.project-osrm.org/route/v1/${profile}/${coords}?overview=full&geometries=geojson`;
+
     const r = await fetch(url);
     const j = await r.json();
-    if(!j || j.code!=='Ok' || !j.routes || !j.routes[0]) return null;
 
-    const distKm = (j.routes[0].distance||0)/1000;
-    const line = (j.routes[0].geometry && j.routes[0].geometry.coordinates) ? j.routes[0].geometry.coordinates : [];
-    const pathLatLngs = line.map(([lon,lat]) => [lat,lon]);
+    if(!j || j.code !== 'Ok' || !j.routes || !j.routes[0]) return null;
+
+    const distKm = (j.routes[0].distance || 0) / 1000;
+
+    // 轉成 [{lat,lng}, ...]（跟你其他地方一致，renderRouteMiniMap 才能畫「道路曲線」）
+    const line = j.routes[0]?.geometry?.coordinates || [];
+    const pathLatLngs = line.map(([lon, lat]) => ({ lat, lng: lon }));
 
     return { distanceKm: distKm, pathLatLngs };
   }catch(e){
@@ -2323,6 +2333,7 @@ async function fetchOsrmRoute(latlngPoints, mode){
     return null;
   }
 }
+
 
 function buildOsmStaticThumb(center, zoom, points){
     // OSM 靜態地圖服務（免 key）
