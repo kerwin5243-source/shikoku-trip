@@ -499,6 +499,7 @@
 
 
     .tl-content{
+      position:relative;
       flex:1;
       min-width:0;
       background:rgba(255,255,255,.78);
@@ -521,8 +522,9 @@
       background:rgba(255,255,255,.86);
       border-radius:8px;
       transform:rotate(-8deg);
-      transform-origin:right center;
+      transform-origin:left center;
       box-shadow:0 6px 18px rgba(0,0,0,.08);
+      right:12px;
     }
 
 
@@ -1129,7 +1131,7 @@
 
     .route-title{
       font-weight:900;
-      font-size:1.02rem;
+      font-size:.95rem;
       letter-spacing:-.2px;
       margin:0;
       white-space:nowrap;
@@ -2188,7 +2190,7 @@
     if(roadKm == null && stopLatLngs.length >= 2){
       try{
         const osrm = await fetchOsrmRoute(stopLatLngs, mode);
-        if(osrm?.distanceKm != null) roadKm = osrm.distanceKm;
+        if(osrm?.distanceKm != null) roadKm = osrm.distanceKm.toFixed(1);
         if(osrm?.pathLatLngs?.length) pathLatLngs = osrm.pathLatLngs;
       }catch(e){
         // 失敗就不顯示 km（避免再回到直線 65km 那種誤差）
