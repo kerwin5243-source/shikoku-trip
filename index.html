@@ -8,6 +8,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#F6F3EE" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 
 
   <!-- ✅ Serif + Sans（標題日系感） -->
@@ -1288,6 +1291,18 @@
       object-fit:cover;
       display:block;
     }
+    .route-thumb{
+      position:relative;
+      aspect-ratio:16/9;
+      overflow:hidden;
+      border-radius:0; /* 你卡片外層已經 rounded */
+    }
+    #routeMiniMap{
+      width:100%;
+      height:100%;
+    }
+    .route-thumb .leaflet-control-container{ display:none; } /* 隱藏放大縮小按鈕，像縮圖 */
+
 
     .route-head{
       display:flex;
@@ -2069,7 +2084,7 @@
     }
 
     const mode = route?.mode || 'drive';
-    const gUrl = buildGoogleDirUrl(pts, mode);
+    const gUrl = buildGoogleDirPathUrl(pts);
 
     // ✅ 縮圖：用 OSM 靜態地圖（免 key）
     const center = route?.preview?.center; // "lat,lng"
@@ -2079,12 +2094,7 @@
     el.innerHTML = `
       <div class="route-card">
         <div class="route-thumb">
-          <img
-            src="${thumb}"
-            alt=""
-            referrerpolicy="no-referrer"
-            onerror="this.onerror=null;this.src='data:image/svg+xml,${encodeURIComponent(`<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"800\" height=\"450\"><rect width=\"100%\" height=\"100%\" fill=\"#f3f1ee\"/><text x=\"50%\" y=\"50%\" dominant-baseline=\"middle\" text-anchor=\"middle\" fill=\"#9a938a\" font-size=\"22\" font-family=\"system-ui, -apple-system\">Map preview unavailable</text></svg>`)}';"
-          />
+          <div id="routeMiniMap"></div>
         </div>
         <div class="route-head">
           <div>
@@ -2097,6 +2107,7 @@
         </div>
       </div>
     `;
+    renderRouteMiniMap(route?.preview?.center, route?.preview?.zoom ?? 12);
   }
 
   function buildGoogleDirUrl(points, mode='drive'){
@@ -2112,6 +2123,12 @@
       + (waypoints ? `&waypoints=${waypoints}` : ``)
       + `&travelmode=${encodeURIComponent(tm)}`;
   }
+  function buildGoogleDirPathUrl(points){
+    // https://www.google.com/maps/dir/點1/點2/點3/點4
+    const path = points.map(p => encodeURIComponent(p)).join('/');
+    return `https://www.google.com/maps/dir/${path}`;
+  }
+
 
   function buildOsmStaticThumb(center, zoom, points){
     // OSM 靜態地圖服務（免 key）
@@ -2147,6 +2164,38 @@
     const centerParam = c ? `center=${encodeURIComponent(c)}&zoom=${encodeURIComponent(zoom)}` : '';
     return `${base}?${centerParam}&size=800x450&maptype=mapnik${mk.join('')}`;
   }
+
+  let __routeMap = null;
+
+  function renderRouteMiniMap(centerStr, zoom=12){
+    const el = document.getElementById('routeMiniMap');
+    if(!el) return;
+
+    // 解析 "lat,lng"
+    const parts = (centerStr || '').split(',').map(s=>parseFloat(s.trim()));
+    if(parts.length !== 2 || parts.some(n=>Number.isNaN(n))){
+      el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9a938a;font-weight:700;">No preview center</div>';
+      return;
+    }
+    const center = [parts[0], parts[1]];
+
+    // 重複切換日期時：清掉舊 map
+    if(__routeMap){
+      __routeMap.remove();
+      __routeMap = null;
+    }
+
+    __routeMap = L.map(el, { zoomControl:false, attributionControl:false, dragging:false, scrollWheelZoom:false, doubleClickZoom:false, boxZoom:false, keyboard:false, tap:false });
+    __routeMap.setView(center, zoom);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19
+    }).addTo(__routeMap);
+
+    // 你想加一個中心點 marker 也可以：
+    L.circleMarker(center, { radius:6, weight:2, fillOpacity:0.7 }).addTo(__routeMap);
+  }
+
 
 
 
