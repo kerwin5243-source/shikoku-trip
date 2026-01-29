@@ -726,13 +726,16 @@
       position:absolute;
       right:12px;
       top:8px;
-      width:36px; height:36px;
+      width:30px; height:30px;  /* ✅ 圓圈小一點 */
       border-radius:50%;
+      display:grid;              /* ✅ 保證置中 */
       border:1px solid rgba(233,225,214,.95);
       background:#fff;
       font-size:20px;
+      line-height:1;             /* ✅ 防止 baseline 視覺偏移 */
       cursor:pointer;
-      display:flex; align-items:center; justify-content:center;
+      align-items:center; 
+      justify-content:center;
       z-index:10;
     }
 
@@ -974,6 +977,44 @@
     }
     .menu-item:last-child{ border-bottom:none; }
     .jp-text{ font-weight:900; color:#5D4037; }
+
+    .menuPillRow{ display:flex; flex-direction:column; gap:10px; }
+
+    .menuPill{
+      width:100%;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:16px;
+      border:1px solid rgba(255, 196, 0, .35);
+      background:rgba(255,255,255,.75);
+      cursor:pointer;
+    }
+
+    .menuPill .jp-text{ font-weight:900; color:#5D4037; }
+    .menuPill .zh-text{ font-size:.9rem; color:#666; font-weight:800; margin-left:auto; }
+
+    .menuSpeak{
+      flex:0 0 auto;
+      width:30px; height:30px;
+      border-radius:999px;
+      display:flex; align-items:center; justify-content:center;
+      border:1px solid rgba(233,225,214,.9);
+      background:#fff;
+    }
+
+    .menuRecTag{
+      flex:0 0 auto;
+      font-size:.68rem;
+      font-weight:900;
+      padding:4px 8px;
+      border-radius:999px;
+      background:rgba(180,35,24,.10);
+      border:1px solid rgba(180,35,24,.25);
+      color:rgba(180,35,24,.95);
+    }
+
 
     .sheet-actions{
       position:sticky;
@@ -1397,6 +1438,66 @@
   border-color:rgba(60,110,210,.78);
 }
 
+.menuRow{ display:flex; flex-wrap:wrap; gap:10px; }
+
+.menuPill{
+  display:inline-flex; align-items:center; gap:10px;
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px solid rgba(233,225,214,.95);
+  background:#fff;
+  font-weight:800;
+  font-size:.9rem;
+  cursor:pointer;
+}
+.menuPill.is-rec{
+  border-color: rgba(176,138,91,.55);
+  box-shadow: 0 10px 20px rgba(0,0,0,.06);
+}
+.menuSpeak{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:28px; height:28px;
+  border-radius:999px;
+  border:1px solid rgba(233,225,214,.95);
+  background:rgba(255,255,255,.9);
+  color:#666;
+}
+.menuSpeak i{ font-size:14px; }
+
+/* ===== menu 字卡 ===== */
+.menuCard{
+  position:absolute;
+  left:12px; right:12px;
+  bottom:12px;
+  border-radius:18px;
+  border:1px solid rgba(233,225,214,.95);
+  background:rgba(255,255,255,.96);
+  box-shadow:0 18px 40px rgba(0,0,0,.18);
+  overflow:hidden;
+  z-index:30;
+}
+.menuCardClose{
+  position:absolute;
+  right:10px; top:8px;
+  width:30px; height:30px;
+  border-radius:999px;
+  border:1px solid rgba(233,225,214,.95);
+  background:#fff;
+  font-size:18px; font-weight:900; line-height:1;
+  display:grid; place-items:center;
+}
+.menuCardImg{
+  width:100%;
+  height:160px;
+  object-fit:cover;
+  display:block;
+}
+.menuCardBody{ padding:12px 14px 14px; }
+.menuCardJp{ font-weight:900; margin-bottom:4px; }
+.menuCardZh{ color:#666; font-weight:800; margin-bottom:8px; }
+.menuCardNote{ color:#444; line-height:1.45; }
+
+
 
 
 
@@ -1523,6 +1624,17 @@
         <div id="modalBody"></div>
     </div>
   </div>
+
+  <div id="menuCard" class="menuCard" hidden>
+    <button class="menuCardClose" type="button">×</button>
+    <img class="menuCardImg" alt="" />
+    <div class="menuCardBody">
+      <div class="menuCardJp"></div>
+      <div class="menuCardZh"></div>
+      <div class="menuCardNote"></div>
+    </div>
+  </div>
+
 
 
   <nav class="bottom-nav">
@@ -2548,6 +2660,7 @@ async function renderWeatherJMA(meta){
   function openModal(itemIdx) {
     const item = currentDayData?.items?.[itemIdx];
     if(!item) return;
+    window.__activeModalItem = item;
 
 
     const hours = item.hours ? `<span class="pill"><i class="fas fa-clock"></i> ${escapeHtml(item.hours)}</span>` : '';
@@ -2562,16 +2675,26 @@ async function renderWeatherJMA(meta){
       ? `<div class="block"><h4><i class="fas fa-triangle-exclamation"></i> 注意事項</h4><ul class="bullet">${item.avoid.map(x=>`<li>${escapeHtml(x).replace(/\n/g,'<br>').replace(/^\[(.+?)\]：/,'<strong>[$1]：</strong>')}</li>`).join('')}</ul></div>`
       : '';
 
-    const menuBlock = (item.menu || []).length
-      ? `<div class="menu-recommend">
-          <div style="font-weight:900; margin-bottom:10px; color:#8C6B43;"><i class="fas fa-thumbs-up"></i> 必吃美食（中日對照）</div>
-          ${(item.menu||[]).map(m=>`
-            <div class="menu-item">
-              <span class="jp-text">${escapeHtml(m.jp || '')}</span>
-              <span style="font-size:.9rem; color:#666; font-weight:800;">${escapeHtml(m.zh || '')}</span>
-            </div>`).join('')}
-        </div>`
-      : '';
+    const menuBlock = (item.menu && item.menu.length) ? `
+      <div class="menuBlock">
+        <div class="menuTitle">推薦品項</div>
+        <div class="menuRow">
+          ${item.menu.map((m, idx) => `
+            <button class="menuPill ${m.rec ? 'is-rec' : ''}"
+                    type="button"
+                    data-menu-idx="${idx}"
+                    data-rec="${m.rec ? '1' : '0'}">
+              <span class="menuText">${escapeHtml(m.zh || m.jp || '')}</span>
+              ${m.jp ? `
+                <span class="menuSpeak" title="日文發音" data-speak="${escapeHtml(m.jp)}">
+                  <i class="fas fa-volume-up"></i>
+                </span>
+              ` : ``}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    ` : '';
     const reserveBlock = (item.reservations || []).length
       ? `<div class="block">
             <h4><i class="fas fa-receipt"></i> 預約資訊</h4>
@@ -2688,6 +2811,27 @@ async function renderWeatherJMA(meta){
     lockBodyScroll();
     document.getElementById('modalOverlay').classList.add('active');
     document.getElementById('modalSheet').classList.add('active');
+    // === menu pill click + 喇叭 click：事件委派（只綁一次）===
+    document.getElementById('modalSheet')?.addEventListener('click', (e) => {
+      const speakBtn = e.target.closest?.('.menuSpeak');
+      if(speakBtn){
+        e.stopPropagation();
+        const text = speakBtn.getAttribute('data-speak') || '';
+        speakJapanese(text);
+        return;
+      }
+
+      const pill = e.target.closest?.('.menuPill');
+      if(!pill) return;
+
+      const isRec = pill.getAttribute('data-rec') === '1';
+      if(!isRec) return; // 不是推薦就不開卡
+
+      const idx = Number(pill.getAttribute('data-menu-idx'));
+      const m = window.__activeModalItem?.menu?.[idx];
+      if(m) openMenuCard(m);
+    });
+
   }
 
   // function openRouteMap(ev, idx){
@@ -2729,12 +2873,131 @@ async function renderWeatherJMA(meta){
   function closeModal() {
     document.getElementById('modalOverlay').classList.remove('active');
     document.getElementById('modalSheet').classList.remove('active');
+    closeMenuCard();
 
     // 等 sheet 動畫收起（你的 transition 0.3s）
     setTimeout(() => {
       unlockBodyScroll();
     }, 320);
   }
+
+  function openMenuCard(m){
+    const card = document.getElementById('menuCard');
+    if(!card) return;
+
+    card.hidden = false;
+    card.querySelector('.menuCardJp').textContent = m.jp || '';
+    card.querySelector('.menuCardZh').textContent = m.zh || '';
+    card.querySelector('.menuCardNote').textContent = m.note || '';
+
+    const img = card.querySelector('.menuCardImg');
+    if(m.img){
+      img.src = m.img;
+      img.style.display = 'block';
+    }else{
+      img.removeAttribute('src');
+      img.style.display = 'none';
+    }
+
+    const closeBtn = card.querySelector('.menuCardClose');
+    closeBtn.onclick = closeMenuCard;
+  }
+
+  function closeMenuCard(){
+    const card = document.getElementById('menuCard');
+    if(card) card.hidden = true;
+  }
+
+  function speakJapanese(text){
+    if(!text) return;
+    if(!('speechSynthesis' in window)) return;
+
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'ja-JP';
+
+    // 嘗試挑 ja-JP voice（有的瀏覽器要 voiceschanged 後才拿得到）
+    const pickVoice = () => {
+      const vs = window.speechSynthesis.getVoices?.() || [];
+      const v = vs.find(v => (v.lang||'').toLowerCase().startsWith('ja'));
+      if(v) u.voice = v;
+      window.speechSynthesis.speak(u);
+    };
+
+    const voices = window.speechSynthesis.getVoices?.() || [];
+    if(voices.length) pickVoice();
+    else window.speechSynthesis.onvoiceschanged = pickVoice;
+  }
+
+
+
+  // ===== Modal drag to close =====
+  (function initModalDrag(){
+    const sheet   = document.getElementById('modalSheet');
+    const overlay = document.getElementById('modalOverlay');
+    const handle  = document.querySelector('.modal-header'); // 或改成 .modal-drag-handle
+
+    if(!sheet || !overlay || !handle) return;
+
+    let startY = 0;
+    let dy = 0;
+    let dragging = false;
+
+    function setTranslate(y){
+      sheet.style.transform = `translateX(-50%) translateY(${y}px)`;
+      sheet.style.transition = 'none';
+      // 讓遮罩跟著變淡（可選）
+      const k = Math.max(0, 1 - y / 280);
+      overlay.style.opacity = (0.38 * k).toFixed(3);
+    }
+
+    function reset(){
+      sheet.style.transition = '';
+      sheet.style.transform = '';       // 交回給 .active 的 transform
+      overlay.style.opacity = '';       // 交回給 CSS
+    }
+
+    
+
+    handle.addEventListener('pointerdown', (e)=>{
+      if(!sheet.classList.contains('active')) return;
+      dragging = true;
+      startY = e.clientY;
+      dy = 0;
+      sheet.setPointerCapture?.(e.pointerId);
+    });
+
+    handle.addEventListener('pointermove', (e)=>{
+      if(!dragging) return;
+      dy = Math.max(0, e.clientY - startY); // 只允許往下拖
+      setTranslate(dy);
+    });
+
+    handle.addEventListener('pointerup', (e)=>{
+      if(!dragging) return;
+      dragging = false;
+      sheet.releasePointerCapture?.(e.pointerId);
+
+      // 拖超過門檻就關掉，否則彈回
+      if(dy > 120){
+        reset();
+        closeModal();
+      }else{
+        // 彈回原位
+        sheet.style.transition = 'transform .18s cubic-bezier(.16,1,.3,1)';
+        sheet.style.transform  = 'translateX(-50%) translateY(0)';
+        overlay.style.opacity  = '0.38';
+        setTimeout(reset, 200);
+      }
+    });
+
+    handle.addEventListener('pointercancel', ()=>{
+      if(!dragging) return;
+      dragging = false;
+      reset();
+    });
+  })();
+
 
 
   function openUrl(url){
@@ -3029,6 +3292,94 @@ async function renderWeatherJMA(meta){
     navigator.clipboard.writeText(txt);
     alert('已複製：' + txt);
   }
+  function speakJapanese(text){
+    const t = String(text||'').trim();
+    if(!t) return;
+
+    if(!('speechSynthesis' in window)) return;
+
+    const u = new SpeechSynthesisUtterance(t);
+    u.lang = 'ja-JP';
+    u.rate = 0.95;
+    u.pitch = 1.0;
+
+    // 嘗試挑 ja-JP voice
+    const voices = speechSynthesis.getVoices?.() || [];
+    const ja = voices.find(v => (v.lang||'').toLowerCase().startsWith('ja'));
+    if(ja) u.voice = ja;
+
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }
+
+  // 確保 menu card 的 DOM 存在
+  function ensureMenuCardUI(){
+    if(document.getElementById('menuCardOverlay')) return;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'menuCardOverlay';
+    overlay.style.cssText = `
+      position:fixed; inset:0;
+      background:rgba(0,0,0,.38);
+      z-index:3000;
+      display:none;
+      align-items:flex-end;
+      justify-content:center;
+      padding:0 12px calc(14px + env(safe-area-inset-bottom));
+    `;
+
+    overlay.innerHTML = `
+      <div id="menuCardSheet" style="
+        width:min(560px, 100%);
+        background:#FAF7F2;
+        border-radius:22px;
+        border:1px solid rgba(233,225,214,.95);
+        box-shadow:0 22px 60px rgba(0,0,0,.22);
+        overflow:hidden;
+      ">
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid rgba(233,225,214,.8);">
+          <div style="font-weight:900;">品項介紹</div>
+          <button onclick="closeMenuCard()" style="
+            width:34px;height:34px;border-radius:999px;
+            border:1px solid rgba(233,225,214,.95);
+            background:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;
+          ">×</button>
+        </div>
+        <div id="menuCardBody" style="padding:14px;"></div>
+      </div>
+    `;
+
+    overlay.addEventListener('click', (e)=>{
+      if(e.target === overlay) closeMenuCard();
+    });
+
+    document.body.appendChild(overlay);
+  }
+
+  function openMenuCard(m){
+    ensureMenuCardUI();
+    const ov = document.getElementById('menuCardOverlay');
+    const body = document.getElementById('menuCardBody');
+    if(!ov || !body) return;
+
+    const img = (m.img || '').trim();
+    const desc = (m.desc || '').trim();
+
+    body.innerHTML = `
+      ${img ? `<img src="${escapeHtml(img)}" alt="" style="width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:14px; border:1px solid rgba(233,225,214,.9);">` : ``}
+      <div style="margin-top:10px; font-weight:900; font-size:1.05rem;">${escapeHtml(m.jp || '')}</div>
+      <div style="margin-top:4px; color:var(--ink2); font-weight:800;">${escapeHtml(m.zh || '')}</div>
+      ${desc ? `<div style="margin-top:10px; line-height:1.65; color:#3A352E; font-weight:700;">${escapeHtml(desc).replace(/\n/g,'<br>')}</div>` : ``}
+    `;
+
+    ov.style.display = 'flex';
+  }
+
+  function closeMenuCard(){
+    const ov = document.getElementById('menuCardOverlay');
+    if(ov) ov.style.display = 'none';
+  }
+
 
   function mmdd(iso){
     if(!iso) return '';
