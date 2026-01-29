@@ -1519,15 +1519,83 @@
         if(t==='shop') return 'tag-shop';
         return 'tag-transport';
     }
-  function tagIcon(tag){
-        const t = (tag||'').toLowerCase();
-        if(t==='food') return 'fa-utensils';
-        if(t==='sight') return 'fa-torii-gate';
-        if(t==='transport') return 'fa-route';
-        if(t==='hotel') return 'fa-bed';
-        if(t==='shop') return 'fa-bag-shopping';
-        return 'fa-circle';
-    }
+
+// 回傳對應 Font Awesome icon class（不含 "fa-solid" 那種前綴）
+// 規則：先看 subtag（子分類）→ 沒命中再看 tag（大分類）→ 都沒有就用預設圓點
+  function tagIcon(tag, subtag){
+
+    // t = 大分類（food / sight / transport / hotel / shop）
+    const t  = (tag || '').toLowerCase().trim();
+
+    // st = 子分類（ramen / sushi / train / onsen ...）
+    const ALIAS = {
+      '汽車':'car','飛機':'plane','火車':'train','巴士':'bus','纜車':'cablecar','輪船':'ferry',
+      '生魚片':'sashimi','壽司':'sushi','咖哩飯':'curry','牛排':'steak','buffet':'buffet','拉麵':'ramen','串燒':'yakitori','居酒屋':'izakaya','咖啡廳':'cafe',
+      '海水浴場':'beach','貓咪':'cat','城池':'castle','溫泉':'onsen','車站':'station',
+      '河川':'river','植物園':'botanic','動物園':'zoo','公園':'park','鳥居':'torii','博物館':'museum',
+    };
+
+    const st = (ALIAS[subtag] || subtag || '').toLowerCase().trim();
+
+
+    // -----------------------------
+    // ✅ 子分類 icon（優先）
+    // 你在資料中寫 subtag，就會優先用這裡的 icon
+    // 例如：tag=food, subtag=ramen → fa-bowl-food
+    // -----------------------------
+    const SUB = {
+
+      // ===== transport 交通子分類 =====
+      car:      'fa-car',            // 汽車
+      plane:    'fa-plane',          // 飛機
+      train:    'fa-train',          // 火車
+      bus:      'fa-bus',            // 巴士
+      cablecar: 'fa-cable-car',      // 纜車（FA 版本若沒有，改成 fa-mountain/ fa-train 都行）
+      ferry:    'fa-ship',           // 輪船/渡輪
+
+      // ===== food 餐飲子分類 =====
+      sashimi:  'fa-fish',           // 生魚片（保守 icon，通常版本都會有）
+      sushi:    'fa-fish-fins',      // 壽司（若你版本沒有 → 換 fa-fish）
+      curry:    'fa-pepper-hot',     // 咖哩飯（若覺得不貼 → 換 fa-utensils）
+      steak:    'fa-drumstick-bite', // 牛排（若版本沒有 → 換 fa-utensils）
+      buffet:   'fa-plate-wheat',    // buffet（若版本沒有 → 換 fa-utensils）
+      ramen:    'fa-bowl-food',      // 拉麵（FA6 才比較穩）
+      yakitori: 'fa-fire-flame-curved', // 串燒/炭火（FA6 才比較穩；保守可換 fa-fire）
+      izakaya:  'fa-beer-mug-empty', // 居酒屋（FA6 才比較穩；保守可換 fa-mug-hot）
+      cafe:     'fa-mug-hot',        // 咖啡廳
+
+      // ===== sight 景點子分類 =====
+      beach:    'fa-umbrella-beach', // 海水浴場
+      cat:      'fa-cat',            // 貓咪
+      castle:   'fa-chess-rook',     // 城池
+      onsen:    'fa-hot-tub-person', // 溫泉（FA6 才比較穩；保守可換 fa-water）
+      station:  'fa-train-subway',   // 車站（若版本沒有 → 換 fa-train）
+      river:    'fa-water',          // 河川
+      botanic:  'fa-seedling',       // 植物園
+      zoo:      'fa-paw',            // 動物園
+      park:     'fa-tree',           // 公園
+      torii:    'fa-torii-gate',     // 鳥居
+      shrine:   'fa-torii-gate',     // 神社（同鳥居）
+      museum:   'fa-landmark'        // 博物館
+    };
+
+    // -----------------------------
+    // ✅ 大分類 icon（fallback）
+    // 當 subtag 沒寫或沒命中時，退回看 tag
+    // 例如：tag=food, subtag="" → fa-utensils
+    // -----------------------------
+    const TAG = {
+      food:      'fa-utensils',      // 餐飲
+      sight:     'fa-torii-gate',    // 景點（預設用鳥居）
+      transport: 'fa-route',         // 交通
+      hotel:     'fa-bed',           // 住宿
+      shop:      'fa-bag-shopping'   // 購物
+    };
+
+    // ✅ 回傳順序：子分類 → 大分類 → 預設
+    return SUB[st] || TAG[t] || 'fa-circle';  // fa-circle = 沒分類時用圓點
+  }
+
 
   function durationChip(item){
     // 1) 優先顯示 stay（你 JSON 已經有）
@@ -1599,7 +1667,7 @@
         <div class="tl-content ${item.highlight ? 'highlight' : ''}">
           <div class="tl-tag ${tagClass(item.tag)}">
             ${escapeHtml((item.tag||'').toUpperCase())}
-            <i class="fas ${tagIcon(item.tag)} style="opacity:.35; font-size:.72rem; margin-left:2px;"></i>
+            <i class="fas ${tagIcon(item.tag, item.subtag)} style="opacity:.35; font-size:.72rem; margin-left:2px;"></i>
           </div>
           <div class="tl-title">${escapeHtml(item.title || '')}</div>
           <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
@@ -1683,7 +1751,7 @@
             }
             return {
                 src: p.src || p.url || '',
-                loc: p.loc || meta?.loc || '',
+                loc: (p.loc !== undefined) ? (p.loc ?? '') : (meta?.loc || ''),
                 caption: p.caption || ''
             };
         }).filter(x=>x.src);
@@ -1792,7 +1860,7 @@
           <div class="tl-content">
             <div class="tl-tag ${tagClass(item.tag)}">
                 ${escapeHtml((item.tag||'').toUpperCase())}
-                <i class="fas ${tagIcon(item.tag)} tag-ico"></i>
+                <i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"></i>
             </div>	  
             <div class="tl-title">${escapeHtml(item.title || '')}</div>
             <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
