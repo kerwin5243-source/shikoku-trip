@@ -2,247 +2,397 @@
   {
     "date": "02/28",
     "day": "六",
-    "loc": "小豆島",
+    "loc": "高松・小豆島",
     "hotel_id": "H1",
-    "items": [
+    "photos": [
       {
-        "type": "route",
-        "time": "07:20",
-        "title": "住宿 → 高松港",
-        "desc": "前往高松港搭乘渡輪。",
-        "durationText": "約 20 分鐘車程",
-        "stay": "20 min",
-        "mode": "drive",
-        "from": "Second Home 瀬戸風月",
-        "to": "高松港",
-        "route": { "mode": "drive", "from": "Second Home 瀬戸風月", "to": "高松港", "minutes": 20 }
+        "src": "/photos/day2/01.jpg",
+        "loc": "高松港",
+        "caption": "晨間出發"
       },
       {
-        "time": "08:02-09:02",
-        "title": "渡輪：高松港 → 土庄港",
+        "src": "/photos/day2/02.jpg",
+        "loc": "小豆島",
+        "caption": "瀨戶內海"
+      },
+      {
+        "src": "/photos/day2/03.jpg",
+        "loc": "天使之路",
+        "caption": "退潮限定"
+      },
+      {
+        "src": "/photos/day2/04.jpg",
+        "loc": "高松城",
+        "caption": "水城風景"
+      }
+    ],
+    "items": [
+      {
+        "time": "06:00",
+        "title": "出發：瀬戸風月 → 高松港",
         "tag": "transport",
-        "desc": "人和車一起搭乘渡輪前往小豆島。",
-        "detail": "船班參考（四國渡輪）：\n08:02 出發 → 09:02 抵達\n\n備註：\n- 需提前抵達港口辦理車輛航運手續\n- 船程約 60 分鐘，可在船上休息或欣賞瀨戶內海風景",
+        "subtag": "汽車",
+        "desc": "清晨前往高松港，準備搭船上小豆島。",
+        "detail": "建議：\n- 先在港口附近找便利商店補水/早餐\n- 車輛上船：提早到場辦理（確認車輛尺寸/票券）",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "20–30 min",
+        "menu": [],
+        "avoid": [
+          "天候不佳可能停航：出發前確認當日航班公告。"
+        ],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "type": "route",
+        "time": "06:30",
+        "title": "瀬戸風月 → 高松港",
+        "desc": "",
+        "durationText": "約 25 分鐘車程",
+        "stay": "25 min",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "Second Home 瀬戸風月",
+          "to": "高松港",
+          "minutes": 25
+        }
+      },
+      {
+        "time": "07:20-08:20",
+        "title": "高松 → 土庄港（小豆島） 高木同學號",
+        "tag": "transport",
+        "subtag": "船",
+        "reserved": true,
+        "desc": "約 1 小時船程（車輛可上船）。",
+        "detail": "票價備註（你提供）：\n- 車輌運賃 7,120円 ×2\n- 旅客運賃 2,800円 ×2\n- 合計 19,840円（另：來回約 4,000円/人）\n\n上船小提醒：\n- 車上船前先把需要的東西帶到身上（飲水、外套、相機）\n- 瀨戶內海海風冷，2月建議帶外套",
         "addr": "高松港",
         "mapcode": "",
         "parking": "",
         "hours": "",
-        "price": "車輛+旅客運費",
+        "price": "",
         "stay": "60 min",
-        "eta": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "如果想省時間：可把『想跑的聖地點』先排成 2–3 個核心點，其餘當作加碼。"
+        ],
+        "links": [
+          {
+            "title": "高松↔土庄 航班參考（時刻表）",
+            "url": "https://shikoku-guide.com/en/information/takamatsutonosho/",
+            "cat": "timetable"
+          }
+        ],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "time": "08:30",
+        "title": "土庄港（小豆島）",
+        "tag": "sight",
+        "subtag": "港口",
+        "desc": "高木同學聖地巡禮起點，先補給/取車後出發。",
+        "detail": "可做的事：\n- 先上洗手間、買飲料\n- 確認今日主要行程：重岩 / 海水浴場 / 神社 / 橄欖公園 / 天使之路",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "15–30 min",
         "menu": [],
         "avoid": [],
         "guide": [],
         "links": [
-            { "title": "四國渡輪時刻表", "url": "https://www.shikokuferry.com/" }
+          {
+            "title": "小豆島（高木同學聖地巡禮 Day1 文章）",
+            "url": "https://achi0506.medium.com/%E6%93%85%E9%95%B7%E6%8D%89%E5%BC%84%E4%BA%BA%E7%9A%84%E9%AB%98%E6%9C%A8%E5%90%8C%E5%AD%B8-%E8%81%96%E5%9C%B0%E5%B7%A1%E7%A6%AE-%E5%B0%8F%E8%B1%86%E5%B3%B6-%E7%B7%A3%E8%B5%B7-day1-f189e4e174c8",
+            "cat": "article"
+          }
         ],
-        "img": ""
+        "img": "",
+        "eta": ""
       },
       {
-        "time": "09:10",
-        "title": "土庄港 (高木同學聖地)",
+        "time": "—",
+        "title": "高木同學聖地巡禮（小豆島）",
         "tag": "sight",
-        "desc": "小豆島門戶，《高木同學》聖地巡禮起點。",
-        "detail": "拍照重點：\n- 太陽的贈禮（金色桂冠藝術裝置）：動畫第三季視覺圖背景\n- 港口周邊：劇中多次出現的集合與道別場景",
-        "addr": "香川県小豆郡土庄町",
+        "subtag": "動畫聖地",
+        "desc": "以『土庄港周邊』＋『北側海岸』為核心跑點。",
+        "detail": "推薦跑法（依時間擇優）：\n1) 重岩（遠眺/攝影點）\n2) 千軒海水浴場（海岸景）\n3) 鹿島明神社 / 富丘八幡神社（神社氛圍）\n\n如果時間緊：先挑 2 個核心＋1個順路點即可。",
+        "addr": "",
         "mapcode": "",
-        "parking": "港口停車場",
-        "hours": "24h",
-        "price": "免費",
-        "stay": "20 min",
-        "menu": [],
-        "avoid": [],
-        "guide": [
-          "雖然是交通節點，但『太陽的贈禮』就在港邊，下船後可直接拍照打卡。"
-        ],
-        "links": [],
-        "img": ""
-      },
-      {
-        "time": "09:40",
-        "title": "重岩 (Kasane Iwa)",
-        "tag": "sight",
-        "desc": "絕景能量景點，巨石平衡的奇蹟。",
-        "detail": "特色：\n- 小瀨石鎚神社的神體，巨大的岩石不可思議地疊在山頂\n- 視野極佳，可俯瞰瀨戶內海\n- 高木同學聖地之一\n\n注意：\n- 需爬陡峭階梯與山路，建議穿好走的鞋子",
-        "addr": "香川県小豆郡土庄町小瀬",
-        "mapcode": "364 298 116*55",
-        "parking": "專用停車場",
-        "hours": "24h",
-        "price": "免費",
-        "stay": "50 min",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "2–3 hr",
         "menu": [],
         "avoid": [
-            "階梯較陡，若有長輩同行需評估體力。"
+          "部分點位停車格少：旺季請預留等車位時間。"
         ],
         "guide": [
-          "據說是昔日大阪城築城的殘念石，至今仍是個謎。",
-          "動畫中高木與西片曾在此處眺望風景。"
+          "建議把每個點做成『Google Map 收藏清單』，開車導航更順。"
         ],
         "links": [
-            { "title": "重岩參考影片 (18:30)", "url": "https://www.youtube.com/watch?v=s8CN8z-iWOw&list=PLa-bLcPCptSG1ecMusSfjYV-rJL3RE32z&index=51" }
+          {
+            "title": "重岩 影片（參考）",
+            "url": "https://www.youtube.com/watch?v=s8CN8z-iWOw&list=PLa-bLcPCptSG1ecMusSfjYV-rJL3RE32z&index=51",
+            "cat": "video"
+          }
         ],
-        "img": ""
+        "img": "",
+        "eta": ""
       },
       {
-        "time": "11:00",
-        "title": "小豆島橄欖公園",
-        "tag": "sight",
-        "desc": "魔女宅急便拍攝地，白色風車與地中海風情。",
-        "detail": "必做體驗：\n1. 借免費魔法掃帚在白色風車前拍飛行照\n2. 尋找心形橄欖葉（可做成書籤）\n3. 試試橄欖霜淇淋（淡綠色）",
-        "addr": "香川県小豆郡小豆島町西村甲1941-1",
-        "mapcode": "364 105 133*17",
-        "parking": "免費",
-        "hours": "08:30–17:00",
-        "price": "入園免費",
-        "stay": "60 min",
-        "menu": [
-             { "jp": "オリーブソフト", "zh": "橄欖霜淇淋" }
-        ],
-        "avoid": [],
-        "guide": [
-          "遊客可在紀念館免費租借掃帚。",
-          "傳說在橄欖樹林中找到心形葉子會帶來幸福。"
-        ],
-        "links": [],
-        "img": ""
-      },
-      {
-        "time": "12:10",
+        "time": "—",
         "title": "千年樹齡橄欖樹",
         "tag": "sight",
-        "desc": "來自西班牙的千年神木，生命力的象徵。",
-        "detail": "這棵樹2011年從西班牙安達魯西亞移植而來，樹齡超過1000年，象徵和平與繁榮。",
-        "addr": "香川県小豆郡小豆島町西村甲1941-1 (橄欖公園附近)",
-        "mapcode": "364 106 314*88",
-        "parking": "有",
-        "hours": "24h",
-        "price": "免費",
-        "stay": "20 min",
-        "menu": [],
-        "avoid": [],
-        "guide": [
-            "就在橄欖公園東側不遠處，順路可達。"
-        ],
-        "links": [],
-        "img": ""
-      },
-      {
-        "time": "12:50",
-        "title": "午餐：小豆島拉麵 HISHIO",
-        "tag": "food",
-        "desc": "Angel Road 店，邊吃拉麵邊看海。",
-        "detail": "必吃：\n- 醬油拉麵 (HISHIO SOBA)：濃郁甘甜，放有熟成大蒜與叉燒\n- 替玉 (Kaedama)：免費加麵（心意制）\n\n特色：\n- 露台座位可直接欣賞海景與天使之路區域",
-        "addr": "香川県小豆郡土庄町甲24-18",
-        "mapcode": "364 043 781*60",
-        "parking": "有",
-        "hours": "11:00–14:00, 17:00–21:00",
-        "price": "約 1000-1500 円",
-        "stay": "50 min",
-        "menu": [
-          { "jp": "醤そば", "zh": "招牌醬油拉麵" }
-        ],
-        "avoid": [
-            "人氣店需排隊，建議避開正餐尖峰或稍作等待。"
-        ],
-        "guide": [
-          "以小豆島特產『醬油』為靈魂的拉麵名店。"
-        ],
-        "links": [],
-        "img": ""
-      },
-      {
-        "time": "14:00",
-        "title": "高木同學聖地巡禮 (神社/海灘)",
-        "tag": "sight",
-        "desc": "鹿島明神社、富丘八幡神社、千軒海水浴場。",
-        "detail": "路線建議：\n1. 富丘八幡神社：爬上石階俯瞰土庄町與海峽（經典展望）\n2. 鹿島明神社：粉絲公認核心聖地，有交流筆記本\n3. 千軒海水浴場：動畫中看夕陽與試膽大會的地點",
-        "addr": "土庄町周邊",
+        "subtag": "自然",
+        "desc": "小豆島代表性的橄欖意象之一，適合拍照。",
+        "detail": "小豆島以橄欖栽培聞名，常見伴手禮有橄欖油、橄欖化妝品與點心。",
+        "addr": "",
         "mapcode": "",
-        "parking": "各神社有小型停車空間",
-        "hours": "24h",
-        "price": "免費",
-        "stay": "90 min",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "10–20 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "time": "12:00",
+        "title": "午餐：小豆島拉麵 HISHIO（ひしお）",
+        "tag": "food",
+        "subtag": "拉麵",
+        "desc": "以小豆島醬油『醤（ひしお）』系湯頭為特色。",
+        "detail": "推薦：\n- 醤油系拉麵（小豆島醬油風味）\n- 若有：橄欖油/柚子點綴的版本也值得試\n\n小提醒：中午熱門時段可能排隊。",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "40–60 min",
         "menu": [],
         "avoid": [],
         "guide": [
-          "富丘八幡神社的長石階是動畫海報與片尾曲常出現的構圖。",
-          "鹿島明神社充滿兩小無猜的氣息，是回味動畫互動的最佳地點。"
+          "小豆島醬油產業很有名，吃完拉麵如果時間夠也可順路買醬油/醬菜當伴手禮。"
         ],
-        "links": [
-             { "title": "聖地巡禮參考文章", "url": "https://achi0506.medium.com/%E6%93%85%E9%95%B7%E6%8D%89%E5%BC%84%E4%BA%BA%E7%9A%84%E9%AB%98%E6%9C%A8%E5%90%8C%E5%AD%B8-%E8%81%96%E5%9C%B0%E5%B7%A1%E7%A6%AE-%E5%B0%8F%E8%B1%86%E5%B3%B6-%E7%B7%A3%E8%B5%B7-day1-f189e4e174c8" }
-        ],
-        "img": ""
+        "links": [],
+        "img": "",
+        "eta": ""
       },
       {
-        "time": "15:40",
-        "title": "天使之路 (Angel Road)",
+        "time": "13:30",
+        "title": "小豆島橄欖公園",
         "tag": "sight",
-        "desc": "戀人聖地，一天只浮現兩次的沙洲步道。",
-        "detail": "今日潮汐 (02/28)：\n- 下午退潮時段：約 13:45 ～ 19:45\n\n玩法：\n- 行走沙洲：傳說牽手走過會幸福\n- 約束之丘展望台：敲響幸福之鐘，俯瞰全景",
-        "addr": "香川県小豆郡土庄町銀波浦",
-        "mapcode": "364 043 750*30",
-        "parking": "專用停車場",
-        "hours": "依潮汐時間開放",
-        "price": "免費",
-        "stay": "60 min",
+        "subtag": "公園",
+        "desc": "『魔女宅急便』風格拍照點：風車＋掃帚。",
+        "detail": "必玩/必買：\n- 魔女宅急便風車拍照\n- 橄欖葉書籤\n- 橄欖面膜/橄欖冰淇淋",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "60–90 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "拿掃帚拍『起飛』姿勢通常要排一下隊，建議先拍照再逛商店。"
+        ],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "time": "15:00",
+        "title": "天使之路（エンジェルロード）",
+        "tag": "sight",
+        "subtag": "海岸",
+        "highlight": true,
+        "desc": "退潮限定的沙洲步道，傳說牽手走過能實現願望。",
+        "detail": "2026/02/28 可通行（官方潮見表）：\n- 第 1 回：00:00–05:26\n- 第 2 回：13:19–19:19\n\n建議：以『開始出現/快消失』時段拍照更有『路浮出海面』感。\n⚠️ 天候與潮位會有誤差，請以現場公告為準。",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "40–60 min",
         "menu": [],
         "avoid": [
-            "2月底海邊風大，傍晚注意保暖。"
+          "請穿不怕濕的鞋；沙洲可能有積水。"
         ],
         "guide": [
-          "建議走過沙洲後，爬上旁邊的展望台敲鐘。",
-          "時間剛好配合下午退潮，可從容散步拍照。"
+          "天使之路也被選為『戀人聖地』，旁邊的展望台（約束之丘）可俯瞰整條沙洲。"
         ],
         "links": [
-            { "title": "天使之路潮汐表", "url": "https://www.shikokuferry.com/angel" }
+          {
+            "title": "官方：エンジェルロード 潮見表（2026/02）",
+            "url": "https://www.shikokuferry.com/angel",
+            "cat": "tide"
+          },
+          {
+            "title": "土庄町：潮見表 2026（PDF）",
+            "url": "https://www.town.tonosho.kagawa.jp/material/files/group/15/AJ2026.pdf",
+            "cat": "tide"
+          }
         ],
-        "img": ""
+        "img": "",
+        "eta": ""
       },
       {
-        "time": "17:30",
-        "title": "渡輪：土庄港 → 高松港",
+        "time": "15:45-16:45",
+        "title": "土庄港 → 高松（呆呆獸號）",
         "tag": "transport",
-        "desc": "搭乘渡輪返回高松。",
-        "detail": "建議預留時間前往港口排隊候船。",
-        "addr": "土庄港",
-        "mapcode": "",
-        "parking": "",
-        "hours": "",
-        "price": "",
-        "stay": "60 min",
-        "menu": [],
-        "avoid": [],
-        "guide": [],
-        "links": [],
-        "img": ""
-      },
-      {
-        "time": "18:40",
-        "title": "抵達高松港 / 晚餐",
-        "tag": "food",
-        "desc": "返回高松市區晚餐。",
-        "detail": "可選擇在港口附近或返回瓦町/兵庫町周邊用餐。",
-        "addr": "高松市",
-        "mapcode": "",
-        "parking": "",
-        "hours": "",
-        "price": "",
-        "stay": "60 min",
-        "menu": [],
-        "avoid": [],
-        "guide": [],
-        "links": [],
-        "img": ""
-      },
-      {
-        "time": "20:00",
-        "title": "返回住宿",
-        "tag": "hotel",
-        "desc": "回到溫暖的民宿。",
+        "subtag": "船",
+        "desc": "返回高松（約 1 小時）。",
         "detail": "",
-        "addr": "Second Home 瀬戸風月",
+        "addr": "",
         "mapcode": "",
-        "parking": "住宿停車位",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "60 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [
+          {
+            "title": "高松↔土庄 航班參考（時刻表）",
+            "url": "https://shikoku-guide.com/en/information/takamatsutonosho/",
+            "cat": "timetable"
+          }
+        ],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "time": "17:10",
+        "title": "高松城（玉藻公園 / Tamamo Park）",
+        "tag": "sight",
+        "subtag": "城跡",
+        "desc": "日本三大水城之一，護城河引入瀨戶內海海水。",
+        "detail": "亮點：\n- 海水護城河、餵鯛魚\n- 月見櫓等重要文化財\n- 披雲閣（和洋折衷的迎賓館）\n\n2月營業時間：07:00–17:30（你備註）。",
+        "addr": "2-1 Tamamocho, Takamatsu, Kagawa",
+        "mapcode": "",
+        "parking": "",
+        "hours": "2月 07:00–17:30；3月 06:30–18:00",
+        "price": "",
+        "stay": "60–90 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "若時間夠：可加購和船體驗（30分鐘）或到披雲閣參觀。"
+        ],
+        "links": [
+          {
+            "title": "景點資訊（營業時間參考）",
+            "url": "https://www.art-takamatsu.com/en/spot/entry-640.html",
+            "cat": "official"
+          },
+          {
+            "title": "Tamamo Park（船體驗等資訊）",
+            "url": "https://shikoku-guide.com/en/information/tamamopark/",
+            "cat": "official"
+          }
+        ],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "time": "18:30",
+        "title": "高松市區逛街（丸龜町商店街周邊）",
+        "tag": "shop",
+        "desc": "Pokemon Center、Loft、藥妝一次逛。",
+        "detail": "清單：\n- Pokémon Center Kagawa（丸龜町Green 1F）\n- Loft\n- 丸龜町商店街\n- 大國藥妝",
+        "addr": "",
+        "mapcode": "",
+        "parking": "候選：高松市立中央駐車場 / 番町パーキング",
+        "hours": "",
+        "price": "",
+        "stay": "1.5–2.5 hr",
+        "menu": [],
+        "avoid": [
+          "熱門商店街假日人多：先鎖定要買的品項（吉伊卡哇/寶可夢/藥妝）。"
+        ],
+        "guide": [
+          "寶可夢中心可先買限定周邊；想拿退稅的話記得集中結帳與帶護照。"
+        ],
+        "links": [
+          {
+            "title": "Pokémon Center KAGAWA（官方）",
+            "url": "https://www.pokemon.co.jp/shop/en/pokecen/kagawa/",
+            "cat": "official"
+          }
+        ],
+        "img": "",
+        "subtag": "",
+        "eta": ""
+      },
+      {
+        "time": "19:30-20:00",
+        "title": "晚餐：Matsuoka（已預約）",
+        "tag": "food",
+        "subtag": "晚餐",
+        "reserved": true,
+        "desc": "高松人氣店，按預約時間入店。",
+        "detail": "若提前到：可先在商店街散步等候。",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "60–90 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [
+          {
+            "title": "Tabelog 預約/資訊",
+            "url": "https://tabelog.com/tw/kagawa/A3701/A370101/37010997/",
+            "cat": "reserve"
+          }
+        ],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "type": "route",
+        "time": "21:30",
+        "title": "高松市區 → 瀬戸風月",
+        "desc": "",
+        "durationText": "約 15 分鐘車程",
+        "stay": "15 min",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "高松市區",
+          "to": "Second Home 瀬戸風月",
+          "minutes": 15
+        }
+      },
+      {
+        "time": "Night",
+        "title": "住宿：瀬戸風月（民宿）",
+        "tag": "hotel",
+        "desc": "第二晚：返回民宿休息。",
+        "detail": "",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
         "hours": "",
         "price": "",
         "stay": "",
@@ -250,8 +400,43 @@
         "avoid": [],
         "guide": [],
         "links": [],
-        "img": ""
+        "img": "",
+        "subtag": "",
+        "eta": ""
       }
-    ]
+    ],
+    "route": {
+      "mode": "drive",
+      "points": [
+        {
+          "q": "Second Home 瀬戸風月"
+        },
+        {
+          "q": "高松港"
+        },
+        {
+          "q": "土庄港"
+        },
+        {
+          "q": "小豆島オリーブ公園"
+        },
+        {
+          "q": "エンジェルロード"
+        },
+        {
+          "q": "高松城（玉藻公園）"
+        },
+        {
+          "q": "丸亀町商店街"
+        },
+        {
+          "q": "Second Home 瀬戸風月"
+        }
+      ],
+      "preview": {
+        "center": "34.48,134.25",
+        "zoom": 10
+      }
+    }
   }
 ]

@@ -2,88 +2,289 @@
   {
     "date": "03/06",
     "day": "五",
-    "loc": "祖谷",
+    "loc": "高知 → 大步危・祖谷 → 琴平",
     "hotel_id": "H4",
+    "photos": [
+      {
+        "src": "/photos/day8/01.jpg",
+        "loc": "大步危峡",
+        "caption": "峽谷遊船"
+      },
+      {
+        "src": "/photos/day8/02.jpg",
+        "loc": "祖谷",
+        "caption": "翡翠色河水"
+      },
+      {
+        "src": "/photos/day8/03.jpg",
+        "loc": "かずら橋",
+        "caption": "藤蔓吊橋"
+      },
+      {
+        "src": "/photos/day8/04.jpg",
+        "loc": "敷島館",
+        "caption": "溫泉旅館"
+      }
+    ],
     "items": [
       {
-        "time": "09:00",
-        "title": "大步危遊覽船",
-        "tag": "sight",
-        "desc": "欣賞峽谷奇岩。",
-        "detail": "船程約 30 分，建議早上光線更漂亮。",
+        "time": "07:00",
+        "title": "早餐：OMO7 buffet",
+        "tag": "food",
+        "subtag": "飯店早餐",
+        "desc": "退房前吃飽再出發。",
+        "detail": "",
+        "addr": "",
         "mapcode": "",
-        "hours": "09:00–17:00",
-        "price": "成人 1500円",
-        "stay": "約 30 分",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "45–60 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "type": "route",
+        "time": "08:00-10:00",
+        "title": "高知 → 大步危峽谷",
+        "desc": "",
+        "durationText": "約 2 小時車程",
+        "stay": "2h",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "高知市",
+          "to": "大歩危峡観光遊覧船",
+          "minutes": 120
+        }
+      },
+      {
+        "time": "10:00",
+        "title": "大步危峽谷觀光遊覽船",
+        "tag": "sight",
+        "subtag": "遊船",
+        "desc": "近距離看結晶片岩峽谷（吉野川切削形成），水色很漂亮。",
+        "detail": "參考資訊：\n- 營業時間：09:00–17:00（最後出航 16:30，全年）\n- 票價：成人約 1,500円\n- 船程：往返約 30 分鐘",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "45–60 min",
         "menu": [],
         "avoid": [],
         "guide": [
-          "峽谷地形很壯觀，建議早上光線更漂亮。"
-        ],
-        "links": [],
-        "img": ""
-      },
-      {
-        "time": "10:30",
-        "title": "GoGo Adventure（森林滑索）",
-        "tag": "sight",
-        "desc": "需預約。穿著限制。",
-        "detail": "建議穿運動鞋、褲裝；會有安全講解。",
-        "mapcode": "",
-        "hours": "09:00–17:00（最後入場依當日規定）",
-        "price": "",
-        "stay": "",
-        "menu": [],
-        "avoid": [
-          "裙裝/涼鞋不建議；現場可能依安全規範拒絕。"
-        ],
-        "guide": [
-          "建議穿運動鞋、褲裝；會有安全講解。"
+          "船上很容易拍到『像刀削』的岩壁，建議坐外側。"
         ],
         "links": [
           {
-            "title": "GoGo Adventure FAQ",
-            "url": "https://iya.gogo-adventure.com/faq/"
+            "title": "票價/時段參考（成人 1,500円）",
+            "url": "https://www.tripadvisor.com/Attraction_Review-g1023595-d10100303-Reviews-Oboke_Gorge_Pleasure_Cruise-Miyoshi_Tokushima_Prefecture_Shikoku.html",
+            "cat": "reference"
           }
         ],
-        "img": ""
+        "img": "",
+        "highlight": true,
+        "eta": ""
+      },
+      {
+        "time": "11:00",
+        "title": "午餐：大步危峽谷 餐廳 Mannaka",
+        "tag": "food",
+        "subtag": "定食/蕎麥麵",
+        "desc": "祖谷蕎麥麵、烤香魚/阿波尾雞定食。",
+        "detail": "旁邊可加碼：妖怪屋敷（兒啼爺傳說）。",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "60–75 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "type": "route",
+        "time": "12:30",
+        "title": "大步危 → 祖谷滑索",
+        "desc": "",
+        "durationText": "約 30 分鐘車程",
+        "stay": "30 min",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "大歩危峡",
+          "to": "Forest Adventure 祖谷",
+          "minutes": 30
+        }
       },
       {
         "time": "13:00",
-        "title": "祖谷藤蔓橋",
-        "tag": "sight",
-        "desc": "三大奇橋。",
-        "detail": "橋面簍空會搖晃，走慢一點、握扶手就好。",
+        "title": "Forest Adventure 祖谷 Go Go 森林滑索",
+        "tag": "activity",
+        "subtag": "滑索",
+        "desc": "360m 超長滑索飛越祖谷川，高低差約 50m。",
+        "detail": "注意事項：\n- 預約制：建議先上官網預約\n- 穿包覆腳趾運動鞋、建議長褲\n- 身高/體重限制請看 FAQ",
+        "addr": "",
         "mapcode": "",
-        "hours": "08:00–17:00",
-        "price": "550円",
-        "stay": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "2 hr",
         "menu": [],
-        "avoid": [],
-        "guide": [
-          "橋面簍空會搖晃，走慢一點、握扶手就好。"
+        "avoid": [
+          "若遇雨/強風可能停辦：出發前確認當日公告。"
         ],
-        "links": [],
-        "img": ""
+        "guide": [],
+        "links": [
+          {
+            "title": "官方 FAQ / 預約",
+            "url": "https://iya.gogo-adventure.com/faq/",
+            "cat": "official"
+          }
+        ],
+        "img": "",
+        "eta": ""
       },
       {
-        "time": "16:00",
-        "title": "敷島館 Check-in",
-        "tag": "hotel",
-        "desc": "享受溫泉。",
-        "detail": "晚上記得吃免費宵夜拉麵（22:00–23:00）。",
+        "type": "route",
+        "time": "15:30",
+        "title": "祖谷滑索 → 祖谷藤蔓橋",
+        "desc": "",
+        "durationText": "約 20 分鐘車程",
+        "stay": "20 min",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "Forest Adventure 祖谷",
+          "to": "祖谷のかずら橋",
+          "minutes": 20
+        }
+      },
+      {
+        "time": "15:50",
+        "title": "祖谷藤蔓橋（かずら橋）",
+        "tag": "sight",
+        "subtag": "吊橋",
+        "desc": "用藤蔓編成的吊橋，腳下簍空會搖，非常刺激。",
+        "detail": "參考：\n- 3月多為 08:00–17:00\n- 門票：成人 550円\n- 單向通行，不能回頭\n\n加碼：琵琶瀑布（過橋後左轉），入口也常有炭火烤香魚。",
+        "addr": "",
         "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "60–90 min",
+        "menu": [],
+        "avoid": [
+          "怕高的人走中間慢慢走就好，不要停太久。"
+        ],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "highlight": true,
+        "eta": ""
+      },
+      {
+        "type": "route",
+        "time": "17:30-19:00",
+        "title": "祖谷 → 琴平（敷島館）",
+        "desc": "",
+        "durationText": "約 1 小時30 分鐘車程",
+        "stay": "1h 30m",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "祖谷",
+          "to": "御宿 敷島館",
+          "minutes": 90
+        }
+      },
+      {
+        "time": "19:30",
+        "title": "旅館晚餐：御宿 敷島館",
+        "tag": "food",
+        "subtag": "會席料理",
+        "desc": "四國當季食材會席（多半 17:30 或 20:00 兩時段）。",
+        "detail": "Check-in 時櫃台會確認用餐時段。\n\n亮點：瀨戶內海生魚片、讚岐牛/當地豬肉等。",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "90–120 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "time": "21:30",
+        "title": "入住：御宿 敷島館（Onyado Shikishima-kan）",
+        "tag": "hotel",
+        "subtag": "",
+        "desc": "共立系溫泉旅館，旁邊就是金刀比羅宮參道。",
+        "detail": "加碼：\n- 免費夜鳴きそば（約 22:00–23:00）\n- 4 間免費貸切風呂（看燈號空就能進）\n- 門口足湯",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
         "hours": "",
         "price": "",
         "stay": "",
         "menu": [],
         "avoid": [],
-        "guide": [
-          "先泡湯再吃晚餐/宵夜，是敷島館最佳節奏。"
-        ],
+        "guide": [],
         "links": [],
-        "img": ""
+        "img": "",
+        "eta": ""
       }
-    ]
+    ],
+    "route": {
+      "mode": "drive",
+      "points": [
+        {
+          "q": "OMO7 高知"
+        },
+        {
+          "q": "大歩危峡観光遊覧船"
+        },
+        {
+          "q": "大歩危峡 レストラン Mannaka"
+        },
+        {
+          "q": "Forest Adventure 祖谷"
+        },
+        {
+          "q": "祖谷のかずら橋"
+        },
+        {
+          "q": "御宿 敷島館"
+        },
+        {
+          "q": "金刀比羅宮"
+        }
+      ],
+      "preview": {
+        "center": "33.85,133.75",
+        "zoom": 8
+      }
+    }
   }
 ]

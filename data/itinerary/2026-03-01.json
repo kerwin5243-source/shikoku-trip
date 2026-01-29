@@ -2,148 +2,413 @@
   {
     "date": "03/01",
     "day": "日",
-    "loc": "德島",
+    "loc": "高松 → 徳島（鳴門）",
     "hotel_id": "H1",
+    "photos": [
+      {
+        "src": "/photos/day3/01.jpg",
+        "loc": "栗林公園",
+        "caption": "大名庭園"
+      },
+      {
+        "src": "/photos/day3/02.jpg",
+        "loc": "鳴門",
+        "caption": "渦潮"
+      },
+      {
+        "src": "/photos/day3/03.jpg",
+        "loc": "渦之道",
+        "caption": "透明步道"
+      },
+      {
+        "src": "/photos/day3/04.jpg",
+        "loc": "眉山",
+        "caption": "夕景夜景"
+      }
+    ],
     "items": [
       {
-        "time": "09:00",
-        "title": "栗林公園（已預約遊船）",
+        "time": "07:30",
+        "title": "栗林公園（含遊船預約 09:00）",
         "tag": "sight",
-        "desc": "米其林三星。已預約遊船。",
-        "detail": "你筆記：\n- 營業：2月 07:00–17:30 / 3月 06:30–18:00（依現場公告）\n- 門票：¥410（搭華航/星宇活動可能可領取免費入園，依活動規則）\n- 遊船：¥850/艘（最多6位），約30分鐘\n- 停車：100円/25分鐘；2H 約 ¥500\n\n若有預約南湖遊船，請提早 15 分鐘報到。",
-        "mapcode": "60 576 348*55",
-        "hours": "",
-        "price": "門票 410円 / 遊船 850円",
-        "stay": "1.5–2 小時",
+        "subtag": "庭園",
+        "desc": "日本最大級的回遊式大名庭園，背靠紫雲山，松樹與池泉造景非常精緻。",
+        "detail": "你提供的安排：07:30–08:00 抵達，09:00 船次（停留 1.5–2 小時）。\n\n參考資訊：\n- 3月營業時間：06:30–18:00\n- 門票：成人 410円 / 兒童 170円\n- 南湖遊船：成人 620円 / 兒童 310円（需預約，營運約 09:00–16:30）",
+        "addr": "",
+        "mapcode": "",
+        "parking": "一般車輛 100円/25分鐘（2H 約 500円）",
+        "hours": "2月 07:00–17:30；3月 06:30–18:00",
+        "price": "入園 成人 410円；南湖遊船 成人 620円（參考）",
+        "stay": "1.5–2 hr",
         "menu": [],
         "avoid": [],
         "guide": [
-          "如果有預約南湖遊船，請提早 15 分鐘報到。"
+          "建議一進園先拍『偃月橋＋池』的經典視角，再去搭船。"
         ],
         "links": [
           {
-            "title": "栗林公園 YouTube",
-            "url": "https://www.youtube.com/watch?v=_gFA5Y7CopE"
+            "title": "栗林公園（營業時間/票價）",
+            "url": "https://shikoku-tourism.com/en/see-and-do/10077",
+            "cat": "official"
+          },
+          {
+            "title": "南湖遊船資訊（票價/時間）",
+            "url": "https://www.my-kagawa.jp/static/en/ritsurin/viewing",
+            "cat": "official"
+          },
+          {
+            "title": "YouTube 參考影片",
+            "url": "https://www.youtube.com/watch?v=_gFA5Y7CopE",
+            "cat": "video"
           }
         ],
-        "img": ""
+        "img": "",
+        "eta": ""
       },
       {
-        "time": "09:45",
-        "title": "車程：栗林公園 → 鳴門",
-        "tag": "transport",
-        "desc": "約 1 小時 15 分鐘車程。",
-        "detail": "預估車程：09:45–11:00（約 1 小時 15 分鐘）。",
+        "type": "route",
+        "time": "09:45-11:00",
+        "title": "栗林公園 → 鳴門",
+        "desc": "",
+        "durationText": "約 75 分鐘車程",
+        "stay": "1h 15m",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "栗林公園",
+          "to": "鳴門（渦潮周邊）",
+          "minutes": 75
+        }
+      },
+      {
+        "time": "11:10",
+        "title": "第1番札所 霊山寺（四國88遍路起點）",
+        "tag": "sight",
+        "subtag": "寺院",
+        "desc": "四國遍路的出發點，能看到許多身穿白衣的遍路者準備啟程。",
+        "detail": "參拜重點：\n- 起點氛圍：納經帳、白衣等裝備\n- 若想留念：買一個小御守或納經帳\n",
+        "addr": "",
         "mapcode": "",
-        "hours": "",
+        "parking": "",
+        "hours": "08:00–17:00",
         "price": "",
-        "stay": "約 75 分",
+        "stay": "30–45 min",
         "menu": [],
         "avoid": [],
-        "guide": [],
+        "guide": [
+          "如果你打算之後再跑更多札所，這裡先買『納經帳』很有儀式感。"
+        ],
         "links": [],
-        "img": ""
+        "img": "",
+        "eta": ""
       },
       {
-        "time": "11:30",
-        "title": "鳴門漩渦（渦之道/觀潮船）",
+        "time": "12:00",
+        "title": "鳴門渦潮觀潮：船 or 渦之道（二選一或都去）",
         "tag": "sight",
-        "desc": "⚠️ 最佳大潮時間！請準時。",
-        "detail": "你筆記：03/01 最佳觀賞時間 11:30。\n選項：\n- 渦之道：門票 ¥510\n- 觀潮船：Wonder 鳴門號 ¥1800/人（依你筆記）\n\n重點：觀潮是『看時間』的景點，晚到會直接少一半震撼。",
+        "subtag": "渦潮",
+        "desc": "鳴門海峽世界級的潮汐漩渦，最佳時間依潮汐而變。",
+        "detail": "選項 A：鳴門観光汽船（うずしお観潮船）\n- Wonder 鳴門號（大型）約 1,800円\n- Aqua Eddy（小型）需預約：因引擎維護暫停至 7/11（官方公告）\n\n選項 B：渦之道（橋下步道）\n- 3/1 屬『夏季（3–9月）』：09:00–18:00（最後入場 17:30）\n- 門票：成人 510円（你備註）\n",
+        "addr": "",
         "mapcode": "",
-        "hours": "渦之道 09:00–18:00（依你筆記）",
-        "price": "渦之道 510円；觀潮船 1800円/人",
-        "stay": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "1.5–2.5 hr",
         "menu": [],
         "avoid": [
-          "觀潮是『看時間』的景點：晚到會直接少一半震撼。"
+          "渦潮最佳時間每天不同：出發前用『潮汐表』確認（觀光船官網有提供）。"
         ],
-        "guide": [],
+        "guide": [
+          "如果只能選一個：想『近距離震撼』選船；想『穩定拍照/不怕暈』選渦之道。"
+        ],
         "links": [
           {
-            "title": "鳴門観光汽船",
-            "url": "https://www.uzusio.com/tw/geton/#lnk_rat"
+            "title": "鳴門観光汽船（乘船資訊）",
+            "url": "https://www.uzusio.com/tw/geton/#lnk_rat",
+            "cat": "official"
           },
           {
-            "title": "うずしお汽船",
-            "url": "https://www.uzushio-kisen.com/"
+            "title": "鳴門観光汽船（預約）",
+            "url": "https://www.uzusio.com/en/yoyaku/",
+            "cat": "reserve"
           },
           {
-            "title": "鳴門渦之道",
-            "url": "https://www.uzunomichi.jp/lang_zh-tw/"
+            "title": "渦之道（繁中）",
+            "url": "https://www.uzunomichi.jp/lang_zh-tw/",
+            "cat": "official"
+          },
+          {
+            "title": "渦之道（英文/營業時間）",
+            "url": "https://www.uzunomichi.jp/lang_en/",
+            "cat": "official"
           }
         ],
-        "img": ""
+        "img": "",
+        "eta": ""
       },
       {
-        "time": "12:30",
-        "title": "午餐：堂の浦 Donoura Naruto",
+        "type": "route",
+        "time": "12:00-12:20",
+        "title": "鳴門周邊 → 午餐",
+        "desc": "",
+        "durationText": "約 20 分鐘車程",
+        "stay": "20 min",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "鳴門",
+          "to": "Donoura Naruto",
+          "minutes": 20
+        }
+      },
+      {
+        "time": "12:20",
+        "title": "午餐：Donoura Naruto 拉麵",
         "tag": "food",
-        "desc": "必吃鯛魚鹽味拉麵＋替飯。",
-        "detail": "推薦：鯛塩ラーメン、替飯（炸鯛魚皮飯）。\n你筆記：午間 11:00–14:00（另有晚間時段依現場）。\n若排隊，行程請預留緩衝。",
+        "subtag": "拉麵",
+        "desc": "德島人氣店，以『鯛塩ラーメン』聞名。",
+        "detail": "必點：\n- 鯛塩ラーメン（烤鯛魚骨湯＋炸鯛魚皮）\n- 替飯（把飯加起司/蛋倒入湯中變鯛魚燉飯）",
+        "addr": "",
         "mapcode": "",
-        "hours": "11:00–14:00（午間）",
+        "parking": "",
+        "hours": "11:00–14:00、18:00–20:00",
         "price": "",
-        "stay": "",
-        "menu": [
-          {
-            "jp": "鯛塩ラーメン",
-            "zh": "鯛魚鹽味拉麵"
-          },
-          {
-            "jp": "替飯",
-            "zh": "替飯（炸鯛魚皮飯，必點）"
-          }
-        ],
+        "stay": "40–60 min",
+        "menu": [],
         "avoid": [],
         "guide": [
-          "這家主打『鯛』：湯頭清爽但很有層次，替飯一定要加。"
+          "若排隊：可以先點餐券/先拍照，縮短等候。"
         ],
         "links": [],
-        "img": ""
+        "img": "",
+        "eta": ""
       },
       {
-        "time": "15:30",
-        "title": "眉山纜車（阿波舞會館 5F）",
+        "type": "route",
+        "time": "13:20-13:45",
+        "title": "午餐 → 德島市區",
+        "desc": "",
+        "durationText": "約 25 分鐘車程",
+        "stay": "25 min",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "Donoura Naruto",
+          "to": "徳島城跡",
+          "minutes": 25
+        }
+      },
+      {
+        "time": "13:45",
+        "title": "徳島城跡（德島中央公園）",
         "tag": "sight",
-        "desc": "上山看德島市景。",
-        "detail": "位於阿波舞會館 5 樓。\n你筆記：來回約 1,030円；3/1 可能到 17:30（依季節）。\n停車：阿波おどり会館 停車場（Mapcode）。",
-        "mapcode": "56 361 036*63",
-        "hours": "09:00–17:30（依季節）",
-        "price": "來回約 1,030円",
-        "stay": "",
+        "subtag": "城跡",
+        "desc": "天守已不在，但護城河與石垣仍壯觀，園內庭園是國家指定名勝。",
+        "detail": "若時間夠：可加逛『舊德島城表御殿庭園』（需另購票）。",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "30–45 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "type": "route",
+        "time": "14:15-14:30",
+        "title": "徳島城 → 王子神社",
+        "desc": "",
+        "durationText": "約 15 分鐘車程",
+        "stay": "15 min",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "徳島城跡",
+          "to": "王子神社",
+          "minutes": 15
+        }
+      },
+      {
+        "time": "14:30",
+        "title": "王子神社（貓神神社）",
+        "tag": "sight",
+        "subtag": "神社",
+        "desc": "德島人氣『貓神』神社，御守/繪馬多是貓造型。",
+        "detail": "傳說供奉為主人報仇的『阿松大明神』。\n運氣好可以遇到社貓。",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "20–40 min",
         "menu": [],
         "avoid": [],
         "guide": [],
         "links": [
           {
-            "title": "眉山纜車參考",
-            "url": "https://rebecca1003.pixnet.net/blog/post/358238850"
+            "title": "王子神社介紹（參考）",
+            "url": "https://janice.life/oujijinja/",
+            "cat": "article"
           }
         ],
-        "img": ""
+        "img": "",
+        "eta": ""
       },
       {
-        "time": "—",
-        "title": "王子神社（貓神神社，可選）",
+        "type": "route",
+        "time": "15:30-15:45",
+        "title": "王子神社 → 阿波おどり会館／眉山纜車",
+        "desc": "",
+        "durationText": "約 15 分鐘車程",
+        "stay": "15 min",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "王子神社",
+          "to": "阿波おどり会館",
+          "minutes": 15
+        }
+      },
+      {
+        "time": "15:50",
+        "title": "眉山纜車＆眉山周邊（阿波おどり会館 5F）",
         "tag": "sight",
-        "desc": "貓奴必訪，御守、繪馬、社貓。",
-        "detail": "你筆記：德島著名『貓神神社』，社務所有販賣各種貓咪造型御守、繪馬；運氣好可見社貓。",
+        "subtag": "纜車/夜景",
+        "desc": "上眉山看德島市景與夕景夜景。",
+        "detail": "票價：來回 1,030円（你備註）。\n營業時間：09:00–17:30（3/1 請留意下山時間）。",
+        "addr": "",
         "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "60–90 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "如果天氣好：接近日落前上山，視野最美。"
+        ],
+        "links": [
+          {
+            "title": "眉山纜車遊記（參考）",
+            "url": "https://rebecca1003.pixnet.net/blog/post/358238850",
+            "cat": "article"
+          }
+        ],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "time": "18:30",
+        "title": "晚餐：骨付鳥 一鶴",
+        "tag": "food",
+        "subtag": "名物",
+        "desc": "四國名物『骨付鳥』代表店，外皮香脆、肉汁多。",
+        "detail": "點餐建議：\n- おや（成雞）：更有嚼勁\n- ひな（嫩雞）：更軟嫩",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "60–90 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "type": "route",
+        "time": "20:30",
+        "title": "徳島 → 高松（回民宿）",
+        "desc": "",
+        "durationText": "約 1 小時45 分鐘車程",
+        "stay": "1h 45m",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "徳島市區",
+          "to": "Second Home 瀬戸風月",
+          "minutes": 105
+        }
+      },
+      {
+        "time": "22:30",
+        "title": "住宿：瀬戸風月（民宿）",
+        "tag": "hotel",
+        "subtag": "",
+        "desc": "第三晚：返回民宿休息。",
+        "detail": "",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
         "hours": "",
         "price": "",
         "stay": "",
         "menu": [],
         "avoid": [],
         "guide": [],
-        "links": [
-          {
-            "title": "王子神社介紹",
-            "url": "https://janice.life/oujijinja/"
-          }
-        ],
-        "img": ""
+        "links": [],
+        "img": "",
+        "eta": ""
       }
-    ]
+    ],
+    "route": {
+      "mode": "drive",
+      "points": [
+        {
+          "q": "Second Home 瀬戸風月"
+        },
+        {
+          "q": "栗林公園"
+        },
+        {
+          "q": "霊山寺"
+        },
+        {
+          "q": "鳴門観光汽船"
+        },
+        {
+          "q": "鳴門渦之道"
+        },
+        {
+          "q": "Donoura Naruto"
+        },
+        {
+          "q": "徳島城跡"
+        },
+        {
+          "q": "王子神社"
+        },
+        {
+          "q": "阿波おどり会館"
+        },
+        {
+          "q": "Second Home 瀬戸風月"
+        }
+      ],
+      "preview": {
+        "center": "34.10,134.55",
+        "zoom": 9
+      }
+    }
   }
 ]

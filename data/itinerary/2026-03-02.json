@@ -2,92 +2,396 @@
   {
     "date": "03/02",
     "day": "一",
-    "loc": "松山",
+    "loc": "高松 → 愛媛（松山・道後）",
     "hotel_id": "H2",
+    "photos": [
+      {
+        "src": "/photos/day4/01.jpg",
+        "loc": "長田 in 香の香",
+        "caption": "釜揚げうどん"
+      },
+      {
+        "src": "/photos/day4/02.jpg",
+        "loc": "丸亀城",
+        "caption": "高石垣"
+      },
+      {
+        "src": "/photos/day4/03.jpg",
+        "loc": "高屋神社",
+        "caption": "天空鳥居"
+      },
+      {
+        "src": "/photos/day4/04.jpg",
+        "loc": "道後溫泉",
+        "caption": "明治浪漫"
+      }
+    ],
     "items": [
       {
+        "type": "route",
+        "time": "08:00-08:45",
+        "title": "民宿 → 長田 in 香の香",
+        "desc": "",
+        "durationText": "約 35 分鐘車程",
+        "stay": "35 min",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "Second Home 瀬戸風月",
+          "to": "長田 in 香の香",
+          "minutes": 35
+        }
+      },
+      {
         "time": "08:45",
-        "title": "長田 in 香の香（早餐）",
+        "title": "早餐：長田 in 香の香（釜あげうどん）",
         "tag": "food",
-        "desc": "百名店 No.2。釜揚烏龍麵。",
-        "detail": "你筆記重點：\n- 平日早上也會排隊\n- 點餐動線：先看菜單→拿配菜→櫃檯點餐結帳→拿號碼牌回座位→茶水自取\n- 釜揚烏龍麵約需等待 15 分鐘\n營業：09:00–15:00（週三、週四休）。",
-        "mapcode": "77 132 233*36",
+        "subtag": "烏龍麵",
+        "desc": "百名店高分名店，釜揚げ烏龍麵代表。",
+        "detail": "你整理的點餐流程（保留）：\n1) 看菜單選釜揚げ/冷烏龍麵\n2) 自取飯糰/壽司等配菜\n3) 櫃檯點麵並結帳\n4) 拿號碼牌回座\n5) 茶水/沾醬碗自取",
+        "addr": "香川県善通寺市金蔵寺町本村1180",
+        "mapcode": "",
+        "parking": "",
         "hours": "09:00–15:00（週三、週四休）",
         "price": "",
-        "stay": "",
-        "menu": [
-          {
-            "jp": "釜あげうどん",
-            "zh": "釜揚烏龍麵（大/小）"
-          }
-        ],
-        "avoid": [],
-        "guide": [
-          "香川烏龍麵名店：排隊速度快，點餐也快，節奏跟上就對了。"
-        ],
-        "links": [
-          {
-            "title": "長田 in 香の香 食記",
-            "url": "https://www.bigfang.tw/blog/post/kanoka-udon-kagawa"
-          }
-        ],
-        "img": ""
-      },
-      {
-        "time": "10:30",
-        "title": "丸龜城",
-        "tag": "sight",
-        "desc": "現存天守，好漢坡。",
-        "detail": "你筆記：日本第一高石垣、現存最小天守。\n門票：天守約 200円；園區散步免費。\n營業：通常 09:00–16:30（依現場）。",
-        "mapcode": "",
-        "hours": "",
-        "price": "天守 200円",
-        "stay": "",
+        "stay": "60–90 min",
         "menu": [],
         "avoid": [],
-        "guide": [],
+        "guide": [
+          "假日人潮很誇張：你安排 08:45 前抵達很漂亮。"
+        ],
         "links": [
           {
-            "title": "丸龜城介紹",
-            "url": "https://journey.tw/marugame-jo/"
+            "title": "食記參考",
+            "url": "https://www.bigfang.tw/blog/post/kanoka-udon-kagawa",
+            "cat": "article"
           }
         ],
-        "img": ""
+        "img": "",
+        "eta": ""
       },
       {
-        "time": "15:00",
-        "title": "松山城 & 纜車/吊椅",
+        "time": "10:15",
+        "title": "第76番札所 金倉寺（對面順路）",
         "tag": "sight",
-        "desc": "搭單人吊椅上山。",
-        "detail": "你筆記：推薦上山搭『單人吊椅』、下山搭纜車。\n票價：套票 520円（纜車+天守）。",
+        "subtag": "寺院",
+        "desc": "烏龍麵名店對面就是札所，可順路參拜。",
+        "detail": "",
+        "addr": "",
         "mapcode": "",
+        "parking": "",
         "hours": "",
-        "price": "套票 520円（纜車+天守）",
-        "stay": "",
+        "price": "",
+        "stay": "20–30 min",
         "menu": [],
         "avoid": [],
         "guide": [],
         "links": [],
-        "img": ""
+        "img": "",
+        "eta": ""
       },
       {
-        "time": "18:00",
-        "title": "道後溫泉",
+        "type": "route",
+        "time": "10:45",
+        "title": "金倉寺 → 丸亀城",
+        "desc": "",
+        "durationText": "約 20 分鐘車程",
+        "stay": "20 min",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "金倉寺",
+          "to": "丸亀城",
+          "minutes": 20
+        }
+      },
+      {
+        "time": "11:10",
+        "title": "丸亀城（百大名城）",
         "tag": "sight",
-        "desc": "少爺機關鐘、神隱少女湯屋。",
-        "detail": "你筆記：整點有少爺機關鐘表演；必逛伊織毛巾。\n本館非常熱門，建議先確認整理券/排隊狀況。",
+        "subtag": "城",
+        "desc": "以『日本第一高石垣』與『現存最小天守』聞名。",
+        "detail": "必看：\n- 扇形高石垣\n- 登天守俯瞰丸龜市景\n- 大手一之門 / 太鼓門\n\n門票：天守約 200円（園區散步免費）",
+        "addr": "",
         "mapcode": "",
+        "parking": "",
+        "hours": "09:00–16:30（常見時段）",
+        "price": "",
+        "stay": "60–90 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [
+          {
+            "title": "景點介紹（參考）",
+            "url": "https://journey.tw/marugame-jo/",
+            "cat": "article"
+          }
+        ],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "type": "route",
+        "time": "12:45",
+        "title": "丸亀城 → 高屋神社（天空鳥居）",
+        "desc": "",
+        "durationText": "約 50 分鐘車程",
+        "stay": "50 min",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "丸亀城",
+          "to": "高屋神社",
+          "minutes": 50
+        }
+      },
+      {
+        "time": "13:45",
+        "title": "高屋神社（天空鳥居）",
+        "tag": "sight",
+        "subtag": "神社/絕景",
+        "desc": "標高 404m 的『天空鳥居』，鳥居框住瀨戶內海景色。",
+        "detail": "交通提醒：\n- 平日可開車上山頂停車場（山路狹窄，會車需小心）\n- 不想冒險：停下宮停車場，徒步約 30–50 分鐘",
+        "addr": "",
+        "mapcode": "",
+        "parking": "仁尾方面展望所/停車場",
+        "hours": "",
+        "price": "",
+        "stay": "45–75 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "若你喜歡夕陽：可把此點安排接近日落，但要留意回程山路視線。"
+        ],
+        "links": [],
+        "img": "",
+        "highlight": true,
+        "eta": ""
+      },
+      {
+        "type": "route",
+        "time": "15:10",
+        "title": "高屋神社 → 錢形沙畫（琴弾公園）",
+        "desc": "",
+        "durationText": "約 25 分鐘車程",
+        "stay": "25 min",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "高屋神社",
+          "to": "琴弾公園 銭形砂絵",
+          "minutes": 25
+        }
+      },
+      {
+        "time": "15:40",
+        "title": "錢形沙畫（寬永通寶）",
+        "tag": "sight",
+        "subtag": "展望台",
+        "desc": "巨大銅錢形沙繪，傳說看見可健康長壽、財運亨通。",
+        "detail": "要上到『琴彈公園山頂展望台』才能看清全貌。\n夜間通常有打燈（約至 22:00）。",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "24小時（夜間點燈）",
+        "price": "",
+        "stay": "30–45 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "type": "route",
+        "time": "16:30",
+        "title": "琴弾公園 → 松山市區（加油/午餐）",
+        "desc": "",
+        "durationText": "約 1 小時50 分鐘車程",
+        "stay": "1h 50m",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "琴弾公園",
+          "to": "松山市區",
+          "minutes": 110
+        }
+      },
+      {
+        "time": "18:30",
+        "title": "加油：SOLATO セルフ樽味 SS（佐竹石油）",
+        "tag": "transport",
+        "subtag": "加油站",
+        "desc": "進溫泉區前先加滿油，松山市區自助加油站。",
+        "detail": "",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "07:30–21:00",
+        "price": "",
+        "stay": "10–15 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "time": "19:00",
+        "title": "晚餐/傍晚餐：宇和島鯛めし もとやま",
+        "tag": "food",
+        "subtag": "鄉土料理",
+        "desc": "愛媛南予名物『宇和島鯛魚飯』（生魚片＋蛋醬油拌飯）。",
+        "detail": "",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "11:00–20:00（最後點餐 19:30）",
+        "price": "",
+        "stay": "60 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "若想更飽：可再加點天婦羅或小菜。"
+        ],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "time": "20:15",
+        "title": "松山城（纜車/吊椅）",
+        "tag": "sight",
+        "subtag": "城",
+        "desc": "現存十二天守之一，360°俯瞰松山市。",
+        "detail": "推薦玩法：上山搭吊椅、下山搭纜車（或反過來）。",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "纜車/吊椅 約 08:30–17:30（季節略有差）",
+        "price": "天守 520円；纜車/吊椅 往返 520円（參考）",
+        "stay": "60–90 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "time": "21:30",
+        "title": "道後溫泉街散步（少爺機關鐘/伴手禮）",
+        "tag": "sight",
+        "subtag": "溫泉街",
+        "desc": "明治浪漫氛圍的拱廊商店街。",
+        "detail": "亮點：\n- 少爺機關鐘（整點演出）\n- 愛媛柑橘果汁、今治毛巾、一六塔",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "多數店家 09:00–21:00（依店家）",
+        "price": "",
+        "stay": "45–75 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "time": "22:15",
+        "title": "道後溫泉本館 & 空之散步道（足湯）",
+        "tag": "sight",
+        "subtag": "溫泉",
+        "desc": "道後象徵性建築（2024 全館重新開放），旁邊有免費足湯展望步道。",
+        "detail": "注意：本館人氣高，若想入浴建議先確認整理券/排隊狀況。",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "06:00–23:00（最後入場 22:30）",
+        "price": "",
+        "stay": "60–120 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "傍晚點燈後拍本館外觀超美；足湯區可拍到全景。"
+        ],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "time": "23:30",
+        "title": "入住：Hotel Kowakuen Haruka",
+        "tag": "hotel",
+        "subtag": "",
+        "desc": "入住時間 15:00–19:30（你備註：02/25 前確認）",
+        "detail": "方案：日式房＋雙人房（單人） $14500",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
         "hours": "",
         "price": "",
         "stay": "",
         "menu": [],
         "avoid": [],
-        "guide": [
-          "整點有少爺機關鐘表演；必逛伊織毛巾。"
-        ],
+        "guide": [],
         "links": [],
-        "img": ""
+        "img": "",
+        "eta": ""
       }
-    ]
+    ],
+    "route": {
+      "mode": "drive",
+      "points": [
+        {
+          "q": "Second Home 瀬戸風月"
+        },
+        {
+          "q": "長田 in 香の香"
+        },
+        {
+          "q": "金倉寺"
+        },
+        {
+          "q": "丸亀城"
+        },
+        {
+          "q": "高屋神社（天空鳥居）"
+        },
+        {
+          "q": "琴弾公園 銭形砂絵"
+        },
+        {
+          "q": "宇和島鯛めし もとやま"
+        },
+        {
+          "q": "松山城"
+        },
+        {
+          "q": "道後温泉本館"
+        },
+        {
+          "q": "Hotel Kowakuen Haruka"
+        }
+      ],
+      "preview": {
+        "center": "33.84,133.00",
+        "zoom": 8
+      }
+    }
   }
 ]

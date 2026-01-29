@@ -2,73 +2,259 @@
   {
     "date": "03/03",
     "day": "二",
-    "loc": "高知",
+    "loc": "愛媛（道後）→ 高知",
     "hotel_id": "H3",
+    "photos": [
+      {
+        "src": "/photos/day5/01.jpg",
+        "loc": "下灘駅",
+        "caption": "海上列車感"
+      },
+      {
+        "src": "/photos/day5/02.jpg",
+        "loc": "大洲城",
+        "caption": "木造復原天守"
+      },
+      {
+        "src": "/photos/day5/03.jpg",
+        "loc": "弘人市場",
+        "caption": "高知人的廚房"
+      },
+      {
+        "src": "/photos/day5/04.jpg",
+        "loc": "OMO7 高知",
+        "caption": "星野飯店"
+      }
+    ],
     "items": [
       {
-        "time": "10:00",
-        "title": "下灘車站",
-        "tag": "sight",
-        "desc": "神隱少女海上鐵道。",
-        "detail": "無人小站很好拍，注意停車與人流。",
+        "time": "06:30",
+        "title": "早餐：湯之町烘焙坊（Yunomachi Bakery）",
+        "tag": "food",
+        "subtag": "麵包",
+        "desc": "道後商店街內人氣麵包店，適合外帶。",
+        "detail": "推薦：道後咖哩麵包、愛媛柑橘丹麥。",
+        "addr": "",
         "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "20–30 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "time": "07:10",
+        "title": "道後溫泉街補買/散步（伴手禮清單）",
+        "tag": "shop",
+        "subtag": "商店街",
+        "desc": "把想買的店一次掃完。",
+        "detail": "你列的必逛：\n- 愛媛の食卓1970（柑橘試飲）\n- 一六本舖（一六塔）\n- 橡子共和國（どんぐりの森）\n- 伊織（今治毛巾）",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "45–75 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "type": "route",
+        "time": "08:30-09:45",
+        "title": "道後 → 下灘駅",
+        "desc": "",
+        "durationText": "約 1 小時15 分鐘車程",
+        "stay": "1h 15m",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "道後温泉",
+          "to": "下灘駅",
+          "minutes": 75
+        }
+      },
+      {
+        "time": "09:45",
+        "title": "下灘駅（海邊無人車站）",
+        "tag": "sight",
+        "subtag": "車站/絕景",
+        "desc": "青春18車票海報名景，月台對面就是伊予灘海景。",
+        "detail": "注意：停車位少（約5–6台），不要走到軌道上拍照。",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "全日開放",
+        "price": "",
+        "stay": "30–45 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "highlight": true,
+        "eta": ""
+      },
+      {
+        "type": "route",
+        "time": "10:30-11:15",
+        "title": "下灘駅 → 大洲城",
+        "desc": "",
+        "durationText": "約 45 分鐘車程",
+        "stay": "45 min",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "下灘駅",
+          "to": "大洲城",
+          "minutes": 45
+        }
+      },
+      {
+        "time": "11:15",
+        "title": "大洲城（木造完全復原天守）",
+        "tag": "sight",
+        "subtag": "城",
+        "desc": "少數『木造完全復原』的天守，展現現代匠人重現江戶建築的工藝。",
+        "detail": "",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "09:00–17:00（最後入場 16:30）",
+        "price": "成人 550円",
+        "stay": "60–90 min",
+        "menu": [],
+        "avoid": [
+          "樓梯陡峭：穿好走的鞋。"
+        ],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "time": "12:45",
+        "title": "午餐：大洲爐端 油屋（赤煉瓦館旁）",
+        "tag": "food",
+        "subtag": "鄉土料理",
+        "desc": "古倉庫改建，氣氛很棒。",
+        "detail": "必吃：豚栗飯（Tonkuri Mabushi）三吃。",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "11:30–14:30",
+        "price": "",
+        "stay": "60–75 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "抵達大洲後先候位再逛周邊，更省時間。"
+        ],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "type": "route",
+        "time": "14:30-16:30",
+        "title": "大洲 → 高知市區",
+        "desc": "",
+        "durationText": "約 2 小時車程",
+        "stay": "2h",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "大洲",
+          "to": "高知市（ひろめ市場）",
+          "minutes": 120
+        }
+      },
+      {
+        "time": "17:30",
+        "title": "晚餐：弘人市場（ひろめ市場）",
+        "tag": "food",
+        "subtag": "美食廣場",
+        "desc": "高知人的廚房，60+攤位共食型市場。",
+        "detail": "攻略：\n- 先佔位再去點餐\n- 推薦：明神丸 炙燒鰹魚（鹽味）、屋台餃子 安兵衛、竹輪小黃瓜、生吻仔魚\n",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "各店不同（多數至晚間）",
+        "price": "",
+        "stay": "1.5–2.5 hr",
+        "menu": [],
+        "avoid": [
+          "人多時很難找位：先繞一圈看哪裡快空桌。"
+        ],
+        "guide": [
+          "想要少排隊：避開 18:30–20:00 尖峰。"
+        ],
+        "links": [],
+        "img": "",
+        "highlight": true,
+        "eta": ""
+      },
+      {
+        "time": "20:30",
+        "title": "入住：OMO7 高知 by 星野集團",
+        "tag": "hotel",
+        "subtag": "",
+        "desc": "入住 15:00–24:00（你備註：02/08 前確認）",
+        "detail": "",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
         "hours": "",
         "price": "",
         "stay": "",
         "menu": [],
         "avoid": [],
-        "guide": [
-          "無人小站很好拍，注意停車與人流。"
-        ],
-        "links": [],
-        "img": ""
-      },
-      {
-        "time": "13:00",
-        "title": "大洲城 & 油屋（午餐：豚栗飯）",
-        "tag": "food",
-        "desc": "午餐吃豚栗飯。",
-        "detail": "午餐：豚栗めし（Tonkuri）。",
-        "mapcode": "",
-        "hours": "",
-        "price": "",
-        "stay": "",
-        "menu": [
-          {
-            "jp": "豚栗めし",
-            "zh": "豚肉栗子蓋飯"
-          }
-        ],
-        "avoid": [],
         "guide": [],
         "links": [],
-        "img": ""
-      },
-      {
-        "time": "19:00",
-        "title": "弘人市場（晚餐）",
-        "tag": "food",
-        "desc": "高知人的廚房！",
-        "detail": "先佔位子再點餐。吃完餐盤放桌上即可。",
-        "mapcode": "",
-        "hours": "",
-        "price": "",
-        "stay": "",
-        "menu": [
-          {
-            "jp": "鰹のタタキ（塩）",
-            "zh": "炙燒鰹魚（鹽味）"
-          },
-          {
-            "jp": "屋台餃子",
-            "zh": "屋台餃子（安兵衛系）"
-          }
-        ],
-        "avoid": [],
-        "guide": [],
-        "links": [],
-        "img": ""
+        "img": "",
+        "eta": ""
       }
-    ]
+    ],
+    "route": {
+      "mode": "drive",
+      "points": [
+        {
+          "q": "道後温泉街"
+        },
+        {
+          "q": "下灘駅"
+        },
+        {
+          "q": "大洲城"
+        },
+        {
+          "q": "大洲爐端 油屋"
+        },
+        {
+          "q": "ひろめ市場"
+        },
+        {
+          "q": "OMO7 高知 by 星野集團"
+        }
+      ],
+      "preview": {
+        "center": "33.40,133.50",
+        "zoom": 7
+      }
+    }
   }
 ]

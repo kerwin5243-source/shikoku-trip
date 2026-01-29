@@ -2,34 +2,156 @@
   {
     "date": "03/07",
     "day": "六",
-    "loc": "返台",
-    "hotel_id": "H4",
-    "items": [
+    "loc": "琴平 → 高松（機場返程）",
+    "hotel_id": "H0",
+    "photos": [
       {
-        "time": "09:00",
-        "title": "高松機場",
-        "tag": "transport",
-        "desc": "還車、逛免稅店。",
-        "detail": "自駕還車＋加油通常耗時，建議提早到機場。",
-        "mapcode": "",
-        "hours": "",
-        "price": "",
-        "stay": "",
-        "menu": [],
-        "avoid": [],
-        "guide": [
-          "自駕還車＋加油通常耗時，建議提早到機場。"
-        ],
-        "links": [],
-        "img": ""
+        "src": "/photos/day9/01.jpg",
+        "loc": "金刀比羅宮",
+        "caption": "清晨參拜"
       },
       {
-        "time": "18:55",
-        "title": "CI 179 起飛",
-        "tag": "transport",
-        "desc": "帶著滿滿回憶回家！",
-        "detail": "高松→台北（TPE）。",
+        "src": "/photos/day9/02.jpg",
+        "loc": "參道",
+        "caption": "伴手禮最後補貨"
+      },
+      {
+        "src": "/photos/day9/03.jpg",
+        "loc": "高松市區",
+        "caption": "最後逛街"
+      },
+      {
+        "src": "/photos/day9/04.jpg",
+        "loc": "高松空港",
+        "caption": "回程"
+      }
+    ],
+    "items": [
+      {
+        "time": "06:30",
+        "title": "清晨可選：金刀比羅宮參拜（避免人潮）",
+        "tag": "sight",
+        "subtag": "神社",
+        "desc": "住在參道旁的最大優勢：清晨爬階梯最舒服。",
+        "detail": "小提醒：\n- 階梯多，穿好走的鞋\n- 可視體力到本宮或再上奧社\n- 清晨人少更好拍照",
+        "addr": "",
         "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "1.5–2.5 hr",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "highlight": true,
+        "eta": ""
+      },
+      {
+        "time": "09:30",
+        "title": "退房：御宿 敷島館",
+        "tag": "hotel",
+        "subtag": "",
+        "desc": "整理行李、確認伴手禮與退稅單據。",
+        "detail": "",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "20–30 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "type": "route",
+        "time": "10:00-11:00",
+        "title": "琴平 → 高松市區",
+        "desc": "",
+        "durationText": "約 60 分鐘車程",
+        "stay": "1h",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "琴平",
+          "to": "高松市（丸亀町/高松站周邊）",
+          "minutes": 60
+        }
+      },
+      {
+        "time": "11:15",
+        "title": "高松市區最後採買（丸龜町/車站周邊）",
+        "tag": "shop",
+        "subtag": "商店街",
+        "desc": "補齊藥妝、土產、漏買的周邊。",
+        "detail": "如果你前兩天沒買完：可再去 Pokémon Center / Loft / 丸龜町商店街。",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "60–120 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "type": "route",
+        "time": "13:30-14:00",
+        "title": "高松市區 → 高松空港（還車/報到）",
+        "desc": "",
+        "durationText": "約 30 分鐘車程",
+        "stay": "30 min",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "高松市",
+          "to": "高松空港",
+          "minutes": 30
+        }
+      },
+      {
+        "time": "—",
+        "title": "高松空港：還車 / 報到 / 免稅店",
+        "tag": "transport",
+        "subtag": "機場",
+        "desc": "預留時間辦理還車與國際線報到。",
+        "detail": "建議：\n- 還車後到航廈移動可能需要接駁\n- 提早到可以買最後的伴手禮/吃個輕食",
+        "addr": "Konanchooka, 高松市香川縣 761-1401 日本",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "2–3 hr",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "time": "—",
+        "title": "回程航班",
+        "tag": "transport",
+        "subtag": "飛機",
+        "desc": "（填入班機/起降時間）",
+        "detail": "若你願意，我也可以把航班資訊補進 JSON（含報到提醒/行李提示）。",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
         "hours": "",
         "price": "",
         "stay": "",
@@ -37,8 +159,30 @@
         "avoid": [],
         "guide": [],
         "links": [],
-        "img": ""
+        "img": "",
+        "eta": ""
       }
-    ]
+    ],
+    "route": {
+      "mode": "drive",
+      "points": [
+        {
+          "q": "御宿 敷島館"
+        },
+        {
+          "q": "金刀比羅宮"
+        },
+        {
+          "q": "高松市區"
+        },
+        {
+          "q": "高松空港"
+        }
+      ],
+      "preview": {
+        "center": "34.20,134.05",
+        "zoom": 9
+      }
+    }
   }
 ]

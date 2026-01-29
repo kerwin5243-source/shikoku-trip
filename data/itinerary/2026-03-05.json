@@ -2,86 +2,342 @@
   {
     "date": "03/05",
     "day": "四",
-    "loc": "高知市",
+    "loc": "高知市內＋近郊",
     "hotel_id": "H3",
+    "photos": [
+      {
+        "src": "/photos/day7/01.jpg",
+        "loc": "高知城",
+        "caption": "現存十二天守"
+      },
+      {
+        "src": "/photos/day7/02.jpg",
+        "loc": "桂濱",
+        "caption": "坂本龍馬像"
+      },
+      {
+        "src": "/photos/day7/03.jpg",
+        "loc": "鰹魚稻草燒",
+        "caption": "DIY 体験"
+      },
+      {
+        "src": "/photos/day7/04.jpg",
+        "loc": "五台山",
+        "caption": "夕景夜景"
+      }
+    ],
     "items": [
+      {
+        "time": "07:00",
+        "title": "早餐：OMO7 buffet",
+        "tag": "food",
+        "subtag": "飯店早餐",
+        "desc": "主題『Tosa Country Breakfast』，名物鰹魚漬丼。",
+        "detail": "",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "45–60 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
       {
         "time": "09:00",
         "title": "高知城",
         "tag": "sight",
-        "desc": "追手門與天守同框。",
-        "detail": "追手門與天守同框的經典角度必拍。",
+        "subtag": "城",
+        "desc": "現存十二天守之一，也是唯一能把追手門與天守同框拍到的城。",
+        "detail": "營業時間：09:00–17:00（最後入場 16:30）\n門票：成人約 500円（各來源可能略有差）",
+        "addr": "",
         "mapcode": "",
+        "parking": "",
         "hours": "",
-        "price": "420円",
-        "stay": "",
+        "price": "",
+        "stay": "60–90 min",
         "menu": [],
-        "avoid": [],
+        "avoid": [
+          "需脫鞋入天守，階梯陡。"
+        ],
         "guide": [],
-        "links": [],
-        "img": ""
-      },
-      {
-        "time": "11:00",
-        "title": "桂濱公園",
-        "tag": "sight",
-        "desc": "坂本龍馬像、水族館。",
-        "detail": "海流湍急，嚴禁游泳，請勿太靠近海浪。",
-        "mapcode": "",
-        "hours": "",
-        "price": "",
-        "stay": "",
-        "menu": [],
-        "avoid": [],
-        "guide": [
-          "龍馬像＋海岸線很好拍；風大要顧帽子。"
-        ],
-        "links": [],
-        "img": ""
-      },
-      {
-        "time": "14:00",
-        "title": "牧野植物園",
-        "tag": "sight",
-        "desc": "日劇《爛漫》場景。",
-        "detail": "建築與溫室很好拍，安排 1.5–2 小時舒服。",
-        "mapcode": "",
-        "hours": "",
-        "price": "",
-        "stay": "",
-        "menu": [],
-        "avoid": [],
-        "guide": [
-          "建築與溫室很好拍，安排 1.5–2 小時舒服。"
-        ],
-        "links": [],
-        "img": ""
-      },
-      {
-        "time": "19:00",
-        "title": "土佐料理 司",
-        "tag": "food",
-        "desc": "百年老店。",
-        "detail": "百年老店，想吃皿鉢料理可點。",
-        "mapcode": "",
-        "hours": "",
-        "price": "",
-        "stay": "",
-        "menu": [
+        "links": [
           {
-            "jp": "皿鉢料理",
-            "zh": "土佐大拼盤"
+            "title": "高知城資訊（營業時間/票價）",
+            "url": "https://shikoku-tourism.com/en/see-and-do/10061",
+            "cat": "official"
           },
           {
-            "jp": "鯨料理",
-            "zh": "鯨魚料理（想嘗鮮可點）"
+            "title": "高知城介紹",
+            "url": "https://shikoku-guide.com/en/information/kochicastle/",
+            "cat": "official"
           }
         ],
+        "img": "",
+        "highlight": true,
+        "eta": ""
+      },
+      {
+        "type": "route",
+        "time": "10:45",
+        "title": "高知城 → 桂浜/鰹魚道場",
+        "desc": "",
+        "durationText": "約 25 分鐘車程",
+        "stay": "25 min",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "高知城",
+          "to": "桂浜方面",
+          "minutes": 25
+        }
+      },
+      {
+        "time": "11:15",
+        "title": "午餐&體驗：鰹魚船（Katsuo Bune）土佐塔塔基道場",
+        "tag": "food",
+        "subtag": "體驗",
+        "desc": "招牌是『稻草燒鰹魚 DIY』，現烤現切現吃。",
+        "detail": "預算：1,500–2,000円（你備註）。\n體驗完可直接當午餐。",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "60–90 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "喜歡拍照的話：稻草火焰很壯觀，先把手機/相機準備好。"
+        ],
+        "links": [],
+        "img": "",
+        "highlight": true,
+        "eta": ""
+      },
+      {
+        "time": "13:00",
+        "title": "桂濱公園（坂本龍馬像 / 龍王岬）",
+        "tag": "sight",
+        "subtag": "海岸",
+        "desc": "高知最知名海岸景點，太平洋海景＋龍馬銅像。",
+        "detail": "亮點：\n- 坂本龍馬像\n- 龍王宮/展望台看海平線\n\n注意：海流湍急，禁止游泳。",
+        "addr": "",
+        "mapcode": "",
+        "parking": "停車場約 400円（參考）",
+        "hours": "",
+        "price": "",
+        "stay": "60–90 min",
+        "menu": [],
         "avoid": [],
         "guide": [],
         "links": [],
-        "img": ""
+        "img": "",
+        "eta": ""
+      },
+      {
+        "time": "14:30",
+        "title": "桂濱水族館",
+        "tag": "sight",
+        "subtag": "水族館",
+        "desc": "以『與動物零距離』爆紅，餵食體驗很有趣。",
+        "detail": "門票：成人 1,600円（你備註）。",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "09:00–17:00",
+        "price": "",
+        "stay": "60–90 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "如果時間緊：優先看餵食時段（海象/水獺/企鵝等）。"
+        ],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "type": "route",
+        "time": "16:00",
+        "title": "桂浜 → 五台山（牧野植物園/竹林寺）",
+        "desc": "",
+        "durationText": "約 20 分鐘車程",
+        "stay": "20 min",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "桂浜",
+          "to": "五台山",
+          "minutes": 20
+        }
+      },
+      {
+        "time": "16:30",
+        "title": "牧野植物園",
+        "tag": "sight",
+        "subtag": "植物園",
+        "desc": "紀念牧野富太郎，溫室與建築設計很有質感。",
+        "detail": "",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "09:00–17:00（最後入園 16:30）",
+        "price": "成人 730円",
+        "stay": "60–90 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "time": "17:45",
+        "title": "竹林寺（第31番札所）",
+        "tag": "sight",
+        "subtag": "寺院",
+        "desc": "五重塔＋名勝庭園，高知的學問與賞楓名所。",
+        "detail": "寶物館/庭園：08:30–17:00（庭園拜觀費 400円）。",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "45–60 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "time": "18:10",
+        "title": "五台山夜景（建議 17:30–18:30 抵達）",
+        "tag": "sight",
+        "subtag": "夜景",
+        "desc": "高知市區夜景首選，夕陽到入夜一次收。",
+        "detail": "3月初日落約 18:10（依當日略有差）。",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "30–45 min",
+        "menu": [],
+        "avoid": [
+          "若展望台整修，旁邊臨時展望台仍可看景。"
+        ],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "type": "route",
+        "time": "19:00",
+        "title": "五台山 → 市區晚餐",
+        "desc": "",
+        "durationText": "約 20 分鐘車程",
+        "stay": "20 min",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "五台山",
+          "to": "土佐料理 司",
+          "minutes": 20
+        }
+      },
+      {
+        "time": "19:30",
+        "title": "晚餐：土佐料理 司（Tsukasa）高知本店",
+        "tag": "food",
+        "subtag": "會席/鄉土料理",
+        "desc": "百年老舖，安靜有包廂，和弘人市場完全不同氛圍。",
+        "detail": "必吃：鰹魚半敲燒、鯨魚料理、海苔天婦羅。",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "90–120 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "time": "22:00",
+        "title": "住宿：OMO7 高知",
+        "tag": "hotel",
+        "subtag": "",
+        "desc": "連住第3晚。",
+        "detail": "",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
       }
-    ]
+    ],
+    "route": {
+      "mode": "drive",
+      "points": [
+        {
+          "q": "OMO7 高知"
+        },
+        {
+          "q": "高知城"
+        },
+        {
+          "q": "桂浜公園"
+        },
+        {
+          "q": "土佐タタキ道場"
+        },
+        {
+          "q": "桂浜水族館"
+        },
+        {
+          "q": "牧野植物園"
+        },
+        {
+          "q": "竹林寺"
+        },
+        {
+          "q": "五台山展望台"
+        },
+        {
+          "q": "土佐料理 司 高知本店"
+        },
+        {
+          "q": "OMO7 高知"
+        }
+      ],
+      "preview": {
+        "center": "33.55,133.55",
+        "zoom": 10
+      }
+    }
   }
 ]

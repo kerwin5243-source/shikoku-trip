@@ -2,45 +2,207 @@
   {
     "date": "03/04",
     "day": "三",
-    "loc": "四萬十",
+    "loc": "高知 → 四萬十 → 高知",
     "hotel_id": "H3",
-    "items": [
+    "photos": [
       {
-        "time": "10:30",
-        "title": "四萬十川",
-        "tag": "sight",
-        "desc": "佐田沉下橋、單車、屋形船。",
-        "detail": "日本最後的清流，建議租腳踏車漫遊。\n拍照點：佐田沈下橋周邊，注意會車。",
-        "mapcode": "",
-        "hours": "",
-        "price": "",
-        "stay": "",
-        "menu": [],
-        "avoid": [],
-        "guide": [
-          "拍照點：沉下橋（佐田沈下橋）周邊，注意會車。"
-        ],
-        "links": [],
-        "img": ""
+        "src": "/photos/day6/01.jpg",
+        "loc": "四萬十川",
+        "caption": "日本最後清流"
       },
       {
-        "time": "18:00",
-        "title": "俺の串",
+        "src": "/photos/day6/02.jpg",
+        "loc": "沈下橋",
+        "caption": "無欄杆的橋"
+      },
+      {
+        "src": "/photos/day6/03.jpg",
+        "loc": "單車道",
+        "caption": "河畔騎行"
+      },
+      {
+        "src": "/photos/day6/04.jpg",
+        "loc": "高知市區",
+        "caption": "回到市區晚餐"
+      }
+    ],
+    "items": [
+      {
+        "time": "07:00",
+        "title": "早餐：OMO7 buffet",
         "tag": "food",
-        "desc": "日式串燒晚餐。",
-        "detail": "當地串燒店，想吃到熱門品項建議早點到。",
+        "subtag": "飯店早餐",
+        "desc": "星野飯店早餐（07:00–10:00）。",
+        "detail": "",
+        "addr": "",
         "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "45–60 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "type": "route",
+        "time": "08:30-10:30",
+        "title": "高知 → 四萬十市",
+        "desc": "",
+        "durationText": "約 2 小時車程",
+        "stay": "2h",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "高知市",
+          "to": "四万十市",
+          "minutes": 120
+        }
+      },
+      {
+        "time": "10:30",
+        "title": "四萬十市觀光協會：租腳踏車 / 取資訊",
+        "tag": "activity",
+        "subtag": "租車/資訊",
+        "desc": "租車後沿四萬十川騎行，搭配沈下橋與河景點。",
+        "detail": "你提供：\n- 單車租借 ¥1,000–2,000 / 5HR\n- 建議河畔來回約 2H\n- 也可加上屋形船約 50 分鐘",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "20–30 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [
+          "若只選一座沈下橋：『佐田沈下橋』最具代表性，也最好拍。"
+        ],
+        "links": [
+          {
+            "title": "四萬十川影片（參考）",
+            "url": "https://youtube.com/watch?v=6IbtEVRo1u0&list=PLcfycscXY9oOFDEIi1EZipgXbSdcDbQNK&index=7",
+            "cat": "video"
+          }
+        ],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "time": "11:00-15:30",
+        "title": "四萬十川單車路線（建議順序）",
+        "tag": "activity",
+        "subtag": "單車",
+        "desc": "把景點拆成『順路拍照點』，依體力彈性增減。",
+        "detail": "路線（你列的點）：\n- 赤鉄橋\n- 四万十川桜づつみ公園\n- 佐田展望所\n- 今成橋（佐田沈下橋）\n- 三里沈下橋\n- 屋形船 四万十の碧\n- 高瀬沈下橋\n- 一條神社\n- 天神橋商店街\n- Sunriver四萬十物產館",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "",
+        "price": "",
+        "stay": "4–5 hr",
+        "menu": [],
+        "avoid": [
+          "3月河邊風大：備手套/防風外套；注意日落前回到市區。"
+        ],
+        "guide": [
+          "如果想輕鬆：把『沈下橋＋物產館』當主軸，其餘點位作為加碼。"
+        ],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "type": "route",
+        "time": "16:30-18:30",
+        "title": "四萬十市 → 高知市",
+        "desc": "",
+        "durationText": "約 2 小時車程",
+        "stay": "2h",
+        "mode": "drive",
+        "from": "",
+        "to": "",
+        "route": {
+          "mode": "drive",
+          "from": "四万十市",
+          "to": "高知市",
+          "minutes": 120
+        }
+      },
+      {
+        "time": "19:00",
+        "title": "晚餐：俺の串 なおさん",
+        "tag": "food",
+        "subtag": "串燒",
+        "desc": "回到高知市區吃串燒放鬆一下。",
+        "detail": "",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
+        "hours": "18:00–23:00",
+        "price": "",
+        "stay": "60–90 min",
+        "menu": [],
+        "avoid": [],
+        "guide": [],
+        "links": [],
+        "img": "",
+        "eta": ""
+      },
+      {
+        "time": "21:00",
+        "title": "住宿：OMO7 高知",
+        "tag": "hotel",
+        "subtag": "",
+        "desc": "連住第2晚。",
+        "detail": "",
+        "addr": "",
+        "mapcode": "",
+        "parking": "",
         "hours": "",
         "price": "",
         "stay": "",
         "menu": [],
         "avoid": [],
-        "guide": [
-          "當地串燒店，想吃到熱門品項建議早點到。"
-        ],
+        "guide": [],
         "links": [],
-        "img": ""
+        "img": "",
+        "eta": ""
       }
-    ]
+    ],
+    "route": {
+      "mode": "drive",
+      "points": [
+        {
+          "q": "OMO7 高知"
+        },
+        {
+          "q": "四万十市観光協会"
+        },
+        {
+          "q": "四万十川 佐田沈下橋"
+        },
+        {
+          "q": "屋形船 四万十の碧"
+        },
+        {
+          "q": "Sunriver四萬十物產館"
+        },
+        {
+          "q": "俺の串 なおさん"
+        },
+        {
+          "q": "OMO7 高知"
+        }
+      ],
+      "preview": {
+        "center": "32.95,132.95",
+        "zoom": 7
+      }
+    }
   }
 ]
