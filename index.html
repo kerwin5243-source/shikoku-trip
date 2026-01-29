@@ -2655,6 +2655,16 @@ async function renderWeatherJMA(meta){
     return buildGoogleNavUrl(item);
   }
 
+  function normalizeAssetUrl(src){
+    const s = String(src || '').trim();
+    if(!s) return '';
+    // 外部連結 / base64 不動
+    if(/^https?:\/\//i.test(s) || s.startsWith('data:')) return s;
+    // 以 / 開頭：改成相對路徑，讓它跟 index.html 同層開始找
+    return s.startsWith('/') ? ('.' + s) : s;
+  }
+
+
 
   // ====== Modal：預計到達/地址/停車/Mapcode/介紹 + Google 導航 ======
   function openModal(itemIdx) {
@@ -2675,26 +2685,30 @@ async function renderWeatherJMA(meta){
       ? `<div class="block"><h4><i class="fas fa-triangle-exclamation"></i> 注意事項</h4><ul class="bullet">${item.avoid.map(x=>`<li>${escapeHtml(x).replace(/\n/g,'<br>').replace(/^\[(.+?)\]：/,'<strong>[$1]：</strong>')}</li>`).join('')}</ul></div>`
       : '';
 
-    const menuBlock = (item.menu && item.menu.length) ? `
-      <div class="menuBlock">
-        <div class="menuTitle">推薦品項</div>
-        <div class="menuRow">
-          ${item.menu.map((m, idx) => `
-            <button class="menuPill ${m.rec ? 'is-rec' : ''}"
-                    type="button"
-                    data-menu-idx="${idx}"
-                    data-rec="${m.rec ? '1' : '0'}">
-              <span class="menuText">${escapeHtml(m.zh || m.jp || '')}</span>
-              ${m.jp ? `
-                <span class="menuSpeak" title="日文發音" data-speak="${escapeHtml(m.jp)}">
-                  <i class="fas fa-volume-up"></i>
-                </span>
-              ` : ``}
-            </button>
-          `).join('')}
+    const menuBlock = (item.menu || []).length ? `
+      <div class="block">
+        <h4><i class="fas fa-utensils"></i> 必吃推薦</h4>
+        <div class="menu-recommend">
+          ${(item.menu || []).map((m, idx) => {
+            const jp = escapeHtml(m.jp || '');
+            const zh = escapeHtml(m.zh || '');
+            const isRec = m.rec === true || m.recommend === true;   // 你用哪個欄位就留哪個
+            return `
+              <div class="menu-item menuPill" data-menu-idx="${idx}" data-rec="${isRec ? '1':'0'}">
+                <div class="jp-text">
+                  ${jp}
+                  <span class="menuSpeak" data-speak="${escapeHtml(m.speak || m.jp || '')}" style="margin-left:8px; opacity:.75;">
+                    <i class="fas fa-volume-up"></i>
+                  </span>
+                </div>
+                <div class="zh-text">${zh}</div>
+              </div>
+            `;
+          }).join('')}
         </div>
       </div>
     ` : '';
+
     const reserveBlock = (item.reservations || []).length
       ? `<div class="block">
             <h4><i class="fas fa-receipt"></i> 預約資訊</h4>
