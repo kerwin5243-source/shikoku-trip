@@ -1410,92 +1410,147 @@
       transform: translateY(-.5px);
     }
 
-/* mini-map pins */
-.rm-pin{
-  border-radius:999px;
-  background:rgba(255,255,255,.92);
-  border:2px solid rgba(60,110,210,.80);
-  box-shadow:0 10px 22px rgba(0,0,0,.16);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.rm-pin span{
-  font-family:'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-weight:800;
-  font-size:.74rem;
-  color:rgba(40,70,150,.95);
-}
-.rm-pin.rm-start{
-  border-color:rgba(34,139,34,.85);
-}
-.rm-pin.rm-start span{ color:rgba(22,110,22,.95); }
-.rm-pin.rm-end{
-  border-color:rgba(180,35,24,.80);
-}
-.rm-pin.rm-end span{ color:rgba(180,35,24,.92); }
-.rm-pin.rm-stop{
-  border-color:rgba(60,110,210,.78);
-}
+    /* mini-map pins */
+    .rm-pin{
+      border-radius:999px;
+      background:rgba(255,255,255,.92);
+      border:2px solid rgba(60,110,210,.80);
+      box-shadow:0 10px 22px rgba(0,0,0,.16);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .rm-pin span{
+      font-family:'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-weight:800;
+      font-size:.74rem;
+      color:rgba(40,70,150,.95);
+    }
+    .rm-pin.rm-start{
+      border-color:rgba(34,139,34,.85);
+    }
+    .rm-pin.rm-start span{ color:rgba(22,110,22,.95); }
+    .rm-pin.rm-end{
+      border-color:rgba(180,35,24,.80);
+    }
+    .rm-pin.rm-end span{ color:rgba(180,35,24,.92); }
+    .rm-pin.rm-stop{
+      border-color:rgba(60,110,210,.78);
+    }
 
-.menuRow{ display:flex; flex-wrap:wrap; gap:10px; }
+    .menuRow{ display:flex; flex-wrap:wrap; gap:10px; }
 
-.menuPill{
-  display:inline-flex; align-items:center; gap:10px;
-  padding:8px 12px;
-  border-radius:999px;
-  border:1px solid rgba(233,225,214,.95);
-  background:#fff;
-  font-weight:800;
-  font-size:.9rem;
-  cursor:pointer;
-}
-.menuPill.is-rec{
-  border-color: rgba(176,138,91,.55);
-  box-shadow: 0 10px 20px rgba(0,0,0,.06);
-}
-.menuSpeak{
-  display:inline-flex; align-items:center; justify-content:center;
-  width:28px; height:28px;
-  border-radius:999px;
-  border:1px solid rgba(233,225,214,.95);
-  background:rgba(255,255,255,.9);
-  color:#666;
-}
-.menuSpeak i{ font-size:14px; }
+    .menuPill{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(233,225,214,.95);
+      background:#fff;
+      font-weight:800;
+      font-size:.9rem;
+      cursor:pointer;
+    }
+    .menuPill.is-rec{
+      border-color: rgba(176,138,91,.55);
+      box-shadow: 0 10px 20px rgba(0,0,0,.06);
+    }
+    .menuSpeak{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:28px; height:28px;
+      border-radius:999px;
+      border:1px solid rgba(233,225,214,.95);
+      background:rgba(255,255,255,.9);
+      color:#666;
+    }
+    .menuSpeak i{ font-size:14px; }
 
-/* ===== menu 字卡 ===== */
-.menuCard{
-  position:absolute;
-  left:12px; right:12px;
-  bottom:12px;
-  border-radius:18px;
-  border:1px solid rgba(233,225,214,.95);
-  background:rgba(255,255,255,.96);
-  box-shadow:0 18px 40px rgba(0,0,0,.18);
-  overflow:hidden;
-  z-index:30;
-}
-.menuCardClose{
-  position:absolute;
-  right:10px; top:8px;
-  width:30px; height:30px;
-  border-radius:999px;
-  border:1px solid rgba(233,225,214,.95);
-  background:#fff;
-  font-size:18px; font-weight:900; line-height:1;
-  display:grid; place-items:center;
-}
-.menuCardImg{
-  width:100%;
-  height:160px;
-  object-fit:cover;
-  display:block;
-}
-.menuCardBody{ padding:12px 14px 14px; }
-.menuCardJp{ font-weight:900; margin-bottom:4px; }
-.menuCardZh{ color:#666; font-weight:800; margin-bottom:8px; }
-.menuCardNote{ color:#444; line-height:1.45; }
+    .menuCardDesc{
+      margin-top:10px;
+      color:#4B5563;
+      font-size:.95rem;
+      line-height:1.55;
+    }
+
+
+    /* ===== menu 字卡 ===== */
+    .menuCard{
+      position:absolute;
+      left:12px; right:12px;
+      bottom:12px;
+      border-radius:18px;
+      border:1px solid rgba(233,225,214,.95);
+      background:rgba(255,255,255,.96);
+      box-shadow:0 18px 40px rgba(0,0,0,.18);
+      overflow:hidden;
+      z-index:30;
+    }
+    .menuCardClose{
+      position:absolute;
+      right:10px; top:8px;
+      width:30px; height:30px;
+      border-radius:999px;
+      border:1px solid rgba(233,225,214,.95);
+      background:#fff;
+      font-size:18px; font-weight:900; line-height:1;
+      display:grid; place-items:center;
+    }
+    .menuCardImg{
+      width:100%;
+      height:160px;
+      object-fit:cover;
+      display:block;
+    }
+    .menuCardBody{ padding:12px 14px 14px; }
+    .menuCardJp{ font-weight:900; margin-bottom:4px; }
+    .menuCardZh{ color:#666; font-weight:800; margin-bottom:8px; }
+    .menuCardNote{ color:#444; line-height:1.45; }
+
+    /* ✅ 黃色表格外框（回到你第一張那種感覺） */
+    .menu-box{
+      background: rgba(255, 242, 210, .55);
+      border: 1px solid rgba(210, 184, 120, .55);
+      border-radius: 16px;
+      padding: 14px 14px 10px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.06);
+    }
+    .menu-box-head{
+      display:flex; align-items:center; gap:8px;
+      font-weight: 900;
+      color: #5B4A2F;
+      margin-bottom: 10px;
+    }
+
+    .menu-table{ display:flex; flex-direction:column; gap:10px; }
+
+    .menu-row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,.65);
+      border: 1px solid rgba(210,184,120,.45);
+      border-radius: 999px;
+    }
+
+    .menu-jp{ display:flex; align-items:center; gap:8px; font-weight:900; color:#4B2E2A; }
+    .menu-zh{ text-align:right; color:#6B7280; font-weight:800; }
+
+    /* ✅ 小喇叭（放日文前面） */
+    .menuSpeak{
+      width:28px; height:28px;
+      border-radius:999px;
+      border:1px solid rgba(210,184,120,.65);
+      background:rgba(255,255,255,.75);
+      display:inline-flex; align-items:center; justify-content:center;
+      color:#6B5B3E;
+      box-shadow:0 6px 16px rgba(0,0,0,.06);
+    }
+    .menuSpeak:active{ transform:scale(.96); }
+
+    /* ✅ 只有推薦的才像「可點」 */
+    .menuPill{ cursor:pointer; }
+    .menuPill:active{ transform:scale(.985); }
+
 
 
 
@@ -2688,26 +2743,39 @@ async function renderWeatherJMA(meta){
     const menuBlock = (item.menu || []).length ? `
       <div class="block">
         <h4><i class="fas fa-utensils"></i> 必吃推薦</h4>
-        <div class="menu-recommend">
-          ${(item.menu || []).map((m, idx) => {
-            const jp = escapeHtml(m.jp || '');
-            const zh = escapeHtml(m.zh || '');
-            const isRec = m.rec === true || m.recommend === true;   // 你用哪個欄位就留哪個
-            return `
-              <div class="menu-item menuPill" data-menu-idx="${idx}" data-rec="${isRec ? '1':'0'}">
-                <div class="jp-text">
-                  ${jp}
-                  <span class="menuSpeak" data-speak="${escapeHtml(m.speak || m.jp || '')}" style="margin-left:8px; opacity:.75;">
-                    <i class="fas fa-volume-up"></i>
-                  </span>
+
+        <div class="menu-box">
+          <div class="menu-box-head">
+            <i class="fas fa-thumbs-up"></i> 必吃美食（中日對照）
+          </div>
+
+          <div class="menu-table">
+            ${(item.menu || []).map((m, idx) => {
+              const jpRaw = (m.jp || '');
+              const jp = escapeHtml(jpRaw);
+              const zh = escapeHtml(m.zh || '');
+              const isRec = m.rec === true || m.recommend === true;
+
+              // ✅ 只讓推薦的項目可以點開（維持你原本邏輯）
+              const pillCls = `menu-row ${isRec ? 'menuPill' : ''}`;
+
+              return `
+                <div class="${pillCls}" data-menu-idx="${idx}" data-rec="${isRec ? '1':'0'}">
+                  <div class="menu-jp">
+                    <button class="menuSpeak" type="button" data-speak="${escapeHtml(m.speak || jpRaw)}" aria-label="speak">
+                      <i class="fas fa-volume-up"></i>
+                    </button>
+                    <span>${jp}</span>
+                  </div>
+                  <div class="menu-zh">${zh}</div>
                 </div>
-                <div class="zh-text">${zh}</div>
-              </div>
-            `;
-          }).join('')}
+              `;
+            }).join('')}
+          </div>
         </div>
       </div>
     ` : '';
+
 
     const reserveBlock = (item.reservations || []).length
       ? `<div class="block">
@@ -2912,6 +2980,9 @@ async function renderWeatherJMA(meta){
       img.removeAttribute('src');
       img.style.display = 'none';
     }
+    const desc = m.desc || m.note || m.detail || m.intro || '';
+    
+
 
     const closeBtn = card.querySelector('.menuCardClose');
     closeBtn.onclick = closeMenuCard;
@@ -3384,6 +3455,7 @@ async function renderWeatherJMA(meta){
       <div style="margin-top:10px; font-weight:900; font-size:1.05rem;">${escapeHtml(m.jp || '')}</div>
       <div style="margin-top:4px; color:var(--ink2); font-weight:800;">${escapeHtml(m.zh || '')}</div>
       ${desc ? `<div style="margin-top:10px; line-height:1.65; color:#3A352E; font-weight:700;">${escapeHtml(desc).replace(/\n/g,'<br>')}</div>` : ``}
+      ${desc ? `<div class="menuCardDesc">${escapeHtml(desc).replace(/\n/g,'<br>')}</div>` : ``}
     `;
 
     ov.style.display = 'flex';
