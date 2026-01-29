@@ -512,8 +512,12 @@
     .tl-content:active{ transform:scale(.985); }
 
     .reserve-badge{
+      position:absolute;
+      top:10px;
+      right:12px;
+      left:auto; 
       display:inline-block;
-      font-size:.66rem;
+      font-size:.6rem;
       line-height:1;
       letter-spacing:.08em;
       padding:4px 8px;
@@ -522,9 +526,11 @@
       background:rgba(255,255,255,.86);
       border-radius:8px;
       transform:rotate(-8deg);
-      transform-origin:left center;
+      transform-origin:top right;
       box-shadow:0 6px 18px rgba(0,0,0,.08);
-      right:12px;
+      z-index:2;                         /* ✅確保不被 tag/標籤蓋住 */
+      pointer-events:none;               /* 可選：避免擋點擊 */
+      
     }
 
 
@@ -1398,7 +1404,7 @@
 /* === PATCH: stronger highlight + reserved badge + route meta === */
 .timeline-item.is-highlight .tl-content{ box-shadow:0 18px 40px rgba(0,0,0,.09), 0 0 0 5px rgba(214,158,76,.22) inset; }
 .timeline-item.is-highlight:before{ inset:-22px -22px; filter: blur(10px); opacity:.95; }
-.reserve-badge{ font-size:.62rem; padding:3px 7px; border-radius:7px; border:1.6px solid rgba(219, 64, 56, .9); color:rgb(219,64,56); transform: rotate(-10deg); }
+/* .reserve-badge{ font-size:.62rem; padding:3px 7px; border-radius:7px; border:1.6px solid rgba(219, 64, 56, .9); color:rgb(219,64,56); transform: rotate(-10deg); } */
 .route-meta{ margin-top:4px; font-size:.86rem; color:var(--ink2); font-weight:700; }
 </style>
 </head>
