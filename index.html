@@ -282,7 +282,7 @@
       position:relative;
       width:100%;
       height:100%;
-      object-fit:contain;          /* ✅ 關鍵 */
+      object-fit:cover;          /* ✅ 關鍵 */
       display:block;
     }
 
@@ -314,7 +314,6 @@
 
     .hero-overlay{
       position:absolute;
-      left:auto;
       left:12px;                      /* 距左 12 */
       right:12px;                     /* 距右 12（等於容器有左右留白） */
       bottom:2px;                     /* ✅ 貼近圖片底部（想更貼就改 4px 或 0） */
@@ -339,11 +338,23 @@
 
       color:#ffffff;                     /* ✅ 白色 */
       font-size:.90rem;               /* 可微調 */
-      font-weight:700;
+      font-weight:500;
 
 
       backdrop-filter:none;           /* ✅ 明確關閉毛玻璃 */
       -webkit-backdrop-filter:none;
+        /* ✅ 文字本身：一近一遠，讓深底淺底都能讀 */
+      text-shadow:
+        0 1px 2px rgba(0,0,0,.60),
+        0 6px 16px rgba(0,0,0,.35);
+
+      /* ✅ 讓整個 loc 區塊有「超淡描邊」：不突兀但可讀性更穩 */
+      padding:2px 6px;                 /* 不算有底，只是給描邊留空間 */
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.22);
+
+      /* ✅ 再加一點點「很淡的底」(可選但很推)：幾乎看不出來卻很有效 */
+      background: rgba(0,0,0,.10);
     }
 
     .hero-caption{
