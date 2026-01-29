@@ -2077,6 +2077,11 @@
     // ✅ 只吃你自定義的 route.points（不再自動抓 items）
     const route = dayData?.route;
     const pts = (route?.points || []).map(s => (s||'').trim()).filter(Boolean);
+    const factor = 1.25; // 你可調
+    return sum * factor;
+    const km = estimateRouteKm(pts);      // ✅ 估算總公里數（直線）
+    const kmText = (km != null) ? `・預計行駛 ${Math.round(km)} km` : '';
+
 
     if(pts.length < 2){
       el.innerHTML = '';
@@ -2099,7 +2104,7 @@
         <div class="route-head">
           <div>
             <div class="route-title">Google Map 導航</div>
-            <div class="route-sub">${pts.length} 個停留點</div>
+            <div class="route-sub">${pts.length} 個停留點 ${kmText}</div>
           </div>
           <a class="route-btn" href="${gUrl}" target="_blank" rel="noopener">
             <i class="fas fa-location-arrow"></i> 開啟
@@ -2128,6 +2133,43 @@
     const path = points.map(p => encodeURIComponent(p)).join('/');
     return `https://www.google.com/maps/dir/${path}`;
   }
+  function parseLatLng(s){
+    // 支援 "lat,lng" 字串
+    if(!s) return null;
+    const m = String(s).trim().match(/^(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)$/);
+    if(!m) return null;
+    const lat = parseFloat(m[1]);
+    const lng = parseFloat(m[3]);
+    if(Number.isNaN(lat) || Number.isNaN(lng)) return null;
+    return {lat, lng};
+  }
+
+  function haversineKm(a, b){
+    const R = 6371; // Earth radius km
+    const toRad = (d)=> d*Math.PI/180;
+    const dLat = toRad(b.lat - a.lat);
+    const dLng = toRad(b.lng - a.lng);
+    const lat1 = toRad(a.lat);
+    const lat2 = toRad(b.lat);
+
+    const x = Math.sin(dLat/2)**2 +
+              Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2;
+    const c = 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1-x));
+    return R * c;
+  }
+
+  function estimateRouteKm(points){
+    // points: ["34.21,134.01", ...]
+    const coords = points.map(parseLatLng).filter(Boolean);
+    if(coords.length < 2) return null;
+
+    let sum = 0;
+    for(let i=0;i<coords.length-1;i++){
+      sum += haversineKm(coords[i], coords[i+1]);
+    }
+    return sum; // 直線估算公里數
+  }
+
 
 
   function buildOsmStaticThumb(center, zoom, points){
