@@ -1268,6 +1268,60 @@
     .route-time i{ color:#8E8E93; }
 
 
+    .route-card{
+      margin:10px 0 14px;
+      background:rgba(255,255,255,.72);
+      border:1px solid rgba(233,225,214,.9);
+      border-radius:24px;
+      box-shadow:0 10px 26px rgba(0,0,0,.08);
+      overflow:hidden;
+    }
+
+    .route-thumb{
+      position:relative;
+      aspect-ratio: 16 / 9;
+      background:rgba(0,0,0,.06);
+    }
+    .route-thumb img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .route-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:12px 14px 10px;
+      gap:12px;
+    }
+    .route-title{
+      font-weight:900;
+      line-height:1.2;
+    }
+    .route-sub{
+      margin-top:4px;
+      font-size:.86rem;
+      color:var(--ink2);
+      font-weight:700;
+    }
+
+    .route-btn{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(176,138,91,.35);
+      background:rgba(255,255,255,.85);
+      font-weight:900;
+      color:#6E4B2A;
+      white-space:nowrap;
+    }
+
+
+
   </style>
 </head>
 
@@ -1318,8 +1372,9 @@
       <div style="text-align:right; font-size:0.86rem; color:var(--ink2); font-weight:800;">
         今晚住宿：<strong id="stayHotelName" style="color:var(--primary);"></strong>
       </div>
-      <div id="dayRouteCard"></div>
     </div>
+
+    <div id="dayRouteCard"></div>
 
     <div id="timelineList" style="padding-bottom: 20px;"></div>
   </div>
@@ -1791,7 +1846,7 @@
     if(scroller && chip){
       const left = chip.offsetLeft - (scroller.clientWidth - chip.clientWidth)/2;
       scroller.scrollTo({ left, behavior:'smooth' });
-}
+    }
 
     
 
@@ -2000,48 +2055,94 @@
     }
     return null;
    }
+  function renderDayRouteCard(dayData){
+    const el = document.getElementById('dayRouteCard');
+    if(!el) return;
 
-   function renderDayRouteCard(dayData){
-      const el = document.getElementById('dayRouteCard');
-      if(!el) return;
+    // ✅ 只吃你自定義的 route.points（不再自動抓 items）
+    const route = dayData?.route;
+    const pts = (route?.points || []).map(s => (s||'').trim()).filter(Boolean);
 
-      // 收集今天所有可導航點：優先 geo，其次 addr/title
-      const pts = (dayData?.items || [])
-        .map(it=>{
-          if(it?.geo?.lat != null && it?.geo?.lng != null) return `${it.geo.lat},${it.geo.lng}`;
-          const q = (it?.addr || it?.title || '').trim();
-          return q ? q : null;
-        })
-        .filter(Boolean);
+    if(pts.length < 2){
+      el.innerHTML = '';
+      return;
+    }
 
-      if(pts.length < 2){
-        el.innerHTML = ''; // 點太少就不顯示
-        return;
-      }
+    const mode = route?.mode || 'drive';
+    const gUrl = buildGoogleDirUrl(pts, mode);
 
-      const origin = pts[0];
-      const dest   = pts[pts.length - 1];
-      const waypts = pts.slice(1, -1).join('|');
+    // ✅ 縮圖：用 OSM 靜態地圖（免 key）
+    const center = route?.preview?.center; // "lat,lng"
+    const zoom = route?.preview?.zoom ?? 12;
+    const thumb = buildOsmStaticThumb(center, zoom, pts);
 
-      const url =
-        `https://www.google.com/maps/dir/?api=1`
-        + `&origin=${encodeURIComponent(origin)}`
-        + `&destination=${encodeURIComponent(dest)}`
-        + (waypts ? `&waypoints=${encodeURIComponent(waypts)}` : ``)
-        + `&travelmode=driving`;
-
-      el.innerHTML = `
-        <div class="day-route-card">
+    el.innerHTML = `
+      <div class="route-card">
+        <div class="route-thumb">
+          <img src="${thumb}" alt="route preview">
+        </div>
+        <div class="route-head">
           <div>
-            <div class="txt">也可以直接 Google Map 導航</div>
-            <div class="sub">${pts.length} 個停留點</div>
+            <div class="route-title">也可以直接 Google Map 導航</div>
+            <div class="route-sub">${pts.length} 個停留點</div>
           </div>
-          <a class="btn-primary" style="height:44px; width:auto; padding:0 14px;" href="${url}" target="_blank" rel="noopener">
+          <a class="route-btn" href="${gUrl}" target="_blank" rel="noopener">
             <i class="fas fa-location-arrow"></i> 開啟
           </a>
         </div>
-      `;
+      </div>
+    `;
+  }
+
+  function buildGoogleDirUrl(points, mode='drive'){
+    // points: ["A","B","C"] → origin=A, destination=C, waypoints=B
+    const origin = points[0];
+    const dest = points[points.length - 1];
+    const waypoints = points.slice(1, -1).join('|');
+
+    const tm = travelModeForRoute(mode); // 你原本就有這個
+    return `https://www.google.com/maps/dir/?api=1`
+      + `&origin=${encodeURIComponent(origin)}`
+      + `&destination=${encodeURIComponent(dest)}`
+      + (waypoints ? `&waypoints=${encodeURIComponent(waypoints)}` : ``)
+      + `&travelmode=${encodeURIComponent(tm)}`;
+  }
+
+  function buildOsmStaticThumb(center, zoom, points){
+    // OSM 靜態地圖服務（免 key）
+    // 需要 center，否則就用第一個點（若是座標可用）或 fallback 一張 placeholder
+    const base = 'https://staticmap.openstreetmap.de/staticmap.php';
+
+    const c = (center && center.includes(',')) ? center : null;
+
+    // markers：最多建議放 5 個，不然 URL 太長（你要更多點就只放起訖）
+    const mk = [];
+    const pick = points.length <= 5 ? points : [points[0], points[points.length-1]];
+
+    // 若 pick 是 "lat,lng" 才能當 marker；若是文字地址 OSM 靜態圖沒辦法地理編碼
+    pick.forEach(p=>{
+      if(/^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(p)){
+        mk.push(`&markers=${encodeURIComponent(p)},lightblue1`);
+      }
+    });
+
+    // 沒 center 又沒有座標 marker → 給一張淡底圖（避免 broken image）
+    if(!c && mk.length === 0){
+      return 'data:image/svg+xml,' + encodeURIComponent(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450">
+          <rect width="100%" height="100%" fill="#f3f1ee"/>
+          <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
+            fill="#9a938a" font-size="24" font-family="system-ui, -apple-system">
+            請在 route.preview.center 設定座標
+          </text>
+        </svg>`
+      );
     }
+
+    const centerParam = c ? `center=${encodeURIComponent(c)}&zoom=${encodeURIComponent(zoom)}` : '';
+    return `${base}?${centerParam}&size=800x450&maptype=mapnik${mk.join('')}`;
+  }
+
 
 
     function wmoToFa(code, hour){
