@@ -52,7 +52,7 @@
 
     .app-header h1{
         margin:0;
-        font-family:'Noto Serif JP', serif;
+        font-family:'Noto Sans TC';
         font-size:1.75rem;     /* 原本 2.2rem → 縮小 */
         font-weight:900;
         letter-spacing:.12em;
@@ -1434,9 +1434,10 @@
     const sub = `${CONFIG?.days || 9}天${CONFIG?.nights || 8}夜${CONFIG?.mode ? CONFIG.mode : ''}`;
     
     document.getElementById('hdrTitle').innerText = title;
+    document.getElementById('hdrKana').innerText = 'とくしまけん、かがわけん、えひめけん、こうちけん';
     document.getElementById('hdrSub').innerText = sub;
     document.getElementById('hdrYear').innerText = '2026';
-    document.getElementById('hdrKana').innerText = 'とくしまけん、かがわけん、えひめけん、こうちけん';
+    
 
 
     document.getElementById('hdrSub').innerText = sub;
