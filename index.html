@@ -254,7 +254,8 @@
 
     .hero-slide{
         flex:0 0 100%;
-        height:clamp(220px, 32vw, 320px);
+        aspect-ratio: 16 / 9;   /* ✅ 固定 16:9 */
+        height:auto;            /* ✅ 不用固定高度 */
         scroll-snap-align:start;
         position:relative;
         overflow:hidden;
