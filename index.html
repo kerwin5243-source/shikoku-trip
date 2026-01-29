@@ -1429,14 +1429,16 @@
     itineraryIndex = ITINERARY || [];
 
     const title = (CONFIG?.trip_title || '四國巡禮');
+
+    // 2) subtitle 不顯示 L,K,R,Y,J
+    const sub = `${CONFIG?.days || 9}天${CONFIG?.nights || 8}夜${CONFIG?.mode ? CONFIG.mode : ''}`;
+    
     document.getElementById('hdrTitle').innerText = title;
     document.getElementById('hdrSub').innerText = sub;
     document.getElementById('hdrYear').innerText = '2026';
     document.getElementById('hdrKana').innerText = 'とくしまけん、かがわけん、えひめけん、こうちけん';
 
 
-    // 2) subtitle 不顯示 L,K,R,Y,J
-    const sub = `${CONFIG?.days || 9}天${CONFIG?.nights || 8}夜${CONFIG?.mode ? CONFIG.mode : ''}`;
     document.getElementById('hdrSub').innerText = sub;
   }
 
