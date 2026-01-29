@@ -257,13 +257,43 @@
         height:clamp(220px, 32vw, 320px);
         scroll-snap-align:start;
         position:relative;
+        overflow:hidden;
     }
-    .hero-slide img{
+    .hero-slide .hero-img{
         width:100%;
         height:100%;
         object-fit:cover;
         display:block;
     }
+    /* 背景層：填滿 + 模糊 */
+    .hero-slide.hero--blur .hero-bg{
+      position:absolute;
+      inset:-18px;                 /* 避免 blur 露邊 */
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      filter: blur(18px) saturate(1.05) brightness(.85);
+      transform: scale(1.12);
+    }
+
+    /* 前景層：完整顯示（不裁切） */
+    .hero-slide.hero--blur .hero-img{
+      position:relative;
+      width:100%;
+      height:100%;
+      object-fit:contain;          /* ✅ 關鍵 */
+      display:block;
+    }
+
+    /* 可選：再加一層淡暗幕，讓字更穩 */
+    .hero-slide.hero--blur::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: linear-gradient(to bottom, rgba(0,0,0,.12), rgba(0,0,0,.22));
+      pointer-events:none;
+    }
+
 
     .hero-dots{
 		  display:none;
@@ -283,8 +313,9 @@
 
     .hero-overlay{
         position:absolute;
-        left:12px;
-        bottom:14px;
+        left:auto;
+        right:12px;         /* ✅ 移到右邊 */
+        bottom:8px;
         display:flex;
         flex-direction:column;
         gap:8px;
@@ -297,10 +328,13 @@
         gap:8px;
         padding:0;
         border-radius:999px;
-        background:transparent;
-        color:rgba(230,230,230,.92);
-        font-weight:900;
+        background:rgba(0,0,0,.22);
+        color:#fff;
         font-size:.85rem;
+        font-weight:900;
+        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
+        color:rgba(230,230,230,.92);
         text-shadow:0 2px 10px rgba(0,0,0,.55); /* ✅ 可讀性 */
     }
 
@@ -310,14 +344,16 @@
         background:transparent;              /* 透明，不要毛玻璃底 */
         color:rgba(255,255,255,.92);
         font-weight:800;
-        font-size:.60rem;
+        font-size:.70rem;
         line-height:1.35;
         align-self:flex-end;                /* 往右靠（在 hero-overlay 內） */
         margin-left:auto;
-        text-shadow:0 2px 10px rgba(0,0,0,.55); /* 透明底也能看清楚 */
+        text-shadow:0 2px 12px rgba(0,0,0,.75); /* 透明底也能看清楚 */
         /* backdrop-filter: blur(6px); */     /* ❌ 取消毛玻璃 */
         /* -webkit-backdrop-filter: blur(6px); */
     }
+
+
 
 
 
@@ -1634,7 +1670,7 @@
         }).filter(x=>x.src);
 
         const slides = photos.map((p, idx)=>`
-          <div class="hero-slide">
+          <div class="hero-slide hero--blur">
             <img
                 src="${escapeHtml(p.src)}"
                 alt="day photo ${idx+1}"
@@ -1642,6 +1678,16 @@
                 decoding="async"
                 referrerpolicy="no-referrer"
                 onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80';"
+                class="hero-bg" alt="" aria-hidden="true"
+            >
+            <img
+                src="${escapeHtml(p.src)}"
+                alt="day photo ${idx+1}"
+                loading="lazy"
+                decoding="async"
+                referrerpolicy="no-referrer"
+                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80';"
+                class="hero-img" alt="day photo ...">
             >
             <div class="hero-overlay">
                 ${p.loc ? `<div class="hero-loc"><i class="fas fa-location-dot"></i>${escapeHtml(p.loc)}</div>` : ``}
