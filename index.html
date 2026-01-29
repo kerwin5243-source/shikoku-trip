@@ -1372,7 +1372,13 @@
 
 
 
-  </style>
+  
+/* === PATCH: stronger highlight + reserved badge + route meta === */
+.timeline-item.is-highlight .tl-content{ box-shadow:0 18px 40px rgba(0,0,0,.09), 0 0 0 5px rgba(214,158,76,.22) inset; }
+.timeline-item.is-highlight:before{ inset:-22px -22px; filter: blur(10px); opacity:.95; }
+.reserve-badge{ font-size:.62rem; padding:3px 7px; border-radius:7px; border:1.6px solid rgba(219, 64, 56, .9); color:rgb(219,64,56); transform: rotate(-10deg); }
+.route-meta{ margin-top:4px; font-size:.86rem; color:var(--ink2); font-weight:700; }
+</style>
 </head>
 
 <body>
@@ -2140,7 +2146,7 @@
       return;
     }
 
-    const gUrl = buildGoogleDirUrl(pts, mode);
+    const gUrl = buildGoogleDirUrlFromPoints(pts, mode);
 
     // --- Stops (中間的停靠點數量) ---
     const stopCount = Math.max(0, pts.length - 2);
@@ -2242,48 +2248,46 @@
     return R * c;
   }
 
-  function estimateRouteKm(points){
-    // points: ["34.21,134.01", ...]
-    const coords = points.map(parseLatLng).filter(Boolean);
-    if(coords.length < 2) return null;
+  
+function estimateRouteKm(points){
+  // Fallback: straight-line (haversine) distance in km (UNDER-estimates driving distance).
+  const coords = (points||[]).map(parseLatLng).filter(Boolean);
+  if(coords.length < 2) return null;
+  let sum = 0;
+  for(let i=0;i<coords.length-1;i++){
+    sum += haversineKm(coords[i], coords[i+1]);
+  }
+  return sum;
+}
 
-    let sum = 0;
-    for(let i=0;i<coords.length-1;i++){
-      sum += haversineKm(coords[i], coords[i+1]);
-    }
-
-  async function fetchOsrmRoute(latlngPoints, mode){
-    const profile = (mode === 'walk' || mode === 'walking') ? 'walking'
-                   : (mode === 'bike' || mode === 'bicycle' || mode === 'cycling') ? 'cycling'
-                   : 'driving';
-
-    const coords = latlngPoints
-      .filter(p=>Number.isFinite(p.lat) && Number.isFinite(p.lng))
-      .map(p=>`${p.lng},${p.lat}`)
+// ✅ Preferred: get road route from OSRM (driving) and return { distanceKm, pathLatLngs }
+async function fetchOsrmRoute(latlngPoints, mode){
+  try{
+    const coords = (latlngPoints||[])
+      .map(parseLatLng)
+      .filter(Boolean)
+      .map(p => `${p[1]},${p[0]}`) // lon,lat
       .join(';');
-
     if(!coords || coords.split(';').length < 2) return null;
 
-    const url = `https://router.project-osrm.org/route/v1/${profile}/${coords}?overview=full&geometries=geojson&steps=false`;
-    const r = await fetch(url, { method:'GET' });
-    if(!r.ok) throw new Error(`OSRM HTTP ${r.status}`);
-    const data = await r.json();
+    // OSRM public demo server: good for preview. (Rate limits / availability not guaranteed.)
+    const url = `https://router.project-osrm.org/route/v1/${(mode||'drive')==='walk'?'foot':(mode||'drive')==='drive'?'driving':'driving'}/${coords}?overview=full&geometries=geojson`;
+    const r = await fetch(url);
+    const j = await r.json();
+    if(!j || j.code!=='Ok' || !j.routes || !j.routes[0]) return null;
 
-    const route = data?.routes?.[0];
-    if(!route) return null;
+    const distKm = (j.routes[0].distance||0)/1000;
+    const line = (j.routes[0].geometry && j.routes[0].geometry.coordinates) ? j.routes[0].geometry.coordinates : [];
+    const pathLatLngs = line.map(([lon,lat]) => [lat,lon]);
 
-    const distanceKm = Math.round((route.distance || 0) / 1000);
-    const pathLatLngs = (route.geometry?.coordinates || []).map(([lng, lat])=>({lat, lng}));
-
-    return { distanceKm, pathLatLngs };
+    return { distanceKm: distKm, pathLatLngs };
+  }catch(e){
+    console.warn('OSRM route failed', e);
+    return null;
   }
+}
 
-    return sum; // 直線估算公里數
-  }
-
-
-
-  function buildOsmStaticThumb(center, zoom, points){
+function buildOsmStaticThumb(center, zoom, points){
     // OSM 靜態地圖服務（免 key）
     // 需要 center，否則就用第一個點（若是座標可用）或 fallback 一張 placeholder
     const base = 'https://staticmap.openstreetmap.fr/staticmap.php';
@@ -2389,7 +2393,7 @@ function renderRouteMiniMap(pathLatLngs, stopLatLngs, fallbackCenterStr, zoom){
 }
 
 
-function renderWeatherJMA(meta){
+async function renderWeatherJMA(meta){
         const el = document.getElementById('weatherStrip');
         if(!el) return;
 
