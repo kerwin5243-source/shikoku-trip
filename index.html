@@ -2055,7 +2055,7 @@
             ${escapeHtml((item.tag||'').toUpperCase())}
             <i class="fas ${tagIcon(item.tag, item.subtag)} style="opacity:.35; font-size:.72rem; margin-left:2px;"></i>
           </div>
-          <div class="tl-title">${escapeHtml(item.title || '')}</div>
+          <div class="tl-title">${escapeHtml(item.title || '').replace(/\n/g,'<br>')}</div>
           <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
           ${stayPill}
         </div>
@@ -2254,7 +2254,7 @@
                 ${escapeHtml((item.tag||'').toUpperCase())}
                 <i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"></i>
             </div>	  
-            <div class="tl-title">${escapeHtml(item.title || '')}</div>
+            <div class="tl-title">${escapeHtml(item.title || '').replace(/\n/g,'<br>')}</div>
             <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
             ${stay}
           </div>
