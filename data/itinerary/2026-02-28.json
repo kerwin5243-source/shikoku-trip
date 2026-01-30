@@ -18,7 +18,7 @@
         "desc": "",
         "durationText": "",
         "stay": "",
-        "mode": "",
+        "mode": "drive",
         "from": "",
         "to": "",
         "route": {
