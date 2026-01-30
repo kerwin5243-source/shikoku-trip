@@ -117,10 +117,10 @@
       {
         "type": "route",
         "time": "09:30",
-        "title": "",
+        "title": "高松港 → 土庄港",
         "desc": "",
         "durationText": "",
-        "stay": "",
+        "stay": "drive",
         "mode": "",
         "from": "",
         "to": "",
