@@ -28,42 +28,20 @@
     ],
     "items": [
       {
-        "time": "06:00",
-        "title": "出發：瀬戸風月 → 高松港",
-        "tag": "transport",
-        "subtag": "汽車",
-        "desc": "清晨前往高松港，準備搭船上小豆島。",
-        "detail": "建議：\n- 先在港口附近找便利商店補水/早餐\n- 車輛上船：提早到場辦理（確認車輛尺寸/票券）",
-        "addr": "",
-        "mapcode": "",
-        "parking": "",
-        "hours": "",
-        "price": "",
-        "stay": "",
-        "menu": [],
-        "avoid": [
-          "天候不佳可能停航：出發前確認當日航班公告。"
-        ],
-        "guide": [],
-        "links": [],
-        "img": "",
-        "eta": ""
-      },
-      {
         "type": "route",
         "time": "06:30",
-        "title": "瀬戸風月 → 高松港",
+        "title": "",
         "desc": "",
-        "durationText": "約 15 分鐘車程",
-        "stay": "15 min",
-        "mode": "drive",
+        "durationText": "",
+        "stay": "",
+        "mode": "",
         "from": "",
         "to": "",
         "route": {
           "mode": "drive",
           "from": "Second Home 瀬戸風月",
           "to": "高松港",
-          "minutes": 25
+          "minutes": 15
         }
       },
       {
