@@ -6,6 +6,11 @@
     "hotel_id": "H1",
     "photos": [
       {
+        "src": "/photos/day3/0101.png",
+        "loc": "",
+        "caption": ""
+      },
+      {
         "src": "/photos/day3/01.jpg",
         "loc": "栗林公園",
         "caption": "大名庭園"
