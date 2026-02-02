@@ -1539,16 +1539,22 @@
       margin-bottom: 10px;
     }
 
-    .menu-table{ display:flex; flex-direction:column; gap:10px; }
+    .menu-table{ display:flex; flex-direction:column; gap:0; }
 
     .menu-row{
       display:grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr auto;
       gap:12px;
-      padding: 10px 12px;
-      background: rgba(255,255,255,.65);
-      border: 1px solid rgba(210,184,120,.45);
-      border-radius: 999px;
+      padding: 12px 2px;
+      background: transparent;;
+      border: none;
+      border-radius: 0;
+      border-bottom:1px solid rgba(0,0,0,.08);
+    }
+
+    /* 最後一列不要底線 */
+    .menu-row:last-child{
+      border-bottom:none;
     }
 
     .menu-jp{ display:flex; align-items:center; gap:8px; font-weight:900; color:#4B2E2A; }
