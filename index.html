@@ -2768,37 +2768,32 @@ async function renderWeatherJMA(meta){
       : '';
 
     const menuBlock = (item.menu || []).length ? `
-      <div class="block">
-        <h4><i class="fas fa-utensils"></i> 必吃推薦</h4>
+      <div class="menu-box">
+        <div class="menu-box-head">
+          <i class="fas fa-thumbs-up"></i> 必吃美食
+        </div>
+        <div class="menu-table">
+          ${(item.menu || []).map((m, idx) => {
+            const jpRaw = (m.jp || '');
+            const jp = escapeHtml(jpRaw);
+            const zh = escapeHtml(m.zh || '');
+            const isRec = m.rec === true || m.recommend === true;
 
-        <div class="menu-box">
-          <div class="menu-box-head">
-            <i class="fas fa-thumbs-up"></i> 必吃美食（中日對照）
-          </div>
+            // ✅ 只讓推薦的項目可以點開（維持你原本邏輯）
+            const pillCls = `menu-row ${isRec ? 'menuPill' : ''}`;
 
-          <div class="menu-table">
-            ${(item.menu || []).map((m, idx) => {
-              const jpRaw = (m.jp || '');
-              const jp = escapeHtml(jpRaw);
-              const zh = escapeHtml(m.zh || '');
-              const isRec = m.rec === true || m.recommend === true;
-
-              // ✅ 只讓推薦的項目可以點開（維持你原本邏輯）
-              const pillCls = `menu-row ${isRec ? 'menuPill' : ''}`;
-
-              return `
-                <div class="${pillCls}" data-menu-idx="${idx}" data-rec="${isRec ? '1':'0'}">
-                  <div class="menu-jp">
-                    <button class="menuSpeak" type="button" data-speak="${escapeHtml(m.speak || jpRaw)}" aria-label="speak">
-                      <i class="fas fa-volume-up"></i>
-                    </button>
-                    <span>${jp}</span>
-                  </div>
-                  <div class="menu-zh">${zh}</div>
+            return `
+              <div class="${pillCls}" data-menu-idx="${idx}" data-rec="${isRec ? '1':'0'}">
+                <div class="menu-jp">
+                  <button class="menuSpeak" type="button" data-speak="${escapeHtml(m.speak || jpRaw)}" aria-label="speak">
+                    <i class="fas fa-volume-up"></i>
+                  </button>
+                  <span>${jp}</span>
                 </div>
-              `;
-            }).join('')}
-          </div>
+                <div class="menu-zh">${zh}</div>
+              </div>
+            `;
+          }).join('')}
         </div>
       </div>
     ` : '';
