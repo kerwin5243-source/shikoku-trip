@@ -98,7 +98,7 @@
         "subtag": "汽車",
         "reserved": true,
         "desc": "(高松空港店)機場附近取車。",
-        "detail": "取車建議：\n- 拍車況（四面/輪胎/刮痕）禁煙車\n- 確認 ETC、保險、加油規則",
+        "detail": "取車建議：\n- 拍車況（四面/輪胎/刮痕）\n- 禁煙車\n- 確認 ETC、保險、加油規則加油方式",
         "addr": "3388-1 Konancho Yusa, Takamatsu, Kagawa 761-1402 日本",
         "mapcode": "60182543*34",
         "parking": "",
@@ -251,7 +251,7 @@
 
       {
         "time": "14:20",
-        "title": "金刀比羅宮",
+        "title": "金刀比羅宮⛩︎",
         "tag": "sight",
         "subtag": "神社",
         "desc": "江戶時代「金毘羅參」名所，挑戰 785 階到御本宮。",
