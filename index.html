@@ -9,8 +9,19 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#F6F3EE" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    const TAG_SVGS = {
+      takagi: ['/takagi_01_nobg_v2.svg','/takagi_02_nobg_v2.svg']
+    };
+    function getTagIconHtml(tag, idx){
+      const t = (tag||'').toLowerCase();
+      if(t==='takagi' && TAG_SVGS.takagi){
+        const src = TAG_SVGS.takagi[idx % TAG_SVGS.takagi.length];
+        return `<img class="tag-svg" src="${src}" alt="takagi" />`;
+      }
+      return '';
+    }
+  </script>				
 
 
   <!-- ✅ Serif + Sans（標題日系感） -->
@@ -829,6 +840,11 @@
     .sheet-tag.tag-hotel::before{ background:#7A4FA8; }
     .sheet-tag.tag-shop::before{ background:#2A6FA0; }
 
+	/* Takagi SVG icon inside tag */
+    .tag-svg{ width:16px; height:16px; display:inline-block; vertical-align:-3px; }
+    .sheet-tag.tag-takagi{ color:#f574ef; }
+
+								
     /* /* ✅ 只縮 modal 內的 tag（不影響外面列表）
     .sheet-head .tl-tag{
         padding:4px 8px;
