@@ -6,9 +6,9 @@
     "hotel_id": "H1",
     "photos": [
       {
-        "src": "/photos/day2/01.jpg",
-        "loc": "高松港",
-        "caption": "晨間出發"
+        "src": "/photos/day2/01.png",
+        "loc": "",
+        "caption": ""
       },
       {
         "src": "/photos/day2/02.jpg",
