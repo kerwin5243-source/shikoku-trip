@@ -9,9 +9,10 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#F6F3EE" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>	
+  <script>
     const TAG_SVGS = {
-      takagi: ['/photos/takagi_01_nobg_v2.svg', '/photos/takagi_02_nobg_v2.svg']
+      takagi: ['./photos/takagi_01_nobg_v2.svg', './photos/takagi_02_nobg_v2.svg']
     };
     function getTagIconHtml(tag, idx){
       const t = (tag||'').toLowerCase();
@@ -567,7 +568,7 @@
     }
     .tag-food::before{ background:#D28A3A; }
     .tag-sight::before{ background:#2F8F5B; }
-    .tag-sight::before{ background:#2F8F5B; }
+    .tag-transport::before{ background:#3D6EA9; }
     .tag-takagi::before{ background:#f574ef; }
     .tag-hotel::before{ background:#7A4FA8; }
     .tag-shop::before{ background:#e1c820; }
@@ -1950,7 +1951,7 @@
 
     const st = (ALIAS[subtag] || subtag || '').toLowerCase().trim();
     const TAG_SVGS = {
-      takagi: ['/photos/takagi_01_nobg_v2.svg', '/photos/takagi_02_nobg_v2.svg']
+      takagi: ['./photos/takagi_01_nobg_v2.svg', './photos/takagi_02_nobg_v2.svg']
     };
 
 
@@ -2086,7 +2087,10 @@
         <div class="tl-content ${item.highlight ? 'highlight' : ''}">
           <div class="tl-tag ${tagClass(item.tag)}">
             ${escapeHtml((item.tag||'').toUpperCase())}
-            <i class="fas ${tagIcon(item.tag, item.subtag)} style="opacity:.35; font-size:.72rem; margin-left:2px;"></i>
+            ${((item.tag||'').toLowerCase()==='takagi')
+              ? getTagIconHtml('takagi', i)
+              :`<i class="fas ${tagIcon(item.tag, item.subtag)} style="opacity:.35; font-size:.72rem; margin-left:2px;"></i>`
+            }
           </div>
           <div class="tl-title">${escapeHtml(item.title || '').replace(/\n/g,'<br>')}</div>
           <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
