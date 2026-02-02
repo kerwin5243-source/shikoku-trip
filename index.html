@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
     const TAG_SVGS = {
-      takagi: ['/takagi_01_nobg_v2.svg','/takagi_02_nobg_v2.svg']
+      takagi: ['/photos/takagi_01_nobg_v2.svg', '/photos/takagi_02_nobg_v2.svg']
     };
     function getTagIconHtml(tag, idx){
       const t = (tag||'').toLowerCase();
@@ -1920,7 +1920,6 @@
         if(t==='food') return 'tag-food';
         if(t==='sight') return 'tag-sight';
         if(t==='sight') return 'tag-sight';
-        if(t==='takagi') return 'tag-takagi';
         if(t==='hotel') return 'tag-hotel';
         if(t==='shop') return 'tag-shop';
         return 'tag-transport';
@@ -1932,6 +1931,7 @@
 
     // t = 大分類（food / sight / transport / hotel / shop）
     const t  = (tag || '').toLowerCase().trim();
+
 
     // st = 子分類（ramen / sushi / train / onsen ...）
     const ALIAS = {
@@ -1996,7 +1996,6 @@
     const TAG = {
       food:      'fa-utensils',      // 餐飲
       sight:     'fa-torii-gate',    // 景點（預設用鳥居）
-      takagi:    'fa-cat',
       transport: 'fa-route',         // 交通
       hotel:     'fa-bed',           // 住宿
       shop:      'fa-bag-shopping'   // 購物
