@@ -133,9 +133,9 @@
         "price": "",
         "stay": "40–60 min",
         "menu": [
-          { "jp": "鍋焼うどん（鳥肉）", "zh": "鍋燒烏龍麵（鳥肉）", "rec": true, "img": "/photos/menu/kawata_nabe.png", "note": "招牌鐵鍋上桌，湯頭偏甘甜，雞肉很嫩。" },
+          { "jp": "鍋焼うどん", "zh": "鍋燒烏龍麵", "rec": true, "img": "/photos/menu/kawata_nabe.png", "note": "招牌鐵鍋上桌，湯頭偏甘甜，雞肉很嫩。" },
           { "jp": "牛たまうどん", "zh": "牛玉烏龍麵" },
-          { "jp": "おでん（関東煮）", "zh": "關東煮" }
+          { "jp": "おでん", "zh": "關東煮" }
         ],
         "avoid": [],
         "guide": [
