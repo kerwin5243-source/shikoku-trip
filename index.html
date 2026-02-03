@@ -693,7 +693,7 @@
       background:rgba(0,0,0,.38);
       z-index:2000;
       opacity:0; pointer-events:none;
-      transition:opacity .2s ease;
+      transition:opacity .12s ease;
     }
 
     /* 點開小程式懸浮的 */
@@ -716,10 +716,18 @@
       display:flex;
       flex-direction:column;
       overflow:hidden;
-      transition:transform .18s cubic-bezier(.16,1,.3,1);
+      /* transition:transform .18s cubic-bezier(.16,1,.3,1); */
+      transform: translateX(-50%) translateY(calc(100dvh + 60px)); /* ✅ 徹底移出視窗 */
+      visibility: hidden;    /* ✅ 連陰影都不會露 */
+      pointer-events: none;  /* ✅ 不會吃到點擊 */
+      will-change: transform;
     }
 
-    .modal-sheet.active{ transform:translateX(-50%) translateY(0); }
+    .modal-sheet.active{ 
+      transform: translateX(-50%) translateY(0);
+      visibility: visible;
+      pointer-events: auto;
+     }
 
     /* ✅ Header 不滾動，永遠在上方 */
     .modal-header{
@@ -3041,18 +3049,46 @@ async function renderWeatherJMA(meta){
     window.open(`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(r.from||'')}&destination=${encodeURIComponent(r.to||'')}&travelmode=${tm}`, '_blank', 'noopener');
   }
 
+  let __closingModal = false;
 
   function closeModal(){
+    if(__closingModal) return;
+    __closingModal = true;
+
     const overlay = document.getElementById('modalOverlay');
     const sheet   = document.getElementById('modalSheet');
 
+    // ✅ 避免拖曳關閉時殘留 inline style 造成 transitionend 怪怪的
+    overlay.style.opacity = '';
+    sheet.style.transition = '';
+    sheet.style.transform  = '';
+
+    // 先讓 sheet 開始下滑
     sheet.classList.remove('active');
     closeMenuCard();
 
-    sheet.addEventListener('transitionend', () => {
-      overlay.classList.remove('active');
+    // ✅ overlay 先淡出/先不擋視覺（你就不會覺得「多蓋一層灰」）
+    overlay.classList.remove('active');
+
+    const done = ()=>{
       unlockBodyScroll();
-    }, { once:true });
+      __closingModal = false;
+    };
+
+    // ✅ 保險：transitionend 有時候會不觸發（或被重排打斷）
+    const onEnd = (e)=>{
+      if(e.target !== sheet) return;
+      sheet.removeEventListener('transitionend', onEnd);
+      done();
+    };
+
+    sheet.addEventListener('transitionend', onEnd);
+
+    // fallback（比你的 .18s 稍長一點就好）
+    setTimeout(()=>{
+      sheet.removeEventListener('transitionend', onEnd);
+      done();
+    }, 260);
   }
 
 
