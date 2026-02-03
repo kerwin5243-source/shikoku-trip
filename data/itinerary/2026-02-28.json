@@ -87,6 +87,7 @@
         "parking": "",
         "hours": "",
         "price": "",
+        "splash": "./photos/day2/splash/takagi01.JPEG",
         "stay": "",
         "menu": [],
         "avoid": [],
@@ -110,7 +111,7 @@
         "parking": "山下自治區",
         "hours": "",
         "price": "",
-        "splash": "./photos/day2/splash/takagi01.JPEG",
+        "splash": "./photos/day2/splash/takagi02.JPEG",
         "stay": "",
         "menu": [],
         "avoid": [
@@ -140,7 +141,7 @@
         "hours": "",
         "price": "",
         "stay": "",
-        "splash": "./photos/day2/splash/takagi02.JPEG",
+        "splash": "./photos/day2/splash/takagi04.JPEG",
         "menu": [],
         "avoid": [],
         "guide": [
@@ -164,6 +165,7 @@
         "parking": "山下自治區",
         "hours": "",
         "price": "",
+        "splash": "./photos/day2/splash/takagi05.JPEG",
         "stay": "",
         "menu": [],
         "avoid": [],
@@ -188,6 +190,7 @@
         "parking": "",
         "hours": "",
         "price": "",
+        "splash": "./photos/day2/splash/takagi06.JPEG",
         "stay": "",
         "menu": [],
         "avoid": [],
@@ -213,6 +216,7 @@
         "parking": "",
         "hours": "",
         "price": "",
+        "splash": "./photos/day2/splash/takagi09.JPEG",
         "stay": "",
         "menu": [],
         "avoid": [
@@ -297,6 +301,7 @@
         "parking": "",
         "hours": "",
         "price": "",
+        "splash": "./photos/day2/splash/takagi10.JPEG",
         "stay": "40–60 min",
         "menu": [],
         "avoid": [
