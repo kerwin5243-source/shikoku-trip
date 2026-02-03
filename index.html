@@ -882,6 +882,44 @@
       line-height:1;
       gap:6px;  
     }
+    /* ===== Sheet Splash (open modal show image for ~5s) ===== */
+    .sheet-splash{
+      position:absolute;
+      inset:0;
+      z-index:2600;                 /* 要高於 modal 內容 */
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      background:rgba(10,10,10,.55);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .22s ease;
+    }
+
+    .sheet-splash.active{
+      opacity:1;
+      pointer-events:auto;          /* 出現時吃點擊，避免誤觸內容 */
+    }
+
+    .sheet-splash img{
+      width:100%;
+      max-width:640px;
+      max-height:72vh;
+      object-fit:cover;
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:0 26px 80px rgba(0,0,0,.38);
+    }
+
+    /* splash 出現時，禁止底下內容互動（保險） */
+    #modalSheet.splash-on #modalScroll{
+      pointer-events:none;
+    }
+
+
+
+
     /* FOOD 外框 */
     .tag-chip{
         display:inline-flex;
@@ -1745,7 +1783,10 @@
       <div class="modal-drag-handle"></div>
       <button class="modal-x" onclick="closeModal()" aria-label="close">×</button>
     </div>
-    <div class="modal-scroll">
+    <div class="sheet-splash" id="sheetSplash" aria-hidden="true">
+      <img id="sheetSplashImg" alt="" />
+    </div>
+    <div class="modal-scroll" id="modalScroll">
         <div id="modalSticky"></div>
         <div id="modalBody"></div>
     </div>
@@ -1784,7 +1825,56 @@
   let dayCache = {};
   let currentDayData = null;
   let currentDayIdx = 0;
-  let __heroTimer = null;
+  let __sheetSplashTimer = null;
+
+  function pickSheetSplashSrc(item){
+    // ✅ 你可以在每個景點 item 裡加這些欄位任何一個：
+    // splash / splash_img / cover / cover_img / image / img
+    const s =
+      item?.splash || item?.splash_img ||
+      item?.cover  || item?.cover_img  ||
+      item?.image  || item?.img || '';
+
+    const src = normalizeAssetUrl(s);
+    return src || '';
+  }
+
+  function hideSheetSplash(){
+    const ov = document.getElementById('sheetSplash');
+    const sheet = document.getElementById('modalSheet');
+    if(!ov || !sheet) return;
+
+    ov.classList.remove('active');
+    sheet.classList.remove('splash-on');
+  }
+
+  function showSheetSplash(item){
+    const src = pickSheetSplashSrc(item);
+    if(!src) return; // 沒提供就不顯示
+
+    const ov = document.getElementById('sheetSplash');
+    const img = document.getElementById('sheetSplashImg');
+    const sheet = document.getElementById('modalSheet');
+    if(!ov || !img || !sheet) return;
+
+    // reset timer
+    if(__sheetSplashTimer) clearTimeout(__sheetSplashTimer);
+
+    img.src = src;
+    ov.classList.add('active');
+    sheet.classList.add('splash-on');
+
+    // 點一下提前跳過
+    ov.onclick = () => {
+      if(__sheetSplashTimer) clearTimeout(__sheetSplashTimer);
+      hideSheetSplash();
+    };
+
+    __sheetSplashTimer = setTimeout(()=>{
+      hideSheetSplash();
+    }, 5000);
+  }
+
 
   // ====== Load Data ======
   async function loadAllData(){ 
@@ -2134,7 +2224,7 @@
             ${escapeHtml((item.tag||'').toUpperCase())}
             ${((item.tag||'').toLowerCase()==='takagi')
               ? getTagIconHtml('takagi', i)
-              :`<i class="fas ${tagIcon(item.tag, item.subtag)} style="opacity:.35; font-size:.72rem; margin-left:2px;"></i>`
+              : `<i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"></i>`
             }
           </div>
           <div class="tl-title">${escapeHtml(item.title || '').replace(/\n/g,'<br>')}</div>
@@ -2919,7 +3009,10 @@ async function renderWeatherJMA(meta){
         <div class="modal-sticky-wrap ${tagClass(item.tag)}">
             <div class="sheet-head">
                 <div class="tag-chip ${tagClass(item.tag)}">
-                    <div class="sheet-tag ${tagClass(item.tag)}">${escapeHtml((item.tag||'').toUpperCase())}</div>
+                    <div class="sheet-tag ${tagClass(item.tag)}">
+                      ${escapeHtml((item.tag||'').toUpperCase())}
+                      ${((item.tag||'').toLowerCase()==='takagi') ? getTagIconHtml('takagi', itemIdx) : ''}
+                    </div>
                 </div>
             <div class="sheet-time"><i class="fa-regular fa-clock" style="color:#8B8175;"></i>${escapeHtml(item.time || '—')}</div>
             </div>
@@ -2991,6 +3084,8 @@ async function renderWeatherJMA(meta){
     lockBodyScroll();
     document.getElementById('modalOverlay').classList.add('active');
     document.getElementById('modalSheet').classList.add('active');
+    showSheetSplash(item);
+
     // === menu pill click + 喇叭 click：事件委派（只綁一次）===
     // document.getElementById('modalSheet')?.addEventListener('click', (e) => {
     //   const speakBtn = e.target.closest?.('.menuSpeak');
@@ -3062,6 +3157,7 @@ async function renderWeatherJMA(meta){
     overlay.style.opacity = '';
     sheet.style.transition = '';
     sheet.style.transform  = '';
+    hideSheetSplash();
 
     // 先讓 sheet 開始下滑
     sheet.classList.remove('active');
