@@ -883,44 +883,123 @@
       gap:6px;  
     }
     /* ===== Sheet Splash (open modal show image for ~5s) ===== */
-    .sheet-splash{
-      position:absolute;
-      inset:0;
-      z-index:2600;                 /* 要高於 modal 內容 */
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:18px;
-      background:rgba(10,10,10,.55);
-      opacity:0;
-      pointer-events:none;
-      transition:opacity .22s ease;
-    }
+.sheet-splash{
+  position:absolute;
+  inset:0;
+  z-index:2600;                 /* 高於 modal 內容 */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:rgba(246,243,238,.18);
+  backdrop-filter: blur(10px) saturate(1.15);
+  -webkit-backdrop-filter: blur(10px) saturate(1.15);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .20s ease;
+}
+.sheet-splash.active{
+  opacity:1;
+  pointer-events:auto;          /* 出現時吃點擊，避免誤觸內容 */
+}
 
-    .sheet-splash.active{
-      opacity:1;
-      pointer-events:auto;          /* 出現時吃點擊，避免誤觸內容 */
-    }
+/* ✅ 像相機取景框的卡片 */
+.sheet-splash-frame{
+  width:min(680px, 92vw);
+  max-height:78vh;
+  position:relative;
+  border-radius:28px;
+  background:rgba(255,255,255,.78);
+  border:1px solid rgba(233,225,214,.9);
+  box-shadow:0 30px 90px rgba(0,0,0,.28);
+  overflow:hidden;
+  transform:translateY(18px) scale(.92);
+  opacity:0;
+}
+.sheet-splash.active .sheet-splash-frame{
+  animation:splashPop .34s cubic-bezier(.2,.95,.2,1) forwards;
+}
+@keyframes splashPop{
+  0%   { transform:translateY(22px) scale(.90); opacity:0; }
+  60%  { transform:translateY(0) scale(1.03); opacity:1; }
+  100% { transform:translateY(0) scale(1.00); opacity:1; }
+}
+.sheet-splash-frame::after{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  background:radial-gradient(ellipse at center, rgba(255,255,255,.16) 0%, rgba(255,255,255,0) 55%);
+  pointer-events:none;
+}
 
-    .sheet-splash img{
-      width:100%;
-      max-width:640px;
-      max-height:72vh;
-      object-fit:cover;
-      border-radius:22px;
-      border:1px solid rgba(255,255,255,.18);
-      box-shadow:0 26px 80px rgba(0,0,0,.38);
-    }
+/* ✅ 1 張 / 2 張：自動切換 */
+.sheet-splash-grid{
+  display:grid;
+  gap:10px;
+  padding:14px;
+  height:100%;
+}
+.sheet-splash-grid.one{ grid-template-rows: 1fr; }
+.sheet-splash-grid.two{ grid-template-rows: 1fr 1fr; }
 
-    /* splash 出現時，禁止底下內容互動（保險） */
-    #modalSheet.splash-on #modalScroll{
-      pointer-events:none;
-    }
+.sheet-splash-grid img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:20px;
+  border:1px solid rgba(0,0,0,.06);
+  box-shadow:0 10px 26px rgba(0,0,0,.12);
+}
 
+/* 取景框四角 */
+.cam-corner{
+  position:absolute;
+  width:22px; height:22px;
+  border:3px solid rgba(60,52,44,.65);
+  border-radius:8px;
+  opacity:.55;
+  pointer-events:none;
+}
+.cam-corner.tl{ top:10px; left:10px; border-right:none; border-bottom:none; }
+.cam-corner.tr{ top:10px; right:10px; border-left:none; border-bottom:none; }
+.cam-corner.bl{ bottom:10px; left:10px; border-right:none; border-top:none; }
+.cam-corner.br{ bottom:10px; right:10px; border-left:none; border-top:none; }
 
+/* 上方相機小膠囊 */
+.cam-topbar{
+  position:absolute;
+  top:10px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,.70);
+  border:1px solid rgba(0,0,0,.05);
+  box-shadow:0 8px 18px rgba(0,0,0,.12);
+}
+.cam-dot{
+  width:8px; height:8px;
+  border-radius:999px;
+  background:#ff4d4d;
+  box-shadow:0 0 0 3px rgba(255,77,77,.18);
+}
+.cam-label{
+  font-family:'Roboto Mono', monospace;
+  font-weight:800;
+  font-size:.78rem;
+  letter-spacing:.12em;
+  color:rgba(43,39,35,.85);
+}
 
-
-    /* FOOD 外框 */
+/* splash 出現時，先暫停底下內容互動（並稍微柔焦） */
+#modalSheet.splash-on #modalScroll{
+  pointer-events:none;
+  filter: blur(1px) saturate(.95);
+}
+/* FOOD 外框 */
     .tag-chip{
         display:inline-flex;
         align-items:center;
@@ -1784,8 +1863,18 @@
       <button class="modal-x" onclick="closeModal()" aria-label="close">×</button>
     </div>
     <div class="sheet-splash" id="sheetSplash" aria-hidden="true">
-      <img id="sheetSplashImg" alt="" />
+  <div class="sheet-splash-frame" role="presentation">
+    <div class="sheet-splash-grid" id="sheetSplashGrid">
+      <img id="sheetSplashImg1" alt="" />
+      <img id="sheetSplashImg2" alt="" />
     </div>
+    <span class="cam-corner tl"></span><span class="cam-corner tr"></span>
+    <span class="cam-corner bl"></span><span class="cam-corner br"></span>
+    <div class="cam-topbar" aria-hidden="true">
+      <span class="cam-dot"></span><span class="cam-label">SNAP</span>
+    </div>
+  </div>
+</div>
     <div class="modal-scroll" id="modalScroll">
         <div id="modalSticky"></div>
         <div id="modalBody"></div>
@@ -1828,40 +1917,86 @@
   let __heroTimer = null;
   let __sheetSplashTimer = null;
 
-  function pickSheetSplashSrc(item){
-    // ✅ 你可以在每個景點 item 裡加這些欄位任何一個：
-    // splash / splash_img / cover / cover_img / image / img
-    const s =
-      item?.splash || item?.splash_img ||
-      item?.cover  || item?.cover_img  ||
-      item?.image  || item?.img || '';
+  function pickSheetSplashSrcs(item){
+  // ✅ 支援：splash (string/array) / splash_img / splash2 / covers / images / cover / image / img
+  //   - 1 張：splash: "xxx.jpg"
+  //   - 2 張：splash: ["a.jpg","b.jpg"]  或 splash_img + splash2
+  const raw =
+    item?.splash ??
+    item?.splash_imgs ??
+    item?.covers ??
+    item?.images ??
+    item?.splash_img ??
+    item?.cover ??
+    item?.cover_img ??
+    item?.image ??
+    item?.img ??
+    '';
 
-    const src = normalizeAssetUrl(s);
-    return src || '';
-  }
+  let list = [];
+  if(Array.isArray(raw)) list = raw;
+  else if(typeof raw === 'string' && raw.trim()) list = [raw];
+  else if(raw) list = [raw];
+
+  // splash2（第二張）補上
+  if(item?.splash2) list.push(item.splash2);
+
+  // normalize + 去空
+  const out = list
+    .map(s => normalizeAssetUrl(s))
+    .filter(Boolean)
+    .slice(0,2);
+
+  return out;
+}
 
   function hideSheetSplash(){
-    const ov = document.getElementById('sheetSplash');
+  const ov    = document.getElementById('sheetSplash');
+  const grid  = document.getElementById('sheetSplashGrid');
+  const img1  = document.getElementById('sheetSplashImg1');
+  const img2  = document.getElementById('sheetSplashImg2');
+  const sheet = document.getElementById('modalSheet');
+  if(!ov || !sheet) return;
+
+  ov.classList.remove('active');
+  sheet.classList.remove('splash-on');
+
+  // 清掉互動與 src（避免下次閃舊圖）
+  ov.onclick = null;
+  if(img1) img1.removeAttribute('src');
+  if(img2){ img2.removeAttribute('src'); img2.style.display = 'none'; }
+  if(grid){ grid.classList.remove('two'); grid.classList.add('one'); }
+}
+
+    function showSheetSplash(item){
+    const srcs = pickSheetSplashSrcs(item);
+    if(!srcs.length) return; // 沒提供就不顯示
+
+    const ov    = document.getElementById('sheetSplash');
+    const grid  = document.getElementById('sheetSplashGrid');
+    const img1  = document.getElementById('sheetSplashImg1');
+    const img2  = document.getElementById('sheetSplashImg2');
     const sheet = document.getElementById('modalSheet');
-    if(!ov || !sheet) return;
-
-    ov.classList.remove('active');
-    sheet.classList.remove('splash-on');
-  }
-
-  function showSheetSplash(item){
-    const src = pickSheetSplashSrc(item);
-    if(!src) return; // 沒提供就不顯示
-
-    const ov = document.getElementById('sheetSplash');
-    const img = document.getElementById('sheetSplashImg');
-    const sheet = document.getElementById('modalSheet');
-    if(!ov || !img || !sheet) return;
+    if(!ov || !grid || !img1 || !img2 || !sheet) return;
 
     // reset timer
     if(__sheetSplashTimer) clearTimeout(__sheetSplashTimer);
 
-    img.src = src;
+    // 1 張 / 2 張：套 class + 顯示/隱藏
+    const two = srcs.length >= 2;
+    grid.classList.toggle('two', two);
+    grid.classList.toggle('one', !two);
+
+    img1.src = srcs[0];
+    if(two){
+      img2.style.display = '';
+      img2.src = srcs[1];
+    }else{
+      img2.style.display = 'none';
+      img2.removeAttribute('src');
+    }
+
+    // show
     ov.classList.add('active');
     sheet.classList.add('splash-on');
 
@@ -1871,120 +2006,11 @@
       hideSheetSplash();
     };
 
-    __sheetSplashTimer = setTimeout(()=>{
-      hideSheetSplash();
-    }, 5000);
+    // 5 秒後自動關
+    __sheetSplashTimer = setTimeout(hideSheetSplash, 5000);
   }
 
-
-  // ====== Load Data ======
-  async function loadAllData(){ 
-    [CONFIG, CHECKLISTS, TODOS, FLIGHTS, HOTELS, ITINERARY] = await Promise.all([
-      fetch("./data/config.json").then(r=>r.json()),
-      fetch("./data/checklists.json").then(r=>r.json()),
-      fetch("./data/todos.json").then(r=>r.json()),
-      fetch("./data/flights.json").then(r=>r.json()),
-      fetch("./data/hotels.json").then(r=>r.json()),
-      fetch("./data/itinerary.index.json").then(r=>r.json()),
-    ]);
-
-    users = CONFIG?.members || ['L','K','R','Y','J'];
-    curUser = users[0] || 'L';
-    curPayer = users[0] || 'L';
-
-    checklistData = CHECKLISTS || { carry: [], check: [] };
-    hotels = HOTELS || [];
-    itineraryIndex = ITINERARY || [];
-
-    const title = (CONFIG?.trip_title || '四國巡禮');
-
-    // 2) subtitle 不顯示 L,K,R,Y,J
-    const sub = `${CONFIG?.days || 9}天${CONFIG?.nights || 8}夜${CONFIG?.mode ? CONFIG.mode : ''}`;
-    
-    document.getElementById('hdrTitle').innerText = title;
-    document.getElementById('hdrKana').innerText = 'とくしまけん、かがわけん、えひめけん、こうちけん';
-    document.getElementById('hdrSub').innerText = sub;
-    document.getElementById('hdrYear').innerText = '2026';
-    
-
-
-    document.getElementById('hdrSub').innerText = sub;
-  }
-
-  document.addEventListener('DOMContentLoaded', async () => {
-    await loadAllData();
-    renderGlobalTodos();
-    renderUserTabs();
-    renderChecklists();
-    renderDateScroller();
-    enableWheelHorizontal(document.getElementById('dayScroller'));
-    await selectDay(0);
-    renderHotels();
-    renderFlights();
-    normalizeExpenses();
-    renderExpenseUI();
-  });
-
-  document.getElementById('modalSheet')?.addEventListener(
-    'touchmove',
-    (e) => e.stopPropagation(),
-    { passive: true }
-  );
-
-
-  document.getElementById('modalOverlay')?.addEventListener(
-    'touchmove',
-    (e) => e.preventDefault(),
-    { passive: false }
-  );
-  document.getElementById('timelineList').addEventListener('click', (e) => {
-    const el = e.target.closest('.route-click');
-    if(!el) return;
-
-    const from = decodeURIComponent(el.dataset.from || '');
-    const to   = decodeURIComponent(el.dataset.to || '');
-    const mode = decodeURIComponent(el.dataset.mode || 'drive');
-
-    openDirections(from, to, mode);
-   });
-
-
-
-  function nav(pageId, el) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-'+pageId).classList.add('active');
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    el.classList.add('active');
-    window.scrollTo(0,0);
-  }
-
-  // ====== 全員待辦 ======
-  function renderGlobalTodos(){
-    const el = document.getElementById('globalTodoList');
-    if(!el) return;
-
-    const saved = JSON.parse(localStorage.getItem('global_todos')) || {};
-    el.innerHTML = (TODOS || []).map((t, idx) => {
-      const key = t.title || `todo_${idx}`;
-      const checked = saved[key] ? 'checked' : '';
-
-      const titleHTML = t.link
-        ? `<div class="todo-title"><a href="${t.link}" target="_blank" rel="noopener">${escapeHtml(t.title)}</a></div>`
-        : `<div class="todo-title"><span>${escapeHtml(t.title)}</span></div>`;
-
-      return `
-        <li class="todo-li">
-          <input type="checkbox" ${checked} onchange="toggleGlobalTodo('${escapeHtml(key)}')">
-          <div>
-            ${titleHTML}
-            ${t.note ? `<div class="todo-note">${escapeHtml(t.note)}</div>` : ''}
-          </div>
-        </li>
-      `;
-    }).join('');
-  }
-
-  function toggleGlobalTodo(key){
+function toggleGlobalTodo(key){
     const k = unescapeHtml(key);
     const saved = JSON.parse(localStorage.getItem('global_todos')) || {};
     saved[k] = !saved[k];
@@ -2425,9 +2451,11 @@
           <div class="tl-content ${item.highlight ? 'highlight' : ''}" style="position:relative;">
             ${item.reserved ? `<div class="reserve-badge">予約済</div>` : ``}
             <div class="tl-tag ${tagClass(item.tag)}">
-                ${escapeHtml((item.tag||'').toUpperCase())}
-                <i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"></i>
-            </div>	  
+    ${escapeHtml((item.tag||'').toUpperCase())}
+    ${((item.tag||'').toLowerCase()==='takagi')
+        ? getTagIconHtml('takagi', i)
+        : `<i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"></i>`}
+</div>	  
             <div class="tl-title">${escapeHtml(item.title || '').replace(/\n/g,'<br>')}</div>
             <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
             ${stay}
