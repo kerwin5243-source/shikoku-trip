@@ -5,6 +5,11 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>2026 四國巡禮</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="/icons/apple-touch-icon-167.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-touch-icon-152.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png">
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#F6F3EE" />
@@ -60,7 +65,7 @@
     body.body-no-scroll{ overflow:hidden; }
 
     .app-header{
-      padding:20px 20px 16px;
+      padding:calc(20px + env(safe-area-inset-top)) 20px 16px;
       text-align:center;
       background:linear-gradient(to bottom, rgba(246,243,238,1), rgba(246,243,238,.82));
     }
@@ -1060,20 +1065,37 @@
     /* bottom nav */
     .bottom-nav{
       position:fixed; 
-      bottom: calc(10px + env(safe-area-inset-bottom));
+      bottom: 0;
       left:20px; right:20px;
       background:rgba(255,255,255,.72);
       backdrop-filter:blur(20px);
       border-radius:24px;
       display:flex;
       justify-content:space-around;
-      padding:10px 0;
+      padding:10px 0 calc(10px + env(safe-area-inset-bottom));
+      border:1px solid rgba(233,225,214,.9);
       box-shadow:0 16px 50px rgba(0,0,0,.12);
       z-index:1000;
       border:1px solid rgba(233,225,214,.9);
+      align-items:flex-end;
     }
-    .nav-item{ text-align:center; color:#B9B2AA; font-size:.66rem; cursor:pointer; flex:1; transition:.2s; }
-    .nav-item i{ display:block; font-size:1.18rem; margin-bottom:2px; }
+    .nav-item{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-end;   /* ✅ 內容貼 bar 底 */
+      gap:2px;
+      font-size:.66rem;
+      color:#B9B2AA;
+      line-height:1;
+    }
+
+    .nav-item i{
+      display:block;
+      font-size:1.18rem;
+      margin-bottom:0;            /* ✅ 不要再把文字往上推 */
+    }
     .nav-item.active{ color:#2B2723; transform:translateY(-1px); }
 
     /* boarding */
@@ -1333,10 +1355,6 @@
       margin-right:auto;
     }
 
-    .bottom-nav{
-      padding-bottom: calc(14px + env(safe-area-inset-bottom));
-    }
-
     /* 右側：時間 + 導航按鈕（把 15min 移到這裡） */
     .route-cta{
       display:flex;
@@ -1558,7 +1576,7 @@
       border-bottom:none;
     }
 
-    .menu-jp{ display:flex; align-items:center; gap:8px; font-weight:900; color:#4B2E2A; }
+    .menu-jp{ display:flex; align-items:center; gap:8px; font-size:.9rem; font-weight:900; color:#4B2E2A; }
     .menu-zh{ text-align:right; color:#6B7280; font-size:.9rem; font-weight:800; }
 
     /* ✅ 小喇叭（放日文前面） */
