@@ -883,10 +883,35 @@
       gap:6px;  
     }
     /* ===== Sheet Splash (open modal show image for ~5s) ===== */
+    /* ===== Sheet Splash (camera frame + pop) ===== */
     .sheet-splash{
       position:absolute;
       inset:0;
-      z-index:2600;                 /* 要高於 modal 內容 */
+      z-index:2600;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+
+      /* 不要死灰：改成鏡頭遮光感 */
+      background:
+        radial-gradient(circle at 50% 40%,
+          rgba(0,0,0,.18) 0%,
+          rgba(0,0,0,.46) 55%,
+          rgba(0,0,0,.62) 100%);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .18s ease;
+    }
+
+
+    /* .sheet-splash{
+      position:absolute;
+      inset:0;
+      z-index:2600;                
       display:flex;
       align-items:center;
       justify-content:center;
@@ -895,7 +920,7 @@
       opacity:0;
       pointer-events:none;
       transition:opacity .22s ease;
-    }
+    } 02031014*/
 
     .sheet-splash.active{
       opacity:1;
@@ -910,6 +935,95 @@
       border-radius:22px;
       border:1px solid rgba(255,255,255,.18);
       box-shadow:0 26px 80px rgba(0,0,0,.38);
+    }
+
+
+    
+    /* 取景框本體 */
+    .splash-frame{
+      width:100%;
+      max-width:660px;
+      max-height:76vh;
+      border-radius:22px;
+      position:relative;
+      overflow:hidden;
+
+      /* 玻璃卡片感 */
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.22);
+      box-shadow:0 28px 90px rgba(0,0,0,.42);
+
+      transform: translateY(18px) scale(.94);
+      opacity:0;
+      animation: splashPop .34s cubic-bezier(.16,1,.3,1) forwards;
+    }
+
+    /* pop 動畫 */
+    @keyframes splashPop{
+      0%   { transform: translateY(18px) scale(.94); opacity:0; }
+      60%  { transform: translateY(-2px) scale(1.01); opacity:1; }
+      100% { transform: translateY(0) scale(1); opacity:1; }
+    }
+
+    /* 取景框四角（相機框） */
+    .splash-frame::before,
+    .splash-frame::after{
+      content:"";
+      position:absolute;
+      inset:12px;
+      border-radius:16px;
+      pointer-events:none;
+    }
+    .splash-frame::before{
+      /* 四角框線：用背景畫四個 L 角 */
+      background:
+        linear-gradient(#fff,#fff) left top/22px 2px no-repeat,
+        linear-gradient(#fff,#fff) left top/2px 22px no-repeat,
+
+        linear-gradient(#fff,#fff) right top/22px 2px no-repeat,
+        linear-gradient(#fff,#fff) right top/2px 22px no-repeat,
+
+        linear-gradient(#fff,#fff) left bottom/22px 2px no-repeat,
+        linear-gradient(#fff,#fff) left bottom/2px 22px no-repeat,
+
+        linear-gradient(#fff,#fff) right bottom/22px 2px no-repeat,
+        linear-gradient(#fff,#fff) right bottom/2px 22px no-repeat;
+      opacity:.55;
+    }
+    .splash-frame::after{
+      border:1px solid rgba(255,255,255,.18);
+      opacity:.8;
+    }
+
+    /* 1 張 / 2 張 */
+    .splash-grid{
+      display:grid;
+      gap:10px;
+      padding:14px;
+    }
+    .splash-grid.one{
+      grid-template-columns:1fr;
+    }
+    .splash-grid.two{
+      grid-template-columns:1fr;
+      grid-template-rows:1fr 1fr;
+    }
+
+    /* 圖片本體 */
+    .splash-img{
+      width:100%;
+      height:100%;
+      aspect-ratio: 16 / 9;
+      object-fit:cover;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:0 18px 50px rgba(0,0,0,.28);
+      display:none; /* JS 會決定顯示哪張 */
+    }
+
+    /* 兩張上下時，讓每張更像拍立得畫面 */
+    .splash-grid.two .splash-img{
+      aspect-ratio: 16 / 10;
     }
 
     /* splash 出現時，禁止底下內容互動（保險） */
@@ -1784,8 +1898,16 @@
       <button class="modal-x" onclick="closeModal()" aria-label="close">×</button>
     </div>
     <div class="sheet-splash" id="sheetSplash" aria-hidden="true">
-      <img id="sheetSplashImg" alt="" />
+      <div class="splash-frame" role="img" aria-label="spotlight">
+        <div class="splash-grid one" id="sheetSplashGrid">
+          <img class="splash-img" id="sheetSplashImg1" alt="" />
+          <img class="splash-img" id="sheetSplashImg2" alt="" />
+        </div>
+      </div>
     </div>
+    <!-- <div class="sheet-splash" id="sheetSplash" aria-hidden="true">
+      <img id="sheetSplashImg" alt="" />
+    </div> 0203_1014-->
     <div class="modal-scroll" id="modalScroll">
         <div id="modalSticky"></div>
         <div id="modalBody"></div>
@@ -1828,17 +1950,44 @@
   let __heroTimer = null;
   let __sheetSplashTimer = null;
 
-  function pickSheetSplashSrc(item){
-    // ✅ 你可以在每個景點 item 裡加這些欄位任何一個：
-    // splash / splash_img / cover / cover_img / image / img
-    const s =
+  function pickSheetSplashSrcs(item){
+    // 支援：字串 or 陣列
+    // 可用欄位：splash / splash_img / cover / cover_img / image / img
+    // 也支援第二張：splash2 / splash_img2 / cover2 / image2 / img2
+    const main =
       item?.splash || item?.splash_img ||
       item?.cover  || item?.cover_img  ||
       item?.image  || item?.img || '';
 
-    const src = normalizeAssetUrl(s);
-    return src || '';
+    const second =
+      item?.splash2 || item?.splash_img2 ||
+      item?.cover2  || item?.cover_img2  ||
+      item?.image2  || item?.img2 || '';
+
+    // 若 main 本身就是陣列：["a","b"]
+    let list = [];
+    if(Array.isArray(main)){
+      list = main;
+    }else{
+      list = [main, second].filter(Boolean);
+    }
+
+    // 正規化 & 最多兩張
+    return list.map(s => normalizeAssetUrl(s)).filter(Boolean).slice(0,2);
   }
+
+
+  // function pickSheetSplashSrc(item){
+  //   // ✅ 你可以在每個景點 item 裡加這些欄位任何一個：
+  //   // splash / splash_img / cover / cover_img / image / img
+  //   const s =
+  //     item?.splash || item?.splash_img ||
+  //     item?.cover  || item?.cover_img  ||
+  //     item?.image  || item?.img || '';
+
+  //   const src = normalizeAssetUrl(s);
+  //   return src || '';
+  // } 02031014
 
   function hideSheetSplash(){
     const ov = document.getElementById('sheetSplash');
@@ -1847,21 +1996,46 @@
 
     ov.classList.remove('active');
     sheet.classList.remove('splash-on');
+    const img1 = document.getElementById('sheetSplashImg1');
+    const img2 = document.getElementById('sheetSplashImg2');
+    if(img1) img1.removeAttribute('src');
+    if(img2) img2.removeAttribute('src');
+
   }
 
   function showSheetSplash(item){
-    const src = pickSheetSplashSrc(item);
-    if(!src) return; // 沒提供就不顯示
+    const srcs = pickSheetSplashSrcs(item);
+    if(!srcs.length) return;
 
-    const ov = document.getElementById('sheetSplash');
-    const img = document.getElementById('sheetSplashImg');
+    const ov    = document.getElementById('sheetSplash');
     const sheet = document.getElementById('modalSheet');
-    if(!ov || !img || !sheet) return;
+    const grid  = document.getElementById('sheetSplashGrid');
+    const img1  = document.getElementById('sheetSplashImg1');
+    const img2  = document.getElementById('sheetSplashImg2');
+    if(!ov || !sheet || !grid || !img1 || !img2) return;
 
     // reset timer
     if(__sheetSplashTimer) clearTimeout(__sheetSplashTimer);
 
-    img.src = src;
+    // 先重置
+    img1.style.display = 'none';
+    img2.style.display = 'none';
+    img1.removeAttribute('src');
+    img2.removeAttribute('src');
+
+    // 套 1/2 張模式 class
+    grid.classList.remove('one','two');
+    grid.classList.add(srcs.length >= 2 ? 'two' : 'one');
+
+    // 塞圖
+    img1.src = srcs[0];
+    img1.style.display = 'block';
+
+    if(srcs[1]){
+      img2.src = srcs[1];
+      img2.style.display = 'block';
+    }
+
     ov.classList.add('active');
     sheet.classList.add('splash-on');
 
@@ -1871,10 +2045,36 @@
       hideSheetSplash();
     };
 
-    __sheetSplashTimer = setTimeout(()=>{
-      hideSheetSplash();
-    }, 5000);
+    __sheetSplashTimer = setTimeout(()=> hideSheetSplash(), 5000);
   }
+
+
+  // function showSheetSplash(item){
+  //   const src = pickSheetSplashSrc(item);
+  //   if(!src) return; // 沒提供就不顯示
+
+  //   const ov = document.getElementById('sheetSplash');
+  //   const img = document.getElementById('sheetSplashImg');
+  //   const sheet = document.getElementById('modalSheet');
+  //   if(!ov || !img || !sheet) return;
+
+  //   // reset timer
+  //   if(__sheetSplashTimer) clearTimeout(__sheetSplashTimer);
+
+  //   img.src = src;
+  //   ov.classList.add('active');
+  //   sheet.classList.add('splash-on');
+
+  //   // 點一下提前跳過
+  //   ov.onclick = () => {
+  //     if(__sheetSplashTimer) clearTimeout(__sheetSplashTimer);
+  //     hideSheetSplash();
+  //   };
+
+  //   __sheetSplashTimer = setTimeout(()=>{
+  //     hideSheetSplash();
+  //   }, 5000);
+  // } 02031014
 
 
   // ====== Load Data ======
@@ -3160,6 +3360,7 @@ async function renderWeatherJMA(meta){
     sheet.style.transition = '';
     sheet.style.transform  = '';
     hideSheetSplash();
+    
 
     // 先讓 sheet 開始下滑
     sheet.classList.remove('active');
