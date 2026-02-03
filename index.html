@@ -1875,7 +1875,7 @@
     </div>
   </div>
 </div>
-    <div class="modal-scroll" id="modalScroll">
+<div class="modal-scroll" id="modalScroll">
         <div id="modalSticky"></div>
         <div id="modalBody"></div>
     </div>
@@ -1916,6 +1916,7 @@
   let currentDayIdx = 0;
   let __heroTimer = null;
   let __sheetSplashTimer = null;
+  let __closingModal = false;
 
   function pickSheetSplashSrcs(item){
   // ✅ 支援：splash (string/array) / splash_img / splash2 / covers / images / cover / image / img
@@ -2010,7 +2011,114 @@
     __sheetSplashTimer = setTimeout(hideSheetSplash, 5000);
   }
 
-function toggleGlobalTodo(key){
+// ====== Load Data ======
+  async function loadAllData(){ 
+    [CONFIG, CHECKLISTS, TODOS, FLIGHTS, HOTELS, ITINERARY] = await Promise.all([
+      fetch("./data/config.json").then(r=>r.json()),
+      fetch("./data/checklists.json").then(r=>r.json()),
+      fetch("./data/todos.json").then(r=>r.json()),
+      fetch("./data/flights.json").then(r=>r.json()),
+      fetch("./data/hotels.json").then(r=>r.json()),
+      fetch("./data/itinerary.index.json").then(r=>r.json()),
+    ]);
+
+    users = CONFIG?.members || ['L','K','R','Y','J'];
+    curUser = users[0] || 'L';
+    curPayer = users[0] || 'L';
+
+    checklistData = CHECKLISTS || { carry: [], check: [] };
+    hotels = HOTELS || [];
+    itineraryIndex = ITINERARY || [];
+
+    const title = (CONFIG?.trip_title || '四國巡禮');
+
+    // 2) subtitle 不顯示 L,K,R,Y,J
+    const sub = `${CONFIG?.days || 9}天${CONFIG?.nights || 8}夜${CONFIG?.mode ? CONFIG.mode : ''}`;
+    
+    document.getElementById('hdrTitle').innerText = title;
+    document.getElementById('hdrKana').innerText = 'とくしまけん、かがわけん、えひめけん、こうちけん';
+    document.getElementById('hdrSub').innerText = sub;
+    document.getElementById('hdrYear').innerText = '2026';
+    
+
+
+    document.getElementById('hdrSub').innerText = sub;
+  }
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    await loadAllData();
+    renderGlobalTodos();
+    renderUserTabs();
+    renderChecklists();
+    renderDateScroller();
+    enableWheelHorizontal(document.getElementById('dayScroller'));
+    await selectDay(0);
+    renderHotels();
+    renderFlights();
+    normalizeExpenses();
+    renderExpenseUI();
+  });
+
+  document.getElementById('modalSheet')?.addEventListener(
+    'touchmove',
+    (e) => e.stopPropagation(),
+    { passive: true }
+  );
+
+
+  document.getElementById('modalOverlay')?.addEventListener(
+    'touchmove',
+    (e) => e.preventDefault(),
+    { passive: false }
+  );
+  document.getElementById('timelineList').addEventListener('click', (e) => {
+    const el = e.target.closest('.route-click');
+    if(!el) return;
+
+    const from = decodeURIComponent(el.dataset.from || '');
+    const to   = decodeURIComponent(el.dataset.to || '');
+    const mode = decodeURIComponent(el.dataset.mode || 'drive');
+
+    openDirections(from, to, mode);
+   });
+
+
+
+  function nav(pageId, el) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-'+pageId).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+    window.scrollTo(0,0);
+  }
+
+  // ====== 全員待辦 ======
+  function renderGlobalTodos(){
+    const el = document.getElementById('globalTodoList');
+    if(!el) return;
+
+    const saved = JSON.parse(localStorage.getItem('global_todos')) || {};
+    el.innerHTML = (TODOS || []).map((t, idx) => {
+      const key = t.title || `todo_${idx}`;
+      const checked = saved[key] ? 'checked' : '';
+
+      const titleHTML = t.link
+        ? `<div class="todo-title"><a href="${t.link}" target="_blank" rel="noopener">${escapeHtml(t.title)}</a></div>`
+        : `<div class="todo-title"><span>${escapeHtml(t.title)}</span></div>`;
+
+      return `
+        <li class="todo-li">
+          <input type="checkbox" ${checked} onchange="toggleGlobalTodo('${escapeHtml(key)}')">
+          <div>
+            ${titleHTML}
+            ${t.note ? `<div class="todo-note">${escapeHtml(t.note)}</div>` : ''}
+          </div>
+        </li>
+      `;
+    }).join('');
+  }
+
+  function toggleGlobalTodo(key){
     const k = unescapeHtml(key);
     const saved = JSON.parse(localStorage.getItem('global_todos')) || {};
     saved[k] = !saved[k];
@@ -2451,11 +2559,9 @@ function toggleGlobalTodo(key){
           <div class="tl-content ${item.highlight ? 'highlight' : ''}" style="position:relative;">
             ${item.reserved ? `<div class="reserve-badge">予約済</div>` : ``}
             <div class="tl-tag ${tagClass(item.tag)}">
-    ${escapeHtml((item.tag||'').toUpperCase())}
-    ${((item.tag||'').toLowerCase()==='takagi')
-        ? getTagIconHtml('takagi', i)
-        : `<i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"></i>`}
-</div>	  
+                ${escapeHtml((item.tag||'').toUpperCase())}
+                <i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"></i>
+            </div>	  
             <div class="tl-title">${escapeHtml(item.title || '').replace(/\n/g,'<br>')}</div>
             <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
             ${stay}
@@ -3115,66 +3221,38 @@ async function renderWeatherJMA(meta){
     document.getElementById('modalOverlay').classList.add('active');
     document.getElementById('modalSheet').classList.add('active');
     showSheetSplash(item);
+    handle.addEventListener('pointermove', (e)=>{
+      if(!dragging) return;
+      dy = Math.max(0, e.clientY - startY); // 只允許往下拖
+      setTranslate(dy);
+    });
 
-    // === menu pill click + 喇叭 click：事件委派（只綁一次）===
-    // document.getElementById('modalSheet')?.addEventListener('click', (e) => {
-    //   const speakBtn = e.target.closest?.('.menuSpeak');
-    //   if(speakBtn){
-    //     e.stopPropagation();
-    //     const text = speakBtn.getAttribute('data-speak') || '';
-    //     speakJapanese(text);
-    //     return;
-    //   }
+    handle.addEventListener('pointerup', (e)=>{
+      if(!dragging) return;
+      dragging = false;
+      sheet.releasePointerCapture?.(e.pointerId);
 
-    //   const pill = e.target.closest?.('.menuPill');
-    //   if(!pill) return;
+      // 拖超過門檻就關掉，否則彈回
+      if(dy > 120){
+        reset();
+        closeModal();
+      }else{
+        // 彈回原位
+        sheet.style.transition = 'transform .18s cubic-bezier(.16,1,.3,1)';
+        sheet.style.transform  = 'translateX(-50%) translateY(0)';
+        overlay.style.opacity  = '0.38';
+        setTimeout(reset, 200);
+      }
+    });
 
-    //   const isRec = pill.getAttribute('data-rec') === '1';
-    //   if(!isRec) return; // 不是推薦就不開卡
+    handle.addEventListener('pointercancel', ()=>{
+      if(!dragging) return;
+      dragging = false;
+      reset();
+    });
+  })();
 
-    //   const idx = Number(pill.getAttribute('data-menu-idx'));
-    //   const m = window.__activeModalItem?.menu?.[idx];
-    //   if(m) openMenuCard(m);
-    // });
 
-  }
-
-  // function openRouteMap(ev, idx){
-  //   ev?.stopPropagation?.();
-
-  //   const item = currentDayData?.items?.[idx];
-  //   if(!item) return;
-
-  //   const r = item.route || {};
-  //   const from = r.from || '';
-  //   const to   = r.to || '';
-  //   if(!to) return;
-
-  //   const mode = (r.mode || 'drive').toLowerCase();
-  //   const travelmode =
-  //     mode === 'walk'  ? 'walking' :
-  //     mode === 'train' ? 'transit' :
-  //     mode === 'ship'  ? 'transit' :
-  //     mode === 'plane' ? 'transit' :
-  //     'driving';
-
-  //   window.open(
-  //     `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(from)}&destination=${encodeURIComponent(to)}&travelmode=${travelmode}`,
-  //     '_blank',
-  //     'noopener'
-  //   );
-  // }
-  function openRouteMap(ev, idx){
-    ev?.stopPropagation?.();
-    const item = currentDayData?.items?.[idx];
-    if(!item?.route) return;
-
-    const r = item.route;
-    const tm = travelModeForRoute(r.mode);
-    window.open(`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(r.from||'')}&destination=${encodeURIComponent(r.to||'')}&travelmode=${tm}`, '_blank', 'noopener');
-  }
-
-  let __closingModal = false;
 
   function closeModal(){
     if(__closingModal) return;
@@ -3216,128 +3294,6 @@ async function renderWeatherJMA(meta){
       done();
     }, 260);
   }
-
-
-  function openMenuCard(m){
-    const card = document.getElementById('menuCard');
-    if(!card) return;
-
-    card.hidden = false;
-    card.querySelector('.menuCardJp').textContent = m.jp || '';
-    card.querySelector('.menuCardZh').textContent = m.zh || '';
-    card.querySelector('.menuCardNote').textContent = m.note || '';
-
-    const img = card.querySelector('.menuCardImg');
-    if(m.img){
-      img.src = m.img;
-      img.style.display = 'block';
-    }else{
-      img.removeAttribute('src');
-      img.style.display = 'none';
-    }
-    const desc = m.desc || m.note || m.detail || m.intro || '';
-    
-
-
-    const closeBtn = card.querySelector('.menuCardClose');
-    closeBtn.onclick = closeMenuCard;
-  }
-
-  function closeMenuCard(){
-    const card = document.getElementById('menuCard');
-    if(card) card.hidden = true;
-  }
-
-  function speakJapanese(text){
-    if(!text) return;
-    if(!('speechSynthesis' in window)) return;
-
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'ja-JP';
-
-    // 嘗試挑 ja-JP voice（有的瀏覽器要 voiceschanged 後才拿得到）
-    const pickVoice = () => {
-      const vs = window.speechSynthesis.getVoices?.() || [];
-      const v = vs.find(v => (v.lang||'').toLowerCase().startsWith('ja'));
-      if(v) u.voice = v;
-      window.speechSynthesis.speak(u);
-    };
-
-    const voices = window.speechSynthesis.getVoices?.() || [];
-    if(voices.length) pickVoice();
-    else window.speechSynthesis.onvoiceschanged = pickVoice;
-  }
-
-
-
-  // ===== Modal drag to close =====
-  (function initModalDrag(){
-    const sheet   = document.getElementById('modalSheet');
-    const overlay = document.getElementById('modalOverlay');
-    const handle  = document.querySelector('.modal-header'); // 或改成 .modal-drag-handle
-
-    if(!sheet || !overlay || !handle) return;
-
-    let startY = 0;
-    let dy = 0;
-    let dragging = false;
-
-    function setTranslate(y){
-      sheet.style.transform = `translateX(-50%) translateY(${y}px)`;
-      sheet.style.transition = 'none';
-      // 讓遮罩跟著變淡（可選）
-      const k = Math.max(0, 1 - y / 280);
-      overlay.style.opacity = (0.38 * k).toFixed(3);
-    }
-
-    function reset(){
-      sheet.style.transition = '';
-      sheet.style.transform = '';       // 交回給 .active 的 transform
-      overlay.style.opacity = '';       // 交回給 CSS
-    }
-
-    
-
-    handle.addEventListener('pointerdown', (e)=>{
-      if(!sheet.classList.contains('active')) return;
-      dragging = true;
-      startY = e.clientY;
-      dy = 0;
-      sheet.setPointerCapture?.(e.pointerId);
-    });
-
-    handle.addEventListener('pointermove', (e)=>{
-      if(!dragging) return;
-      dy = Math.max(0, e.clientY - startY); // 只允許往下拖
-      setTranslate(dy);
-    });
-
-    handle.addEventListener('pointerup', (e)=>{
-      if(!dragging) return;
-      dragging = false;
-      sheet.releasePointerCapture?.(e.pointerId);
-
-      // 拖超過門檻就關掉，否則彈回
-      if(dy > 120){
-        reset();
-        closeModal();
-      }else{
-        // 彈回原位
-        sheet.style.transition = 'transform .18s cubic-bezier(.16,1,.3,1)';
-        sheet.style.transform  = 'translateX(-50%) translateY(0)';
-        overlay.style.opacity  = '0.38';
-        setTimeout(reset, 200);
-      }
-    });
-
-    handle.addEventListener('pointercancel', ()=>{
-      if(!dragging) return;
-      dragging = false;
-      reset();
-    });
-  })();
-
 
 
   function openUrl(url){
