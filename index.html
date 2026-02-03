@@ -883,123 +883,44 @@
       gap:6px;  
     }
     /* ===== Sheet Splash (open modal show image for ~5s) ===== */
-.sheet-splash{
-  position:absolute;
-  inset:0;
-  z-index:2600;                 /* 高於 modal 內容 */
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:18px;
-  background:rgba(246,243,238,.18);
-  backdrop-filter: blur(10px) saturate(1.15);
-  -webkit-backdrop-filter: blur(10px) saturate(1.15);
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .20s ease;
-}
-.sheet-splash.active{
-  opacity:1;
-  pointer-events:auto;          /* 出現時吃點擊，避免誤觸內容 */
-}
+    .sheet-splash{
+      position:absolute;
+      inset:0;
+      z-index:2600;                 /* 要高於 modal 內容 */
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      background:rgba(10,10,10,.55);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .22s ease;
+    }
 
-/* ✅ 像相機取景框的卡片 */
-.sheet-splash-frame{
-  width:min(680px, 92vw);
-  max-height:78vh;
-  position:relative;
-  border-radius:28px;
-  background:rgba(255,255,255,.78);
-  border:1px solid rgba(233,225,214,.9);
-  box-shadow:0 30px 90px rgba(0,0,0,.28);
-  overflow:hidden;
-  transform:translateY(18px) scale(.92);
-  opacity:0;
-}
-.sheet-splash.active .sheet-splash-frame{
-  animation:splashPop .34s cubic-bezier(.2,.95,.2,1) forwards;
-}
-@keyframes splashPop{
-  0%   { transform:translateY(22px) scale(.90); opacity:0; }
-  60%  { transform:translateY(0) scale(1.03); opacity:1; }
-  100% { transform:translateY(0) scale(1.00); opacity:1; }
-}
-.sheet-splash-frame::after{
-  content:"";
-  position:absolute;
-  inset:-2px;
-  background:radial-gradient(ellipse at center, rgba(255,255,255,.16) 0%, rgba(255,255,255,0) 55%);
-  pointer-events:none;
-}
+    .sheet-splash.active{
+      opacity:1;
+      pointer-events:auto;          /* 出現時吃點擊，避免誤觸內容 */
+    }
 
-/* ✅ 1 張 / 2 張：自動切換 */
-.sheet-splash-grid{
-  display:grid;
-  gap:10px;
-  padding:14px;
-  height:100%;
-}
-.sheet-splash-grid.one{ grid-template-rows: 1fr; }
-.sheet-splash-grid.two{ grid-template-rows: 1fr 1fr; }
+    .sheet-splash img{
+      width:100%;
+      max-width:640px;
+      max-height:72vh;
+      object-fit:cover;
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:0 26px 80px rgba(0,0,0,.38);
+    }
 
-.sheet-splash-grid img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  border-radius:20px;
-  border:1px solid rgba(0,0,0,.06);
-  box-shadow:0 10px 26px rgba(0,0,0,.12);
-}
+    /* splash 出現時，禁止底下內容互動（保險） */
+    #modalSheet.splash-on #modalScroll{
+      pointer-events:none;
+    }
 
-/* 取景框四角 */
-.cam-corner{
-  position:absolute;
-  width:22px; height:22px;
-  border:3px solid rgba(60,52,44,.65);
-  border-radius:8px;
-  opacity:.55;
-  pointer-events:none;
-}
-.cam-corner.tl{ top:10px; left:10px; border-right:none; border-bottom:none; }
-.cam-corner.tr{ top:10px; right:10px; border-left:none; border-bottom:none; }
-.cam-corner.bl{ bottom:10px; left:10px; border-right:none; border-top:none; }
-.cam-corner.br{ bottom:10px; right:10px; border-left:none; border-top:none; }
 
-/* 上方相機小膠囊 */
-.cam-topbar{
-  position:absolute;
-  top:10px;
-  left:50%;
-  transform:translateX(-50%);
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding:6px 10px;
-  border-radius:999px;
-  background:rgba(255,255,255,.70);
-  border:1px solid rgba(0,0,0,.05);
-  box-shadow:0 8px 18px rgba(0,0,0,.12);
-}
-.cam-dot{
-  width:8px; height:8px;
-  border-radius:999px;
-  background:#ff4d4d;
-  box-shadow:0 0 0 3px rgba(255,77,77,.18);
-}
-.cam-label{
-  font-family:'Roboto Mono', monospace;
-  font-weight:800;
-  font-size:.78rem;
-  letter-spacing:.12em;
-  color:rgba(43,39,35,.85);
-}
 
-/* splash 出現時，先暫停底下內容互動（並稍微柔焦） */
-#modalSheet.splash-on #modalScroll{
-  pointer-events:none;
-  filter: blur(1px) saturate(.95);
-}
-/* FOOD 外框 */
+
+    /* FOOD 外框 */
     .tag-chip{
         display:inline-flex;
         align-items:center;
@@ -1863,19 +1784,9 @@
       <button class="modal-x" onclick="closeModal()" aria-label="close">×</button>
     </div>
     <div class="sheet-splash" id="sheetSplash" aria-hidden="true">
-  <div class="sheet-splash-frame" role="presentation">
-    <div class="sheet-splash-grid" id="sheetSplashGrid">
-      <img id="sheetSplashImg1" alt="" />
-      <img id="sheetSplashImg2" alt="" />
+      <img id="sheetSplashImg" alt="" />
     </div>
-    <span class="cam-corner tl"></span><span class="cam-corner tr"></span>
-    <span class="cam-corner bl"></span><span class="cam-corner br"></span>
-    <div class="cam-topbar" aria-hidden="true">
-      <span class="cam-dot"></span><span class="cam-label">SNAP</span>
-    </div>
-  </div>
-</div>
-<div class="modal-scroll" id="modalScroll">
+    <div class="modal-scroll" id="modalScroll">
         <div id="modalSticky"></div>
         <div id="modalBody"></div>
     </div>
@@ -1914,90 +1825,42 @@
   let dayCache = {};
   let currentDayData = null;
   let currentDayIdx = 0;
-  let __heroTimer = null;
   let __sheetSplashTimer = null;
-  let __closingModal = false;
 
-  function pickSheetSplashSrcs(item){
-  // ✅ 支援：splash (string/array) / splash_img / splash2 / covers / images / cover / image / img
-  //   - 1 張：splash: "xxx.jpg"
-  //   - 2 張：splash: ["a.jpg","b.jpg"]  或 splash_img + splash2
-  const raw =
-    item?.splash ??
-    item?.splash_imgs ??
-    item?.covers ??
-    item?.images ??
-    item?.splash_img ??
-    item?.cover ??
-    item?.cover_img ??
-    item?.image ??
-    item?.img ??
-    '';
+  function pickSheetSplashSrc(item){
+    // ✅ 你可以在每個景點 item 裡加這些欄位任何一個：
+    // splash / splash_img / cover / cover_img / image / img
+    const s =
+      item?.splash || item?.splash_img ||
+      item?.cover  || item?.cover_img  ||
+      item?.image  || item?.img || '';
 
-  let list = [];
-  if(Array.isArray(raw)) list = raw;
-  else if(typeof raw === 'string' && raw.trim()) list = [raw];
-  else if(raw) list = [raw];
-
-  // splash2（第二張）補上
-  if(item?.splash2) list.push(item.splash2);
-
-  // normalize + 去空
-  const out = list
-    .map(s => normalizeAssetUrl(s))
-    .filter(Boolean)
-    .slice(0,2);
-
-  return out;
-}
+    const src = normalizeAssetUrl(s);
+    return src || '';
+  }
 
   function hideSheetSplash(){
-  const ov    = document.getElementById('sheetSplash');
-  const grid  = document.getElementById('sheetSplashGrid');
-  const img1  = document.getElementById('sheetSplashImg1');
-  const img2  = document.getElementById('sheetSplashImg2');
-  const sheet = document.getElementById('modalSheet');
-  if(!ov || !sheet) return;
-
-  ov.classList.remove('active');
-  sheet.classList.remove('splash-on');
-
-  // 清掉互動與 src（避免下次閃舊圖）
-  ov.onclick = null;
-  if(img1) img1.removeAttribute('src');
-  if(img2){ img2.removeAttribute('src'); img2.style.display = 'none'; }
-  if(grid){ grid.classList.remove('two'); grid.classList.add('one'); }
-}
-
-    function showSheetSplash(item){
-    const srcs = pickSheetSplashSrcs(item);
-    if(!srcs.length) return; // 沒提供就不顯示
-
-    const ov    = document.getElementById('sheetSplash');
-    const grid  = document.getElementById('sheetSplashGrid');
-    const img1  = document.getElementById('sheetSplashImg1');
-    const img2  = document.getElementById('sheetSplashImg2');
+    const ov = document.getElementById('sheetSplash');
     const sheet = document.getElementById('modalSheet');
-    if(!ov || !grid || !img1 || !img2 || !sheet) return;
+    if(!ov || !sheet) return;
+
+    ov.classList.remove('active');
+    sheet.classList.remove('splash-on');
+  }
+
+  function showSheetSplash(item){
+    const src = pickSheetSplashSrc(item);
+    if(!src) return; // 沒提供就不顯示
+
+    const ov = document.getElementById('sheetSplash');
+    const img = document.getElementById('sheetSplashImg');
+    const sheet = document.getElementById('modalSheet');
+    if(!ov || !img || !sheet) return;
 
     // reset timer
     if(__sheetSplashTimer) clearTimeout(__sheetSplashTimer);
 
-    // 1 張 / 2 張：套 class + 顯示/隱藏
-    const two = srcs.length >= 2;
-    grid.classList.toggle('two', two);
-    grid.classList.toggle('one', !two);
-
-    img1.src = srcs[0];
-    if(two){
-      img2.style.display = '';
-      img2.src = srcs[1];
-    }else{
-      img2.style.display = 'none';
-      img2.removeAttribute('src');
-    }
-
-    // show
+    img.src = src;
     ov.classList.add('active');
     sheet.classList.add('splash-on');
 
@@ -2007,11 +1870,13 @@
       hideSheetSplash();
     };
 
-    // 5 秒後自動關
-    __sheetSplashTimer = setTimeout(hideSheetSplash, 5000);
+    __sheetSplashTimer = setTimeout(()=>{
+      hideSheetSplash();
+    }, 5000);
   }
 
-// ====== Load Data ======
+
+  // ====== Load Data ======
   async function loadAllData(){ 
     [CONFIG, CHECKLISTS, TODOS, FLIGHTS, HOTELS, ITINERARY] = await Promise.all([
       fetch("./data/config.json").then(r=>r.json()),
@@ -3221,38 +3086,66 @@ async function renderWeatherJMA(meta){
     document.getElementById('modalOverlay').classList.add('active');
     document.getElementById('modalSheet').classList.add('active');
     showSheetSplash(item);
-    handle.addEventListener('pointermove', (e)=>{
-      if(!dragging) return;
-      dy = Math.max(0, e.clientY - startY); // 只允許往下拖
-      setTranslate(dy);
-    });
 
-    handle.addEventListener('pointerup', (e)=>{
-      if(!dragging) return;
-      dragging = false;
-      sheet.releasePointerCapture?.(e.pointerId);
+    // === menu pill click + 喇叭 click：事件委派（只綁一次）===
+    // document.getElementById('modalSheet')?.addEventListener('click', (e) => {
+    //   const speakBtn = e.target.closest?.('.menuSpeak');
+    //   if(speakBtn){
+    //     e.stopPropagation();
+    //     const text = speakBtn.getAttribute('data-speak') || '';
+    //     speakJapanese(text);
+    //     return;
+    //   }
 
-      // 拖超過門檻就關掉，否則彈回
-      if(dy > 120){
-        reset();
-        closeModal();
-      }else{
-        // 彈回原位
-        sheet.style.transition = 'transform .18s cubic-bezier(.16,1,.3,1)';
-        sheet.style.transform  = 'translateX(-50%) translateY(0)';
-        overlay.style.opacity  = '0.38';
-        setTimeout(reset, 200);
-      }
-    });
+    //   const pill = e.target.closest?.('.menuPill');
+    //   if(!pill) return;
 
-    handle.addEventListener('pointercancel', ()=>{
-      if(!dragging) return;
-      dragging = false;
-      reset();
-    });
-  })();
+    //   const isRec = pill.getAttribute('data-rec') === '1';
+    //   if(!isRec) return; // 不是推薦就不開卡
 
+    //   const idx = Number(pill.getAttribute('data-menu-idx'));
+    //   const m = window.__activeModalItem?.menu?.[idx];
+    //   if(m) openMenuCard(m);
+    // });
 
+  }
+
+  // function openRouteMap(ev, idx){
+  //   ev?.stopPropagation?.();
+
+  //   const item = currentDayData?.items?.[idx];
+  //   if(!item) return;
+
+  //   const r = item.route || {};
+  //   const from = r.from || '';
+  //   const to   = r.to || '';
+  //   if(!to) return;
+
+  //   const mode = (r.mode || 'drive').toLowerCase();
+  //   const travelmode =
+  //     mode === 'walk'  ? 'walking' :
+  //     mode === 'train' ? 'transit' :
+  //     mode === 'ship'  ? 'transit' :
+  //     mode === 'plane' ? 'transit' :
+  //     'driving';
+
+  //   window.open(
+  //     `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(from)}&destination=${encodeURIComponent(to)}&travelmode=${travelmode}`,
+  //     '_blank',
+  //     'noopener'
+  //   );
+  // }
+  function openRouteMap(ev, idx){
+    ev?.stopPropagation?.();
+    const item = currentDayData?.items?.[idx];
+    if(!item?.route) return;
+
+    const r = item.route;
+    const tm = travelModeForRoute(r.mode);
+    window.open(`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(r.from||'')}&destination=${encodeURIComponent(r.to||'')}&travelmode=${tm}`, '_blank', 'noopener');
+  }
+
+  let __closingModal = false;
 
   function closeModal(){
     if(__closingModal) return;
@@ -3294,6 +3187,128 @@ async function renderWeatherJMA(meta){
       done();
     }, 260);
   }
+
+
+  function openMenuCard(m){
+    const card = document.getElementById('menuCard');
+    if(!card) return;
+
+    card.hidden = false;
+    card.querySelector('.menuCardJp').textContent = m.jp || '';
+    card.querySelector('.menuCardZh').textContent = m.zh || '';
+    card.querySelector('.menuCardNote').textContent = m.note || '';
+
+    const img = card.querySelector('.menuCardImg');
+    if(m.img){
+      img.src = m.img;
+      img.style.display = 'block';
+    }else{
+      img.removeAttribute('src');
+      img.style.display = 'none';
+    }
+    const desc = m.desc || m.note || m.detail || m.intro || '';
+    
+
+
+    const closeBtn = card.querySelector('.menuCardClose');
+    closeBtn.onclick = closeMenuCard;
+  }
+
+  function closeMenuCard(){
+    const card = document.getElementById('menuCard');
+    if(card) card.hidden = true;
+  }
+
+  function speakJapanese(text){
+    if(!text) return;
+    if(!('speechSynthesis' in window)) return;
+
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'ja-JP';
+
+    // 嘗試挑 ja-JP voice（有的瀏覽器要 voiceschanged 後才拿得到）
+    const pickVoice = () => {
+      const vs = window.speechSynthesis.getVoices?.() || [];
+      const v = vs.find(v => (v.lang||'').toLowerCase().startsWith('ja'));
+      if(v) u.voice = v;
+      window.speechSynthesis.speak(u);
+    };
+
+    const voices = window.speechSynthesis.getVoices?.() || [];
+    if(voices.length) pickVoice();
+    else window.speechSynthesis.onvoiceschanged = pickVoice;
+  }
+
+
+
+  // ===== Modal drag to close =====
+  (function initModalDrag(){
+    const sheet   = document.getElementById('modalSheet');
+    const overlay = document.getElementById('modalOverlay');
+    const handle  = document.querySelector('.modal-header'); // 或改成 .modal-drag-handle
+
+    if(!sheet || !overlay || !handle) return;
+
+    let startY = 0;
+    let dy = 0;
+    let dragging = false;
+
+    function setTranslate(y){
+      sheet.style.transform = `translateX(-50%) translateY(${y}px)`;
+      sheet.style.transition = 'none';
+      // 讓遮罩跟著變淡（可選）
+      const k = Math.max(0, 1 - y / 280);
+      overlay.style.opacity = (0.38 * k).toFixed(3);
+    }
+
+    function reset(){
+      sheet.style.transition = '';
+      sheet.style.transform = '';       // 交回給 .active 的 transform
+      overlay.style.opacity = '';       // 交回給 CSS
+    }
+
+    
+
+    handle.addEventListener('pointerdown', (e)=>{
+      if(!sheet.classList.contains('active')) return;
+      dragging = true;
+      startY = e.clientY;
+      dy = 0;
+      sheet.setPointerCapture?.(e.pointerId);
+    });
+
+    handle.addEventListener('pointermove', (e)=>{
+      if(!dragging) return;
+      dy = Math.max(0, e.clientY - startY); // 只允許往下拖
+      setTranslate(dy);
+    });
+
+    handle.addEventListener('pointerup', (e)=>{
+      if(!dragging) return;
+      dragging = false;
+      sheet.releasePointerCapture?.(e.pointerId);
+
+      // 拖超過門檻就關掉，否則彈回
+      if(dy > 120){
+        reset();
+        closeModal();
+      }else{
+        // 彈回原位
+        sheet.style.transition = 'transform .18s cubic-bezier(.16,1,.3,1)';
+        sheet.style.transform  = 'translateX(-50%) translateY(0)';
+        overlay.style.opacity  = '0.38';
+        setTimeout(reset, 200);
+      }
+    });
+
+    handle.addEventListener('pointercancel', ()=>{
+      if(!dragging) return;
+      dragging = false;
+      reset();
+    });
+  })();
+
 
 
   function openUrl(url){
