@@ -891,7 +891,7 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:18px;
+      padding:8px;
 
       /* 不要死灰：改成鏡頭遮光感 */
       background:
@@ -908,19 +908,7 @@
     }
 
 
-    /* .sheet-splash{
-      position:absolute;
-      inset:0;
-      z-index:2600;                
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:18px;
-      background:rgba(10,10,10,.55);
-      opacity:0;
-      pointer-events:none;
-      transition:opacity .22s ease;
-    } 02031014*/
+
 
     .sheet-splash.active{
       opacity:1;
@@ -941,17 +929,17 @@
     
     /* 取景框本體 */
     .splash-frame{
-      width:100%;
+      width: min(720px, calc(100vw - 16px));
       max-width:660px;
-      max-height:76vh;
+      max-height: 86vh; 
       border-radius:22px;
       position:relative;
       overflow:hidden;
 
       /* 玻璃卡片感 */
       background:rgba(255,255,255,.10);
-      border:1px solid rgba(255,255,255,.22);
-      box-shadow:0 28px 90px rgba(0,0,0,.42);
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:0 28px 90px rgba(0,0,0,.38);
 
       transform: translateY(18px) scale(.94);
       opacity:0;
@@ -999,10 +987,12 @@
     .splash-grid{
       display:grid;
       gap:10px;
-      padding:14px;
+      padding:10px;
+      height: min(82vh, 680px);
     }
     .splash-grid.one{
       grid-template-columns:1fr;
+      grid-template-rows: 1fr;
     }
     .splash-grid.two{
       grid-template-columns:1fr;
@@ -1015,9 +1005,10 @@
       height:100%;
       aspect-ratio: 16 / 9;
       object-fit:cover;
+      object-position: center;
       border-radius:16px;
-      border:1px solid rgba(255,255,255,.18);
-      box-shadow:0 18px 50px rgba(0,0,0,.28);
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow:0 18px 50px rgba(0,0,0,.25);
       display:none; /* JS 會決定顯示哪張 */
     }
 
@@ -1025,6 +1016,31 @@
     .splash-grid.two .splash-img{
       aspect-ratio: 16 / 10;
     }
+
+        /* ===== Shutter flash (120ms) ===== */
+    .splash-frame{
+      position:relative; /* 確保 flash 疊在框上 */
+    }
+
+    .splash-frame .shutter-flash{
+      position:absolute;
+      inset:0;
+      border-radius:22px;
+      background:rgba(255,255,255,.92);
+      opacity:0;
+      pointer-events:none;
+    }
+
+    .splash-frame.flash .shutter-flash{
+      animation: shutterFlash 120ms ease-out 1;
+    }
+
+    @keyframes shutterFlash{
+      0%   { opacity:0; }
+      15%  { opacity:1; }
+      100% { opacity:0; }
+    }
+
 
     /* splash 出現時，禁止底下內容互動（保險） */
     #modalSheet.splash-on #modalScroll{
@@ -1899,15 +1915,13 @@
     </div>
     <div class="sheet-splash" id="sheetSplash" aria-hidden="true">
       <div class="splash-frame" role="img" aria-label="spotlight">
+        <div class="shutter-flash" aria-hidden="true"></div>
         <div class="splash-grid one" id="sheetSplashGrid">
           <img class="splash-img" id="sheetSplashImg1" alt="" />
           <img class="splash-img" id="sheetSplashImg2" alt="" />
         </div>
       </div>
     </div>
-    <!-- <div class="sheet-splash" id="sheetSplash" aria-hidden="true">
-      <img id="sheetSplashImg" alt="" />
-    </div> 0203_1014-->
     <div class="modal-scroll" id="modalScroll">
         <div id="modalSticky"></div>
         <div id="modalBody"></div>
@@ -1977,17 +1991,7 @@
   }
 
 
-  // function pickSheetSplashSrc(item){
-  //   // ✅ 你可以在每個景點 item 裡加這些欄位任何一個：
-  //   // splash / splash_img / cover / cover_img / image / img
-  //   const s =
-  //     item?.splash || item?.splash_img ||
-  //     item?.cover  || item?.cover_img  ||
-  //     item?.image  || item?.img || '';
 
-  //   const src = normalizeAssetUrl(s);
-  //   return src || '';
-  // } 02031014
 
   function hideSheetSplash(){
     const ov = document.getElementById('sheetSplash');
@@ -2038,6 +2042,13 @@
 
     ov.classList.add('active');
     sheet.classList.add('splash-on');
+    // ✅ shutter flash (120ms)
+    const frame = document.getElementById('sheetSplashFrame');
+    if(frame){
+      frame.classList.remove('flash');      // reset
+      requestAnimationFrame(()=> frame.classList.add('flash'));
+    }
+
 
     // 點一下提前跳過
     ov.onclick = () => {
@@ -2049,32 +2060,7 @@
   }
 
 
-  // function showSheetSplash(item){
-  //   const src = pickSheetSplashSrc(item);
-  //   if(!src) return; // 沒提供就不顯示
 
-  //   const ov = document.getElementById('sheetSplash');
-  //   const img = document.getElementById('sheetSplashImg');
-  //   const sheet = document.getElementById('modalSheet');
-  //   if(!ov || !img || !sheet) return;
-
-  //   // reset timer
-  //   if(__sheetSplashTimer) clearTimeout(__sheetSplashTimer);
-
-  //   img.src = src;
-  //   ov.classList.add('active');
-  //   sheet.classList.add('splash-on');
-
-  //   // 點一下提前跳過
-  //   ov.onclick = () => {
-  //     if(__sheetSplashTimer) clearTimeout(__sheetSplashTimer);
-  //     hideSheetSplash();
-  //   };
-
-  //   __sheetSplashTimer = setTimeout(()=>{
-  //     hideSheetSplash();
-  //   }, 5000);
-  // } 02031014
 
 
   // ====== Load Data ======
