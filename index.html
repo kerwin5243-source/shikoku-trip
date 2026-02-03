@@ -2224,7 +2224,8 @@
             ${escapeHtml((item.tag||'').toUpperCase())}
             ${((item.tag||'').toLowerCase()==='takagi')
               ? getTagIconHtml('takagi', i)
-              : `<i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"></i>`
+              : `<i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"
+                  style="opacity:.35; font-size:.72rem; margin-left:2px;"></i>`
             }
           </div>
           <div class="tl-title">${escapeHtml(item.title || '').replace(/\n/g,'<br>')}</div>
