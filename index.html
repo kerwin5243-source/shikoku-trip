@@ -5,11 +5,11 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>2026 四國巡禮</title>
-  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180.png">
-  <link rel="apple-touch-icon" sizes="167x167" href="/icons/apple-touch-icon-167.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-touch-icon-152.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icon/apple-touch-icon-180.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="/icon/apple-touch-icon-167.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/icon/apple-touch-icon-152.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icon/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icon/favicon-16.png">
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#F6F3EE" />
@@ -59,7 +59,7 @@
       background:var(--bg-body);
       color:var(--ink);
       margin:0;
-      padding-bottom:calc(110px + env(safe-area-inset-bottom));
+      padding-bottom:calc(90px + env(safe-area-inset-bottom));
       overscroll-behavior-y:none;
     }
     body.body-no-scroll{ overflow:hidden; }
@@ -786,6 +786,11 @@
         position: relative;
         padding-left: 14px;
     }
+    .modal-overlay.active{
+      opacity:1;
+      pointer-events:auto;
+    }
+
     .modal-sticky-wrap::before{
         content:'';
         position:absolute;
@@ -1066,8 +1071,22 @@
     .bottom-nav{
       position:fixed; 
       bottom: 0;
-      left:20px; right:20px;
+      left:50%;
+      transform:translateX(-50%);
+      width:min(520px, calc(100vw - 40px));
+
+      bottom:max(10px, env(safe-area-inset-bottom));
+      padding:10px 0;
+
       background:rgba(255,255,255,.72);
+      backdrop-filter:blur(20px);
+      border-radius:24px;
+      display:flex;
+      justify-content:space-around;
+      box-shadow:0 16px 50px rgba(0,0,0,.12);
+      z-index:1000;
+      border:1px solid rgba(233,225,214,.9); 
+      /* background:rgba(255,255,255,.72);
       backdrop-filter:blur(20px);
       border-radius:24px;
       display:flex;
@@ -1077,7 +1096,7 @@
       box-shadow:0 16px 50px rgba(0,0,0,.12);
       z-index:1000;
       border:1px solid rgba(233,225,214,.9);
-      align-items:flex-end;
+      align-items:flex-end; */
     }
     .nav-item{
       flex:1;
@@ -2774,6 +2793,27 @@ async function renderWeatherJMA(meta){
     return s.startsWith('/') ? ('.' + s) : s;
   }
 
+  if(!window.__modalBound){
+    window.__modalBound = true;
+    document.getElementById('modalSheet')?.addEventListener('click', (e) => {
+      const speakBtn = e.target.closest?.('.menuSpeak');
+      if(speakBtn){
+        e.stopPropagation();
+        const text = speakBtn.getAttribute('data-speak') || '';
+        speakJapanese(text);
+        return;
+      }
+      const pill = e.target.closest?.('.menuPill');
+      if(!pill) return;
+      const isRec = pill.getAttribute('data-rec') === '1';
+      if(!isRec) return;
+      const idx = Number(pill.getAttribute('data-menu-idx'));
+      const m = window.__activeModalItem?.menu?.[idx];
+      if(m) openMenuCard(m);
+    });
+  }
+
+
 
 
   // ====== Modal：預計到達/地址/停車/Mapcode/介紹 + Google 導航 ======
@@ -2944,25 +2984,25 @@ async function renderWeatherJMA(meta){
     document.getElementById('modalOverlay').classList.add('active');
     document.getElementById('modalSheet').classList.add('active');
     // === menu pill click + 喇叭 click：事件委派（只綁一次）===
-    document.getElementById('modalSheet')?.addEventListener('click', (e) => {
-      const speakBtn = e.target.closest?.('.menuSpeak');
-      if(speakBtn){
-        e.stopPropagation();
-        const text = speakBtn.getAttribute('data-speak') || '';
-        speakJapanese(text);
-        return;
-      }
+    // document.getElementById('modalSheet')?.addEventListener('click', (e) => {
+    //   const speakBtn = e.target.closest?.('.menuSpeak');
+    //   if(speakBtn){
+    //     e.stopPropagation();
+    //     const text = speakBtn.getAttribute('data-speak') || '';
+    //     speakJapanese(text);
+    //     return;
+    //   }
 
-      const pill = e.target.closest?.('.menuPill');
-      if(!pill) return;
+    //   const pill = e.target.closest?.('.menuPill');
+    //   if(!pill) return;
 
-      const isRec = pill.getAttribute('data-rec') === '1';
-      if(!isRec) return; // 不是推薦就不開卡
+    //   const isRec = pill.getAttribute('data-rec') === '1';
+    //   if(!isRec) return; // 不是推薦就不開卡
 
-      const idx = Number(pill.getAttribute('data-menu-idx'));
-      const m = window.__activeModalItem?.menu?.[idx];
-      if(m) openMenuCard(m);
-    });
+    //   const idx = Number(pill.getAttribute('data-menu-idx'));
+    //   const m = window.__activeModalItem?.menu?.[idx];
+    //   if(m) openMenuCard(m);
+    // });
 
   }
 
@@ -3002,16 +3042,19 @@ async function renderWeatherJMA(meta){
   }
 
 
-  function closeModal() {
-    document.getElementById('modalOverlay').classList.remove('active');
-    document.getElementById('modalSheet').classList.remove('active');
+  function closeModal(){
+    const overlay = document.getElementById('modalOverlay');
+    const sheet   = document.getElementById('modalSheet');
+
+    sheet.classList.remove('active');
     closeMenuCard();
 
-    // 等 sheet 動畫收起（你的 transition 0.3s）
-    setTimeout(() => {
+    sheet.addEventListener('transitionend', () => {
+      overlay.classList.remove('active');
       unlockBodyScroll();
-    }, 320);
+    }, { once:true });
   }
+
 
   function openMenuCard(m){
     const card = document.getElementById('menuCard');
