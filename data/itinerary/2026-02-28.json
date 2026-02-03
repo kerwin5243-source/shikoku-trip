@@ -111,7 +111,7 @@
         "parking": "山下自治區",
         "hours": "",
         "price": "",
-        "splash": ["./photos/day2/splash/takagi02.JPEG","./photos/day2/splash/takagi03.JPEG"]
+        "splash": "./photos/day2/splash/takagi02.JPEG",
         "stay": "",
         "menu": [],
         "avoid": [
@@ -165,7 +165,7 @@
         "parking": "山下自治區",
         "hours": "",
         "price": "",
-        "splash": ["./photos/day2/splash/takagi05.JPEG","./photos/day2/splash/takagi08.JPEG"]
+        "splash": "./photos/day2/splash/takagi05.JPEG",
         "stay": "",
         "menu": [],
         "avoid": [],
@@ -190,7 +190,7 @@
         "parking": "",
         "hours": "",
         "price": "",
-        "splash": ["./photos/day2/splash/takagi06.JPEG","./photos/day2/splash/takagi07.JPEG"]
+        "splash": "./photos/day2/splash/takagi06.JPEG",
         "stay": "",
         "menu": [],
         "avoid": [],
