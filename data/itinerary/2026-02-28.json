@@ -110,6 +110,7 @@
         "parking": "山下自治區",
         "hours": "",
         "price": "",
+        "splash": "./photos/day2/splash/takagi01.jpg",
         "stay": "",
         "menu": [],
         "avoid": [
@@ -139,6 +140,7 @@
         "hours": "",
         "price": "",
         "stay": "",
+        "splash": "./photos/day2/splash/takagi02.jpg",
         "menu": [],
         "avoid": [],
         "guide": [
