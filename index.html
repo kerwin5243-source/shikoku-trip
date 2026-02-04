@@ -882,199 +882,170 @@
       line-height:1;
       gap:6px;  
     }
-    /* ===== Sheet Splash (Polaroid / postcard stack) ===== */
-.sheet-splash{
-  position:absolute;
-  inset:0;
-  z-index:2600;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:8px;
+    /* ===== Sheet Splash (open modal show image for ~5s) ===== */
+    /* ===== Sheet Splash (camera frame + pop) ===== */
+    .sheet-splash{
+      position:absolute;
+      inset:0;
+      z-index:2600;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px;
 
-  /* 鏡頭遮光感 */
-  background:
-    radial-gradient(circle at 50% 40%,
-      rgba(0,0,0,.18) 0%,
-      rgba(0,0,0,.46) 55%,
-      rgba(0,0,0,.62) 100%);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+      /* 不要死灰：改成鏡頭遮光感 */
+      background:
+        radial-gradient(circle at 50% 40%,
+          rgba(0,0,0,.18) 0%,
+          rgba(0,0,0,.46) 55%,
+          rgba(0,0,0,.62) 100%);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
 
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .18s ease;
-}
-.sheet-splash.active{
-  opacity:1;
-  pointer-events:auto; /* 出現時吃點擊，避免誤觸內容 */
-}
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .18s ease;
+    }
 
-/* 舞台：固定視覺中心，避免跟 sheet 大小綁死 */
-.postcard-stage{
-  width: min(760px, calc(100vw - 18px));
-  height: min(88vh, 760px);
-  position: relative;
-  display:flex;
-  align-items:center;
-  justify-content:center;
 
-  transform: translateY(18px) scale(.96);
-  opacity:0;
-  animation: splashPop .34s cubic-bezier(.16,1,.3,1) forwards;
-}
 
-/* pop 動畫 */
-@keyframes splashPop{
-  0%   { transform: translateY(18px) scale(.94); opacity:0; }
-  60%  { transform: translateY(-2px) scale(1.01); opacity:1; }
-  100% { transform: translateY(0) scale(1); opacity:1; }
-}
 
-/* 拍立得 / 明信片本體：白框 + 底部加厚留白 */
-.postcard{
-  position:absolute;
-  width: min(600px, calc(100vw - 54px));
-  max-height: 82vh;
-  background: rgba(255,255,255,.965);
-  border-radius: 26px;                 /* 不要太方正 */
-  padding: 16px 16px 58px;             /* ✅ 底部加厚留白（更像拍立得） */
-  box-shadow: 0 26px 80px rgba(0,0,0,.38);
-  border: 1px solid rgba(0,0,0,.06);
-  overflow:hidden;
-  transform-origin: 50% 70%;
-}
+    .sheet-splash.active{
+      opacity:1;
+      pointer-events:auto;          /* 出現時吃點擊，避免誤觸內容 */
+    }
 
-/* 紙紋（很淡） */
-.postcard::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  opacity:.16;
-  background:
-    radial-gradient(circle at 20% 10%, rgba(0,0,0,.05), transparent 45%),
-    radial-gradient(circle at 80% 90%, rgba(0,0,0,.04), transparent 48%),
-    repeating-linear-gradient(0deg, rgba(0,0,0,.02) 0 1px, transparent 1px 6px),
-    repeating-linear-gradient(90deg, rgba(0,0,0,.018) 0 1px, transparent 1px 7px);
-  mix-blend-mode: multiply;
-}
+    .sheet-splash img{
+      width:100%;
+      max-width:640px;
+      max-height:72vh;
+      object-fit:cover;
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:0 26px 80px rgba(0,0,0,.38);
+    }
 
-/* 照片區 */
-.postcard .pc-photo{
-  width:100%;
-  height: min(62vh, 540px);
-  border-radius: 18px;
-  overflow:hidden;
-  background:#f3f1ed;                  /* 空白處墊底色，像相紙 */
-  border: 1px solid rgba(0,0,0,.06);
-  box-shadow: 0 14px 36px rgba(0,0,0,.16);
-  position:relative;
-}
-.postcard img{
-  width:100%;
-  height:100%;
-  object-fit: contain;                 /* ✅ 不裁切：完整呈現照片 */
-  object-position:center;
-  display:block;
-}
 
-/* 下方留白文字（可有可無） */
-.pc-caption{
-  position:absolute;
-  left:0; right:0; bottom:0;
-  height:58px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:10px 14px 12px;
-  font-family:'Noto Serif TC', serif;
-  font-weight:900;
-  font-size:.92rem;
-  letter-spacing:.2px;
-  color:#3A342E;
-  text-shadow: 0 1px 0 rgba(255,255,255,.6);
-  pointer-events:none;
-}
+    
+    /* 取景框本體 */
+    .splash-frame{
+      width: min(720px, calc(100vw - 16px));
+      max-width:660px;
+      max-height: 86vh; 
+      border-radius:22px;
+      position:relative;
+      overflow:hidden;
 
-/* 膠帶貼紙角 */
-.tape{
-  position:absolute;
-  width: 92px;
-  height: 32px;
-  background: rgba(255,255,255,.55);
-  border: 1px solid rgba(0,0,0,.06);
-  box-shadow: 0 10px 20px rgba(0,0,0,.18);
-  border-radius: 10px;
-  opacity:.92;
-  pointer-events:none;
-  backdrop-filter: blur(1px);
-  -webkit-backdrop-filter: blur(1px);
-}
-.tape::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius: 10px;
-  background:
-    repeating-linear-gradient(45deg, rgba(0,0,0,.05) 0 1px, transparent 1px 6px);
-  opacity:.20;
-  mix-blend-mode:multiply;
-}
-.tape.tl{ top: 10px; left: 12px; transform: rotate(-12deg); }
-.tape.tr{ top: 12px; right: 12px; transform: rotate(10deg); }
+      /* 玻璃卡片感 */
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:0 28px 90px rgba(0,0,0,.38);
 
-/* 第一張：略微旋轉 */
-.card-a{
-  transform: rotate(-1.6deg) translateY(-2px);
-  z-index:1;
-}
+      transform: translateY(18px) scale(.94);
+      opacity:0;
+      animation: splashPop .34s cubic-bezier(.16,1,.3,1) forwards;
+    }
 
-/* 第二張：預設藏起來 */
-.card-b{
-  opacity:0;
-  transform: translateY(54px) rotate(2.4deg);
-  pointer-events:none;
-  z-index:2;
-  box-shadow: 0 22px 64px rgba(0,0,0,.34);
-}
+    /* pop 動畫 */
+    @keyframes splashPop{
+      0%   { transform: translateY(18px) scale(.94); opacity:0; }
+      60%  { transform: translateY(-2px) scale(1.01); opacity:1; }
+      100% { transform: translateY(0) scale(1); opacity:1; }
+    }
 
-/* 第二張出現：滑上 + 微彈 + 陰影變重 */
-.card-b.show{
-  opacity:1;
-  animation: pcSlideBounce .62s cubic-bezier(.16,1,.3,1) forwards;
-}
+    /* 取景框四角（相機框） */
+    .splash-frame::before,
+    .splash-frame::after{
+      content:"";
+      position:absolute;
+      inset:12px;
+      border-radius:16px;
+      pointer-events:none;
+    }
+    .splash-frame::before{
+      /* 四角框線：用背景畫四個 L 角 */
+      background:
+        linear-gradient(#fff,#fff) left top/22px 2px no-repeat,
+        linear-gradient(#fff,#fff) left top/2px 22px no-repeat,
 
-@keyframes pcSlideBounce{
-  0%   { transform: translateY(54px) rotate(2.4deg); box-shadow:0 22px 64px rgba(0,0,0,.34); }
-  60%  { transform: translateY(4px)  rotate(2.4deg); box-shadow:0 30px 90px rgba(0,0,0,.44); }
-  82%  { transform: translateY(12px) rotate(2.4deg); box-shadow:0 28px 84px rgba(0,0,0,.42); }
-  100% { transform: translateY(9px)  rotate(2.4deg); box-shadow:0 30px 92px rgba(0,0,0,.46); }
-}
+        linear-gradient(#fff,#fff) right top/22px 2px no-repeat,
+        linear-gradient(#fff,#fff) right top/2px 22px no-repeat,
 
-/* ===== Shutter flash (120ms) ===== */
-.postcard-stage .shutter-flash{
-  position:absolute;
-  inset:0;
-  border-radius:22px;
-  background:rgba(255,255,255,.92);
-  opacity:0;
-  pointer-events:none;
-  z-index:5;
-}
-.postcard-stage.flash .shutter-flash{
-  animation: shutterFlash 120ms ease-out 1;
-}
-@keyframes shutterFlash{
-  0%   { opacity:0; }
-  15%  { opacity:1; }
-  100% { opacity:0; }
-}
+        linear-gradient(#fff,#fff) left bottom/22px 2px no-repeat,
+        linear-gradient(#fff,#fff) left bottom/2px 22px no-repeat,
 
-/* splash 出現時，禁止底下內容互動（保險） */
-#modalSheet.splash-on #modalScroll{
-  pointer-events:none;
-}
+        linear-gradient(#fff,#fff) right bottom/22px 2px no-repeat,
+        linear-gradient(#fff,#fff) right bottom/2px 22px no-repeat;
+      opacity:.55;
+    }
+    .splash-frame::after{
+      border:1px solid rgba(255,255,255,.18);
+      opacity:.8;
+    }
+
+    /* 1 張 / 2 張 */
+    .splash-grid{
+      display:grid;
+      gap:10px;
+      padding:10px;
+      height: min(82vh, 680px);
+    }
+    .splash-grid.one{
+      grid-template-columns:1fr;
+      grid-template-rows: 1fr;
+    }
+    .splash-grid.two{
+      grid-template-columns:1fr;
+      grid-template-rows:1fr 1fr;
+    }
+
+    /* 圖片本體 */
+    .splash-img{
+      width:100%;
+      height:100%;
+      aspect-ratio: 16 / 9;
+      object-fit:cover;
+      object-position: center;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow:0 18px 50px rgba(0,0,0,.25);
+      display:none; /* JS 會決定顯示哪張 */
+    }
+
+    /* 兩張上下時，讓每張更像拍立得畫面 */
+    .splash-grid.two .splash-img{
+      aspect-ratio: 16 / 10;
+    }
+
+        /* ===== Shutter flash (120ms) ===== */
+    .splash-frame{
+      position:relative; /* 確保 flash 疊在框上 */
+    }
+
+    .splash-frame .shutter-flash{
+      position:absolute;
+      inset:0;
+      border-radius:22px;
+      background:rgba(255,255,255,.92);
+      opacity:0;
+      pointer-events:none;
+    }
+
+    .splash-frame.flash .shutter-flash{
+      animation: shutterFlash 120ms ease-out 1;
+    }
+
+    @keyframes shutterFlash{
+      0%   { opacity:0; }
+      15%  { opacity:1; }
+      100% { opacity:0; }
+    }
+
+
+    /* splash 出現時，禁止底下內容互動（保險） */
+    #modalSheet.splash-on #modalScroll{
+      pointer-events:none;
+    }
 
 
 
@@ -1942,31 +1913,16 @@
       <div class="modal-drag-handle"></div>
       <button class="modal-x" onclick="closeModal()" aria-label="close">×</button>
     </div>
-    
-<div class="sheet-splash" id="sheetSplash" aria-hidden="true">
-  <div class="postcard-stage" id="sheetSplashFrame" role="img" aria-label="postcard spotlight">
-    <div class="shutter-flash" aria-hidden="true"></div>
-
-    <div class="postcard card-a" id="pcA" aria-hidden="true">
-      <span class="tape tl" aria-hidden="true"></span>
-      <span class="tape tr" aria-hidden="true"></span>
-      <div class="pc-photo">
-        <img id="pcImgA" alt="" />
+    <div class="sheet-splash" id="sheetSplash" aria-hidden="true">
+      <div class="splash-frame" role="img" aria-label="spotlight">
+        <div class="shutter-flash" aria-hidden="true"></div>
+        <div class="splash-grid one" id="sheetSplashGrid">
+          <img class="splash-img" id="sheetSplashImg1" alt="" />
+          <img class="splash-img" id="sheetSplashImg2" alt="" />
+        </div>
       </div>
-      <div class="pc-caption" id="pcCapA"></div>
     </div>
-
-    <div class="postcard card-b" id="pcB" aria-hidden="true">
-      <span class="tape tl" aria-hidden="true"></span>
-      <span class="tape tr" aria-hidden="true"></span>
-      <div class="pc-photo">
-        <img id="pcImgB" alt="" />
-      </div>
-      <div class="pc-caption" id="pcCapB"></div>
-    </div>
-  </div>
-</div>
-<div class="modal-scroll" id="modalScroll">
+    <div class="modal-scroll" id="modalScroll">
         <div id="modalSticky"></div>
         <div id="modalBody"></div>
     </div>
@@ -2038,82 +1994,51 @@
 
 
   function hideSheetSplash(){
-  const ov = document.getElementById('sheetSplash');
-  const sheet = document.getElementById('modalSheet');
-  if(!ov || !sheet) return;
+    const ov = document.getElementById('sheetSplash');
+    const sheet = document.getElementById('modalSheet');
+    if(!ov || !sheet) return;
 
-  ov.classList.remove('active');
-  sheet.classList.remove('splash-on');
+    ov.classList.remove('active');
+    sheet.classList.remove('splash-on');
+    const img1 = document.getElementById('sheetSplashImg1');
+    const img2 = document.getElementById('sheetSplashImg2');
+    if(img1) img1.removeAttribute('src');
+    if(img2) img2.removeAttribute('src');
 
-  const frame = document.getElementById('sheetSplashFrame');
-  const pcB   = document.getElementById('pcB');
-  const imgA  = document.getElementById('pcImgA');
-  const imgB  = document.getElementById('pcImgB');
-  const capA  = document.getElementById('pcCapA');
-  const capB  = document.getElementById('pcCapB');
-
-  if(frame) frame.classList.remove('flash');
-  if(pcB) pcB.classList.remove('show');
-
-  if(imgA) imgA.removeAttribute('src');
-  if(imgB) imgB.removeAttribute('src');
-  if(capA) capA.textContent = '';
-  if(capB) capB.textContent = '';
-}
-
-function showSheetSplash(item){
-  const srcs = pickSheetSplashSrcs(item);
-  if(!srcs.length) return;
-
-  const ov    = document.getElementById('sheetSplash');
-  const sheet = document.getElementById('modalSheet');
-  const frame = document.getElementById('sheetSplashFrame');
-  const pcA   = document.getElementById('pcA');
-  const pcB   = document.getElementById('pcB');
-  const imgA  = document.getElementById('pcImgA');
-  const imgB  = document.getElementById('pcImgB');
-  const capA  = document.getElementById('pcCapA');
-  const capB  = document.getElementById('pcCapB');
-
-  if(!ov || !sheet || !frame || !pcA || !pcB || !imgA || !imgB) return;
-
-  // reset timer
-  if(__sheetSplashTimer) clearTimeout(__sheetSplashTimer);
-
-  // reset state
-  pcB.classList.remove('show');
-  imgA.removeAttribute('src');
-  imgB.removeAttribute('src');
-
-  const titleText = (item && (item.title || item.name)) ? String(item.title || item.name) : '';
-  if(capA) capA.textContent = titleText;
-  if(capB) capB.textContent = titleText;
-
-  // load images
-  imgA.src = srcs[0];
-  if(srcs[1]) imgB.src = srcs[1];
-
-  ov.classList.add('active');
-  sheet.classList.add('splash-on');
-
-  // shutter flash (120ms)
-  frame.classList.remove('flash');
-  requestAnimationFrame(()=> frame.classList.add('flash'));
-
-  // 點一下提前跳過
-  ov.onclick = () => {
-    if(__sheetSplashTimer) clearTimeout(__sheetSplashTimer);
-    hideSheetSplash();
-  };
-
-  // 2 張：10 秒後疊上第二張（滑上 + 微彈 + 陰影變重）
-  if(srcs[1]){
-    setTimeout(()=> pcB.classList.add('show'), 10000);
-    __sheetSplashTimer = setTimeout(()=> hideSheetSplash(), 22000);
-  }else{
-    __sheetSplashTimer = setTimeout(()=> hideSheetSplash(), 6000);
   }
-}
+
+  function showSheetSplash(item){
+    const srcs = pickSheetSplashSrcs(item);
+    if(!srcs.length) return;
+
+    const ov    = document.getElementById('sheetSplash');
+    const sheet = document.getElementById('modalSheet');
+    const grid  = document.getElementById('sheetSplashGrid');
+    const img1  = document.getElementById('sheetSplashImg1');
+    const img2  = document.getElementById('sheetSplashImg2');
+    if(!ov || !sheet || !grid || !img1 || !img2) return;
+
+    // reset timer
+    if(__sheetSplashTimer) clearTimeout(__sheetSplashTimer);
+
+    // 先重置
+    img1.style.display = 'none';
+    img2.style.display = 'none';
+    img1.removeAttribute('src');
+    img2.removeAttribute('src');
+
+    // 套 1/2 張模式 class
+    grid.classList.remove('one','two');
+    grid.classList.add(srcs.length >= 2 ? 'two' : 'one');
+
+    // 塞圖
+    img1.src = srcs[0];
+    img1.style.display = 'block';
+
+    if(srcs[1]){
+      img2.src = srcs[1];
+      img2.style.display = 'block';
+    }
 
     ov.classList.add('active');
     sheet.classList.add('splash-on');
