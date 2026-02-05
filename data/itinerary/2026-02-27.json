@@ -54,7 +54,7 @@
         "parking": "",
         "hours": "",
         "price": "",
-        "stay": "",
+        "stay": "2h20m",
         "route": {
           "mode": "plane",
           "from": "台北桃園國際機場 第二航廈",
