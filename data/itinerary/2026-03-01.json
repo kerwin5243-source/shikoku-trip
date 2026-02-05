@@ -121,24 +121,7 @@
         "eta": ""
       },
       {
-        "type": "route",
-        "time": "11:20-11:45",
-        "title": " 霊山寺 → 鳴門",
-        "desc": "",
-        "durationText": "約 75 分鐘車程",
-        "stay": "1h 15m",
-        "mode": "drive",
-        "from": "",
-        "to": "",
-        "route": {
-          "mode": "drive",
-          "from": "霊山寺",
-          "to": "うずしお観潮船 マイカー駐車場",
-          "minutes": 25
-        }
-      },
-      {
-        "time": "12:00",
+        "time": "11:30",
         "title": "鳴門渦潮觀潮船",
         "tag": "sight",
         "subtag": "渦潮",
@@ -184,7 +167,7 @@
       },
       {
         "type": "route",
-        "time": "12:00-12:20",
+        "time": "12:30-12:50",
         "title": "鳴門周邊 → 午餐",
         "desc": "",
         "durationText": "約 20 分鐘車程",
@@ -200,7 +183,7 @@
         }
       },
       {
-        "time": "12:20",
+        "time": "12:45",
         "title": "午餐：Donoura Naruto 拉麵",
         "tag": "food",
         "subtag": "拉麵",
@@ -223,11 +206,11 @@
       },
       {
         "type": "route",
-        "time": "13:20-13:45",
+        "time": "14:00-",
         "title": "午餐 → 德島市區",
         "desc": "",
-        "durationText": "約 25 分鐘車程",
-        "stay": "25 min",
+        "durationText": "約 30 分鐘車程",
+        "stay": "30 min",
         "mode": "drive",
         "from": "",
         "to": "",
@@ -235,7 +218,7 @@
           "mode": "drive",
           "from": "Donoura Naruto",
           "to": "徳島城跡",
-          "minutes": 25
+          "minutes": 30
         }
       },
       {
@@ -250,7 +233,7 @@
         "parking": "",
         "hours": "",
         "price": "",
-        "stay": "30–45 min",
+        "stay": "15-20 min",
         "menu": [],
         "avoid": [],
         "guide": [],
@@ -287,7 +270,7 @@
         "parking": "",
         "hours": "",
         "price": "",
-        "stay": "20–40 min",
+        "stay": "40–60 min",
         "menu": [],
         "avoid": [],
         "guide": [],
