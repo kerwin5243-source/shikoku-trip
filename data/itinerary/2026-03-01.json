@@ -200,8 +200,8 @@
         "price": "",
         "stay": "40–60 min",
         "menu": [
-          { "jp": "鯛塩ラーメン", "zh": "鯛魚鹽味拉麵", "rec": true, "img": "/photos/menu/kawata_nabe.png" },
-          {"jp": "替飯", "zh": "特色伴飯"}
+          { "jp": "鯛塩ラーメン", "zh": "鯛魚鹽味拉麵", "rec": true, "img": "/photos/menu/030109.jpg" },
+          {"jp": "替飯", "zh": "特色伴飯""rec": true, "img": "/photos/menu/030111.jpg" }
         ],
         "avoid": [
           "前一天下午15:00提供預約"
@@ -358,8 +358,8 @@
         "price": "",
         "stay": "60–90 min",
         "menu": [
-          {"jp": "ひなどり", "zh": "嫩雞"},
-          {"jp": "おやどり", "zh": "成雞"}
+          {"jp": "ひなどり", "zh": "嫩雞","rec": true, "img": "/photos/menu/030107.jpg"},
+          {"jp": "おやどり", "zh": "成雞","rec": true, "img": "/photos/menu/030108.jpg"}
         ],
         "avoid": [],
         "guide": [
