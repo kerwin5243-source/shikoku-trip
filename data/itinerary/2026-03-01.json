@@ -201,7 +201,7 @@
         "stay": "40–60 min",
         "menu": [
           { "jp": "鯛塩ラーメン", "zh": "鯛魚鹽味拉麵", "rec": true, "img": "/photos/menu/030109.jpg" },
-          {"jp": "替飯", "zh": "特色伴飯""rec": true, "img": "/photos/menu/030111.jpg" }
+          {"jp": "替飯", "zh": "特色伴飯","rec": true, "img": "/photos/menu/030111.jpg" }
         ],
         "avoid": [
           "前一天下午15:00提供預約"
