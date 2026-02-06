@@ -1,0 +1,132 @@
+/**
+ * 2026 四國巡禮 - 雲端後端核心 (Shikoku Trip Backend)
+ * 支援功能：記帳同步、待辦清單同步、行程順序編輯與重置
+ */
+
+// --- 安全設定 ---
+const WEB_APP_TOKEN = "shikoku_2026_secret"; // 👈 請務必與 index.html 中的 G_TOKEN 一致
+
+// --- 試算表全域變數 ---
+const SS = SpreadsheetApp.getActiveSpreadsheet();
+const EXP_SHEET = SS.getSheetByName("Expenses");
+const CHK_SHEET = SS.getSheetByName("Checklists");
+const ITIN_SHEET = SS.getSheetByName("ItineraryEdits");
+
+// 權限驗證：確保請求來自你的網頁
+function isAuthorized(token) {
+  return token === WEB_APP_TOKEN;
+}
+
+/**
+ * 處理 GET 請求：拉取所有最新雲端資料
+ */
+function doGet(e) {
+  if (!isAuthorized(e.parameter.token)) {
+    return ContentService.createTextOutput("Unauthorized").setMimeType(ContentService.MimeType.TEXT);
+  }
+
+  // 1. 讀取記帳資料
+  const expValues = EXP_SHEET.getDataRange().getValues();
+  const expenseList = (expValues.length <= 1) ? [] : expValues.slice(1).map(r => {
+    try {
+      return { 
+        name: r[1], cost: r[2], payer: r[3], type: r[4], ts: r[5], 
+        participants: JSON.parse(r[6] || "[]") 
+      };
+    } catch(err) { return null; }
+  }).filter(x => x !== null);
+
+  // 2. 讀取勾選清單 (個人 + 全員 GLOBAL)
+  const chkValues = CHK_SHEET.getDataRange().getValues();
+  const checklistMap = (chkValues.length <= 1) ? [] : chkValues.slice(1).map(r => ({ 
+    user: r[0], type: r[1], item: r[2], checked: r[3] === true || r[3] === "TRUE" 
+  }));
+
+  // 3. 讀取行程編輯紀錄 (自定義排序)
+  const itinValues = ITIN_SHEET.getDataRange().getValues();
+  const itineraryEdits = (itinValues.length <= 1) ? {} : itinValues.slice(1).reduce((acc, r) => {
+    if (r[0] && r[1]) {
+      try { acc[r[0]] = JSON.parse(r[1]); } catch(err) {}
+    }
+    return acc;
+  }, {});
+
+  const result = {
+    expenses: expenseList,
+    checklists: checklistMap,
+    itineraryEdits: itineraryEdits
+  };
+  
+  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * 處理 POST 請求：寫入、修改或刪除雲端資料
+ */
+function doPost(e) {
+  try {
+    const params = JSON.parse(e.postData.contents);
+    if (!isAuthorized(params.token)) {
+      return ContentService.createTextOutput("Forbidden").setMimeType(ContentService.MimeType.TEXT);
+    }
+
+    const action = params.action;
+    const d = params.data;
+
+    // --- [動作 A]：新增記帳 ---
+    if (action === "addExpense" && d) {
+      EXP_SHEET.appendRow([new Date(), d.name, d.cost, d.payer, d.type, d.ts, JSON.stringify(d.participants || [])]);
+    } 
+    
+    // --- [動作 B]：刪除記帳 ---
+    else if (action === "deleteExpense" && d.ts) {
+      const data = EXP_SHEET.getDataRange().getValues();
+      for (let i = data.length - 1; i >= 1; i--) {
+        if (data[i][5] == d.ts) {
+          EXP_SHEET.deleteRow(i + 1);
+          break; 
+        }
+      }
+    }
+
+    // --- [動作 C]：更新勾選狀態 (個人清單 & 全員待辦) ---
+    else if (action === "updateCheck" && d) {
+      const dataRows = CHK_SHEET.getDataRange().getValues();
+      let found = false;
+      for (let i = 1; i < dataRows.length; i++) {
+        if (dataRows[i][0] === d.user && dataRows[i][1] === d.type && dataRows[i][2] === d.item) {
+          CHK_SHEET.getRange(i + 1, 4).setValue(d.checked);
+          found = true; break;
+        }
+      }
+      if (!found) CHK_SHEET.appendRow([d.user, d.type, d.item, d.checked]);
+    }
+
+    // --- [動作 D]：更新行程編輯 (排序/時間修改) ---
+    else if (action === "updateItinerary" && d.file) {
+      const itinRows = ITIN_SHEET.getDataRange().getValues();
+      let found = false;
+      for (let i = 1; i < itinRows.length; i++) {
+        if (itinRows[i][0] === d.file) {
+          ITIN_SHEET.getRange(i + 1, 2).setValue(JSON.stringify(d.items));
+          found = true; break;
+        }
+      }
+      if (!found) ITIN_SHEET.appendRow([d.file, JSON.stringify(d.items)]);
+    }
+
+    // --- [動作 E]：重置行程為 Default (刪除異動紀錄) ---
+    else if (action === "resetItinerary" && d.file) {
+      const itinRows = ITIN_SHEET.getDataRange().getValues();
+      for (let i = itinRows.length - 1; i >= 1; i--) {
+        if (itinRows[i][0] === d.file) {
+          ITIN_SHEET.deleteRow(i + 1);
+        }
+      }
+    }
+    
+    return ContentService.createTextOutput("Success").setMimeType(ContentService.MimeType.TEXT);
+  } catch (err) {
+    return ContentService.createTextOutput("Error: " + err.message).setMimeType(ContentService.MimeType.TEXT);
+  }
+}

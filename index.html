@@ -29,7 +29,7 @@
     }
   </script>				
   <script>
-    const G_API_URL = "https://script.google.com/macros/s/AKfycbyTqLUmqiHp-Fh6knhf28oQ2MRIoY6TgPZBAimOvUMOMTg9rZkK55TF9Exgi38gq1Fo/exec"; // 貼上剛才步驟 1 得到的網址
+    const G_API_URL = "https://script.google.com/macros/s/AKfycbwNqQaxH8pNJzsVeq6QANtCgue1FouFO-2CDrhvqSjECCtXxD5Yo8d32V2vLGdUBGpD/exec"; // 貼上剛才步驟 1 得到的網址
     const G_TOKEN = "shikoku_2026_secret"; // 必須與 GAS 內的設定一致
   </script>
 
@@ -506,6 +506,12 @@
         align-items:start;
         margin-bottom:18px; 
         cursor:pointer; 
+
+	/* --- 新增：防止系統選單干擾長壓 --- */
+        -webkit-touch-callout: none; /* 禁用 iOS 長壓彈出選單 */
+        -webkit-user-select: none;   /* 禁止長壓選取文字 */
+        user-select: none;           /* 標準屬性 */
+        touch-action: pan-y;         /* 允許垂直捲動，但防止其他觸控手勢衝突 */
     }
     .tl-time{
       min-width:56px;
@@ -2030,6 +2036,12 @@
   let curUser = 'L';
   let curPayer = 'L';
 
+  // timeline (支援本機即時編輯：拖曳排序 / 改時間 / 刪除)
+  // ✅ 先宣告編輯模式狀態，避免 TDZ 造成行程渲染失敗
+  let __tlEditMode = false;
+  let __tlSortable = null;
+  let __editHistory = [];
+
   let checklistData = { carry: [], check: [] };
   let hotels = [];
   let itineraryIndex = [];
@@ -2143,23 +2155,21 @@
   // Sync data from Google sheet
   async function syncFromCloud() {
     try {
-      // 加入隨機參數防止瀏覽器快取舊資料
+      // 1. 發送請求，加入 _t 防止瀏覽器快取
       const resp = await fetch(`${G_API_URL}?token=${G_TOKEN}&_t=${Date.now()}`);
       const cloudData = await resp.json();
   
-      // 1. 同步帳本資料
+      // 2. 同步帳本資料
       if (cloudData.expenses) {
-        // 關鍵：將全域變數 expenses 更新為雲端抓下來的最新完整清單
         expenses = cloudData.expenses; 
         localStorage.setItem('expenses', JSON.stringify(expenses));
-        renderExpenseUI(); // 務必呼叫重新渲染
+        if (typeof renderExpenseUI === 'function') renderExpenseUI(); 
       }
   
-      // 2. 同步 Checkbox 資料
-      // 💡 優化 Checkbox 與 Todo 同步邏輯
+      // 3. 同步 Checkbox 與 全員待辦 (GLOBAL)
       if (cloudData.checklists) {
         const userCheckMap = {};
-        const globalTodos = {}; // 新增一個存全球待辦的物件
+        const globalTodos = {}; 
   
         cloudData.checklists.forEach(item => {
           if (item.user === "GLOBAL") {
@@ -2170,21 +2180,44 @@
           }
         });
   
-        // 儲存全員待辦狀態
         localStorage.setItem('global_todos', JSON.stringify(globalTodos));
-        
-        // 儲存個人清單狀態
         Object.keys(userCheckMap).forEach(user => {
           localStorage.setItem('check_' + user, JSON.stringify(userCheckMap[user]));
         });
         
         // 重新渲染畫面
-        renderGlobalTodos(); // 💡 確保全員待辦 UI 更新
+        if (typeof renderGlobalTodos === 'function') renderGlobalTodos();
         if (document.getElementById('page-pre').classList.contains('active')) {
-          renderChecklists();
+          if (typeof renderChecklists === 'function') renderChecklists();
         }
       }
-      console.log("雲端同步成功");
+  
+      // 4. 💡 新增：同步行程異動 (Itinerary Edits)
+      if (cloudData.itineraryEdits) {
+        const currentFile = itineraryIndex[currentDayIdx]?.file;
+        
+        Object.keys(cloudData.itineraryEdits).forEach(file => {
+          const key = `day_edits_${file}`;
+          const editData = cloudData.itineraryEdits[file];
+          
+          // 更新 LocalStorage 以供離線使用
+          localStorage.setItem(key, JSON.stringify(editData));
+          
+          // 如果雲端異動的是「目前正在看」的這一天，立即更新快取並重繪
+          if (file === currentFile) {
+            dayCache[currentDayIdx] = { ...dayCache[currentDayIdx], items: editData.items };
+            currentDayData = dayCache[currentDayIdx];
+            
+            // 確保在行程頁面時才重繪
+            if (document.getElementById('page-itinerary').classList.contains('active')) {
+              renderTimelineList(currentDayData);
+              if (typeof enableTimelineSortable === 'function') enableTimelineSortable();
+            }
+          }
+        });
+      }
+  
+      console.log("雲端資料同步完成");
     } catch (e) {
       console.error("同步失敗:", e);
     }
@@ -2575,24 +2608,41 @@
       <i class="fas fa-hourglass-half" style="color:#9CA3AF;"></i>${escapeHtml(item.stay)}
     </div>` : '';
 
+    // ✅ 關鍵：移除 onclick，改用 data-idx 供 JS 識別
     return `
-      <div class="timeline-item" onclick='openModal(${i})'>
-        <div class="tl-time">${escapeHtml(item.time || '')}</div>
-        <div class="tl-content ${item.highlight ? 'highlight' : ''}">
+      <div class="timeline-item" data-idx="${i}" id="exp-item-${i}">
+        <div class="tl-time">${escapeHtml(t)}</div>
+        <div class="tl-content ${item.highlight ? 'highlight' : ''}" style="position:relative;">
+          ${item.reserved ? `<div class="reserve-badge">予約済</div>` : ``}
           <div class="tl-tag ${tagClass(item.tag)}">
-            ${escapeHtml((item.tag||'').toUpperCase())}
-            ${((item.tag||'').toLowerCase()==='takagi')
-              ? getTagIconHtml('takagi', i)
-              : `<i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"
-                  style="opacity:.35; font-size:.72rem; margin-left:2px;"></i>`
-            }
-          </div>
-          <div class="tl-title">${escapeHtml(item.title || '').replace(/\n/g,'<br>')}</div>
-          <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
-          ${stayPill}
+              ${escapeHtml((item.tag || '').toUpperCase())}
+              <i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"></i>
+          </div>	  
+          <div class="tl-title">${escapeHtml(item.title || '').replace(/\n/g, '<br>')}</div>
+          <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g, '<br>')}</div>
+          ${stay}
+          ${renderEditRow(i, item)}
         </div>
       </div>
     `;
+//     return `
+//       <div class="timeline-item" onclick='openModal(${i})'>
+//         <div class="tl-time">${escapeHtml(item.time || '')}</div>
+//         <div class="tl-content ${item.highlight ? 'highlight' : ''}">
+//           <div class="tl-tag ${tagClass(item.tag)}">
+//             ${escapeHtml((item.tag||'').toUpperCase())}
+//             ${((item.tag||'').toLowerCase()==='takagi')
+//               ? getTagIconHtml('takagi', i)
+//               : `<i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"
+//                   style="opacity:.35; font-size:.72rem; margin-left:2px;"></i>`
+//             }
+//           </div>
+//           <div class="tl-title">${escapeHtml(item.title || '').replace(/\n/g,'<br>')}</div>
+//           <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
+//           ${stayPill}
+//         </div>
+//       </div>
+//     `;
   }
   function openDirections(from, to, mode='drive'){
     const tm = travelModeForRoute(mode); // 你下面已經有這個 function
@@ -2621,6 +2671,8 @@
 
   async function selectDay(idx) {
     currentDayIdx = idx;
+    __editHistory = []; // ✅ 切換日期時清空歷史紀錄棧
+    __tlEditMode = false; // ✅ 重設編輯模式
 
     document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
     const chip = document.getElementById('chip-'+idx);
@@ -2732,10 +2784,10 @@
         }, 12000);
     }
     
-    // timeline (支援本機即時編輯：拖曳排序 / 改時間 / 刪除)
-    // ✅ 先宣告編輯模式狀態，避免 TDZ 造成行程渲染失敗
-    let __tlEditMode = false;
-    let __tlSortable = null;
+//     // timeline (支援本機即時編輯：拖曳排序 / 改時間 / 刪除)
+//     // ✅ 先宣告編輯模式狀態，避免 TDZ 造成行程渲染失敗
+//     let __tlEditMode = false;
+//     let __tlSortable = null;
 
     renderTimelineToolbar(meta);
     renderTimelineList(dayData);
@@ -2788,24 +2840,43 @@
 
 
 
-      // ✅ 一般行程卡（可點開 modal）
-      return `
-        <div class="timeline-item" onclick='openModal(${i})'>
-          <div class="tl-time">${escapeHtml(t)}</div>
-          <div class="tl-content ${item.highlight ? 'highlight' : ''}" style="position:relative;">
-            ${item.reserved ? `<div class="reserve-badge">予約済</div>` : ``}
-            <div class="tl-tag ${tagClass(item.tag)}">
-                ${escapeHtml((item.tag||'').toUpperCase())}
-                <i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"></i>
-            </div>	  
-            <div class="tl-title">${escapeHtml(item.title || '').replace(/\n/g,'<br>')}</div>
-            <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
-            ${stay}
-            ${renderEditRow(i, item)}
-          </div>
+    // ✅ 一般行程卡（可點開 modal）
+    // ✅ 一般行程卡：拔掉 onclick，改用 data-idx 配合長壓偵測
+    return `
+      <div class="timeline-item" data-idx="${i}" id="exp-item-${i}">
+        <div class="tl-time">${escapeHtml(t)}</div>
+        <div class="tl-content ${item.highlight ? 'highlight' : ''}" style="position:relative;">
+          ${item.reserved ? `<div class="reserve-badge">予約済</div>` : ``}
+          <div class="tl-tag ${tagClass(item.tag)}">
+              ${escapeHtml((item.tag||'').toUpperCase())}
+              <i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"></i>
+          </div>	  
+          <div class="tl-title">${escapeHtml(item.title || '').replace(/\n/g,'<br>')}</div>
+          <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
+          ${stay}
+          ${renderEditRow(i, item)}
         </div>
-      `;
+      </div>
+    `;
+//    return `
+//      <div class="timeline-item" onclick='openModal(${i})'>
+//        <div class="tl-time">${escapeHtml(t)}</div>
+//        <div class="tl-content ${item.highlight ? 'highlight' : ''}" style="position:relative;">
+//          ${item.reserved ? `<div class="reserve-badge">予約済</div>` : ``}
+//          <div class="tl-tag ${tagClass(item.tag)}">
+//              ${escapeHtml((item.tag||'').toUpperCase())}
+//              <i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"></i>
+//          </div>	  
+//          <div class="tl-title">${escapeHtml(item.title || '').replace(/\n/g,'<br>')}</div>
+//          <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
+//          ${stay}
+//          ${renderEditRow(i, item)}
+//        </div>
+//      </div>
+//    `;
     }).join('');
+
+    bindLongPressSelection();
     }
 
     // ===== timeline edit helpers =====
@@ -2824,57 +2895,82 @@
       return dayData;
     }
 
-    function saveDayEdits(){
-      try{
+    function saveDayEdits() {
+      try {
+        const file = itineraryIndex[currentDayIdx]?.file;
+        if (!file) return;
+    
         const key = dayEditKey();
-        localStorage.setItem(key, JSON.stringify({ items: (currentDayData?.items || []) }));
-      }catch(e){}
+        const dataToSave = { items: (currentDayData?.items || []) };
+        
+        // 1. 本地備份
+        localStorage.setItem(key, JSON.stringify(dataToSave));
+    
+        // 2. 雲端同步
+        cloudPost("updateItinerary", {
+          file: file,
+          items: dataToSave // 包含完整的項目順序與時間
+        });
+        console.log(`Day ${currentDayIdx + 1} 行程異動已同步雲端`);
+      } catch (e) {
+        console.error("儲存失敗", e);
+      }
     }
 
     function resetDayEdits(){
       try{ localStorage.removeItem(dayEditKey()); }catch(e){}
     }
 
-    function renderTimelineToolbar(meta){
+//     let __editHistory = []; // 用於存放上一步的狀態
+    
+    function renderTimelineToolbar(meta) {
       const el = document.getElementById('timelineToolbar');
-      if(!el) return;
-      const label = __tlEditMode ? '編輯中：可拖曳/改時間/刪除' : '檢視模式';
+      if (!el) return;
+    
       el.innerHTML = `
         <div class="tl-tool-left">
-          <button class="tl-btn ${__tlEditMode ? 'primary':''}" id="tlEditToggle">
+          <button class="tl-btn ${__tlEditMode ? 'primary' : ''}" id="tlEditToggle">
             <i class="fas ${__tlEditMode ? 'fa-check' : 'fa-pen'}"></i>
             ${__tlEditMode ? '完成' : '編輯'}
           </button>
-          <div class="tl-edit-hint">${label}</div>
         </div>
         <div class="tl-tool-right">
-          <button class="tl-btn ghost" id="tlExportDay"><i class="fas fa-file-export"></i> 匯出</button>
-          <button class="tl-btn ghost" id="tlResetDay"><i class="fas fa-rotate-left"></i> 還原</button>
+          <button class="tl-btn ghost" id="tlUndoEdit"><i class="fas fa-undo"></i> 回復上一步</button>
+          <button class="tl-btn ghost" id="tlResetDay"><i class="fas fa-rotate-left"></i> 重置default</button>
         </div>
       `;
-
-      el.querySelector('#tlEditToggle')?.addEventListener('click', ()=>{
+    
+      // --- 重置功能 ---
+      el.querySelector('#tlResetDay')?.addEventListener('click', async () => {
+        const file = itineraryIndex[currentDayIdx]?.file;
+        if (!file || !confirm('確定要將此日行程「重置default」嗎？')) return;
+        cloudPost("resetItinerary", { file: file });
+        localStorage.removeItem(`day_edits_${file}`);
+        delete dayCache[currentDayIdx];
+        await selectDay(currentDayIdx);
+      });
+    
+      // --- 回復上一步 (Undo) ---
+      el.querySelector('#tlUndoEdit')?.addEventListener('click', () => {
+        if (__editHistory.length > 0) {
+          const prevState = __editHistory.pop();
+          currentDayData.items = prevState; 
+          
+          saveDayEdits();
+          renderTimelineList(currentDayData);
+          enableTimelineSortable(); // ✅ 關鍵：回復後必須重新啟用排序監聽
+          
+          console.log("已回復上一步，剩餘步數:", __editHistory.length);
+        } else {
+          alert('沒有更多步驟可以回復');
+        }
+      });
+    
+      el.querySelector('#tlEditToggle')?.addEventListener('click', () => {
         __tlEditMode = !__tlEditMode;
         renderTimelineToolbar(meta);
         renderTimelineList(currentDayData);
         enableTimelineSortable();
-      });
-
-      el.querySelector('#tlResetDay')?.addEventListener('click', ()=>{
-        resetDayEdits();
-        // 重新載入原始 dayData
-        loadDay(currentDayIndex);
-      });
-
-      el.querySelector('#tlExportDay')?.addEventListener('click', ()=>{
-        const blob = new Blob([JSON.stringify(currentDayData, null, 2)], {type:'application/json'});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = meta?.file || 'day.json';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
       });
     }
 
@@ -2884,20 +2980,35 @@
       if(__tlSortable){ __tlSortable.destroy(); __tlSortable = null; }
       if(!__tlEditMode) return;
       if(typeof Sortable === 'undefined') return;
+    
       __tlSortable = new Sortable(list, {
         animation: 180,
         handle: '.tl-content, .route-strip, .tl-time, .route-time-top',
         ghostClass: 'is-dragging',
-        onStart: (evt)=>{ evt.item.classList.add('is-dragging'); },
+        delay: 400,
+        delayOnTouchOnly: true,
+        touchStartThreshold: 5,
+    
+        onStart: (evt)=>{ 
+          if (navigator.vibrate) navigator.vibrate(40);
+          evt.item.classList.add('is-dragging'); 
+        },
         onEnd: (evt)=>{
           evt.item.classList.remove('is-dragging');
           const oldIndex = evt.oldIndex;
           const newIndex = evt.newIndex;
-          if(oldIndex == null || newIndex == null) return;
+          
+          // ✅ 檢查：如果位置沒有變動，就不需要紀錄歷史與重新渲染
+          if(oldIndex === newIndex || oldIndex == null || newIndex == null) return;
+    
+          // ✅ 關鍵：在修改陣列順序之前，先存入目前的狀態到「上一步」
+          pushHistory();
+    
           const arr = (currentDayData?.items || []).slice();
           const [moved] = arr.splice(oldIndex, 1);
           arr.splice(newIndex, 0, moved);
           currentDayData = { ...currentDayData, items: arr };
+          
           saveDayEdits();
           renderTimelineList(currentDayData);
           enableTimelineSortable();
@@ -2910,6 +3021,9 @@
       if(!__tlEditMode) return;
       const inp = e.target.closest('input[data-edit-time]');
       if(!inp) return;
+
+      pushHistory(); // 💡 新增：修改前紀錄狀態
+
       const idx = Number(inp.dataset.idx);
       if(!Number.isFinite(idx)) return;
       const arr = (currentDayData?.items || []).slice();
@@ -2923,6 +3037,9 @@
       if(!__tlEditMode) return;
       const btn = e.target.closest('[data-delete-idx]');
       if(!btn) return;
+
+      pushHistory(); // 💡 新增：修改前紀錄狀態
+
       const idx = Number(btn.dataset.deleteIdx);
       if(!Number.isFinite(idx)) return;
       const arr = (currentDayData?.items || []).slice();
@@ -4274,6 +4391,99 @@ async function renderWeatherJMA(meta){
     document.body.style.width = '';
 
     window.scrollTo(0, __scrollY);
+  }
+
+  function bindLongPressSelection() {
+    // 選取所有非路徑的行程項目
+    const items = document.querySelectorAll('.timeline-item:not(.route-item)');
+    
+    items.forEach(el => {
+      let pressTimer;
+      let isLongPress = false;
+      let startPos = { x: 0, y: 0 };
+  
+      // 攔截系統選單中斷
+      el.oncontextmenu = (e) => {
+        if (!__tlEditMode) e.preventDefault(); 
+      };
+  
+      const start = (e) => {
+        if (__tlEditMode) return; 
+        
+        isLongPress = false;
+        startPos = { x: e.clientX, y: e.clientY };
+        
+        // 啟動 700ms 定時器
+        pressTimer = setTimeout(() => {
+          isLongPress = true;
+          triggerEditMode(el);
+        }, 700); 
+      };
+  
+      const cancel = (e) => {
+        clearTimeout(pressTimer);
+        
+        // 如果不是長壓，且是正常放開指針，則視為「點擊」打開 Modal
+        if (!isLongPress && e.type === 'pointerup') {
+          // 檢查位移，避免滑動時意外開啟 Modal
+          const dist = Math.hypot(e.clientX - startPos.x, e.clientY - startPos.y);
+          if (dist < 10) {
+            const idx = el.dataset.idx;
+            openModal(idx);
+          }
+        }
+      };
+  
+      // 如果移動距離過大（在滑動網頁），則取消長壓偵測
+      const move = (e) => {
+        const dist = Math.hypot(e.clientX - startPos.x, e.clientY - startPos.y);
+        if (dist > 10) clearTimeout(pressTimer);
+      };
+  
+      // 綁定所有指針事件
+      el.addEventListener('pointerdown', start);
+      el.addEventListener('pointerup', cancel);
+      el.addEventListener('pointermove', move);
+      el.addEventListener('pointercancel', () => clearTimeout(pressTimer));
+    });
+  }
+
+  // ✅ 新增：統一的歷史紀錄推送函式
+  function pushHistory() {
+    if (currentDayData && currentDayData.items) {
+      __editHistory.push(JSON.parse(JSON.stringify(currentDayData.items)));
+      // 限制 Stack 大小為 10 步
+      if (__editHistory.length > 10) __editHistory.shift();
+      console.log("已紀錄歷史狀態，當前步數:", __editHistory.length);
+    }
+  }
+
+  function triggerEditMode(targetEl) {
+    if (navigator.vibrate) navigator.vibrate(50); // 觸覺回饋
+    
+    // 紀錄目前狀態到歷史紀錄，支援「回復上一步」
+//     if (currentDayData) {
+//       __editHistory.push(JSON.parse(JSON.stringify(currentDayData.items)));
+//       if (__editHistory.length > 10) __editHistory.shift();
+//     }
+
+    // ✅ 修改：呼叫統一的歷史紀錄函式，紀錄「進入編輯前」的原始狀態
+    pushHistory();
+  
+    __tlEditMode = true;
+    
+    // 重新渲染 UI 以顯示拖曳手柄與工具列
+    renderTimelineToolbar(itineraryIndex[currentDayIdx]);
+    renderTimelineList(currentDayData);
+    enableTimelineSortable();
+    
+    // 給選中的項目一個視覺提示
+    const content = targetEl.querySelector('.tl-content');
+    if (content) {
+      content.style.transition = "transform 0.2s";
+      content.style.transform = "scale(1.05)";
+      setTimeout(() => content.style.transform = "", 200);
+    }
   }
 
   // 在你的 script 結尾加入
