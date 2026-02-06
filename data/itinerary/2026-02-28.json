@@ -266,7 +266,7 @@
         "tag": "food",
         "subtag": "拉麵",
         "desc": "以小豆島醬油『醤（ひしお）』系湯頭為特色。",
-        "detail": "推薦：\n- 醤油系拉麵（小豆島醬油風味）\n- 若有：橄欖油/柚子點綴的版本也值得試\n\n小提醒：中午熱門時段可能排隊。",
+        "detail": "🌟 Tabelog：3.46 \n 推薦：\n- 醤油系拉麵（小豆島醬油風味）\n- 若有：橄欖油/柚子點綴的版本也值得試\n\n小提醒：中午熱門時段可能排隊。",
         "addr": "",
         "mapcode": "",
         "parking": "餐廳停車場",
@@ -274,10 +274,10 @@
         "price": "",
         "stay": "40–60 min",
         "menu": [
-          "招牌醬油拉麵",
-          "HISHIO special 2.0",
-          "島餃子",
-          "小豆島橄欖汽水"
+          {"jp": "醤そば", "zh": "招牌醬油拉麵", "rec": true, "img": "/photos/day2/2026-01-30_22h17_10.png" },
+          {"jp": "HISHIO special 2.2", "zh": "加量拉麵","rec": true, "img": "/photos/day2/2026-01-30_22h17_17.png" },
+          {"jp": "餃子", "zh": "島餃子","rec": true, "img": "/photos/day2/2026-01-30_22h17_24.png" },
+          {"jp": "オリーブサイダー", "zh": "小豆島橄欖汽水","rec": true, "img": "/photos/day2/2026-01-30_22h17_38.png" }
         ],
         "avoid": [],
         "guide": [
@@ -357,7 +357,7 @@
         "tag": "sight",
         "subtag": "城跡",
         "desc": "日本三大水城之一，護城河引入瀨戶內海海水。",
-        "detail": "亮點：\n- 海水護城河、餵鯛魚\n- 月見櫓等重要文化財\n- 披雲閣（和洋折衷的迎賓館）\n\n2月營業時間：07:00–17:30（你備註）。",
+        "detail": "亮點：\n- 海水護城河、餵鯛魚\n- 月見櫓等重要文化財\n- 披雲閣（和洋折衷的迎賓館）\n\n2月營業時間：07:00–17:30。",
         "addr": "2-1 Tamamocho, Takamatsu, Kagawa",
         "mapcode": "",
         "parking": "",
@@ -416,12 +416,12 @@
       },
       {
         "time": "19:30-20:00",
-        "title": "晚餐：Matsuoka（已預約）",
+        "title": "晚餐：Matsuoka",
         "tag": "food",
         "subtag": "晚餐",
         "reserved": true,
         "desc": "高松人氣店，按預約時間入店。",
-        "detail": "若提前到：可先在商店街散步等候。",
+        "detail": "🌟 Tabelog：3.20 若提前到：可先在商店街散步等候。",
         "addr": "",
         "mapcode": "",
         "parking": "",
