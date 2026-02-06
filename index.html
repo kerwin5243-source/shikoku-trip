@@ -29,7 +29,7 @@
     }
   </script>				
   <script>
-    const G_API_URL = "https://script.google.com/macros/s/AKfycbxqQoxt4SWitybsmXjaX7_ye05QYkEpjUOcqa9BH1_wCUTLw7SeeuSiPwJCYrJnP-wj/exec"; // 貼上剛才步驟 1 得到的網址
+    const G_API_URL = "https://script.google.com/macros/s/AKfycbwnnZxxqKD6VTAUai9PaK3naBSkIMLLTdPRpwYHit4HEzCE7QQfoxkbLLicVOeFqPc/exec"; // 貼上剛才步驟 1 得到的網址
     const G_TOKEN = "shikoku_2026_secret"; // 必須與 GAS 內的設定一致
   </script>
 
@@ -4057,14 +4057,42 @@ async function renderWeatherJMA(meta){
     cloudPost("addExpense", newExp);
   }
 
-  function delExpByTs(ts){
+  function delExpByTs(ts) {
     const t = Number(ts);
-    if(!Number.isFinite(t)) return;
-    if(confirm('刪除這筆紀錄?')){
-      expenses = expenses.filter(e => Number(e.ts) !== t);
-      localStorage.setItem('expenses', JSON.stringify(expenses));
-      renderExpenseUI();
-    }
+    if (!Number.isFinite(t)) return;
+  
+    // 1. 使用確認對話框 (優化語氣)
+    if (!confirm('確定要永久刪除這筆紀錄嗎？此動作將同步移除雲端資料。')) return;
+  
+    // 2. 本地資料過濾
+    const index = expenses.findIndex(e => Number(e.ts) === t);
+    if (index === -1) return;
+  
+    // 備份一份資料，萬一失敗可以回滾 (BIOS 工程師習慣的備援機制)
+    const deletedItem = expenses[index];
+    
+    // 先從本地陣列移除
+    expenses.splice(index, 1);
+    localStorage.setItem('expenses', JSON.stringify(expenses));
+    
+    // 3. 立即刷新 UI (Optimistic UI 更新，讓使用者感覺很快)
+    renderExpenseUI();
+  
+    // 4. 同步至雲端
+    fetch(G_API_URL, {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify({
+        token: G_TOKEN,
+        action: "deleteExpense",
+        data: { ts: t }
+      })
+    }).then(() => {
+      console.log(`雲端刪除成功: ${t}`);
+    }).catch(err => {
+      console.error("雲端刪除失敗，資料可能在下次重新整理時恢復", err);
+      alert("網路連線不穩，雲端同步失敗。");
+    });
   }
 
   
