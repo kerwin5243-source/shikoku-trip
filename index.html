@@ -28,6 +28,10 @@
       return '';
     }
   </script>				
+  <script>
+    const G_API_URL = "https://script.google.com/macros/s/AKfycbxqQoxt4SWitybsmXjaX7_ye05QYkEpjUOcqa9BH1_wCUTLw7SeeuSiPwJCYrJnP-wj/exec"; // 貼上剛才步驟 1 得到的網址
+    const G_TOKEN = "shikoku_2026_secret"; // 必須與 GAS 內的設定一致
+  </script>
 
 
   <!-- ✅ Serif + Sans（標題日系感） -->
@@ -2135,6 +2139,58 @@
 
 
   // ====== Load Data ======
+
+  // Sync data from Google sheet
+  async function syncFromCloud() {
+    try {
+      // 加入隨機參數防止瀏覽器快取舊資料
+      const resp = await fetch(`${G_API_URL}?token=${G_TOKEN}&_t=${Date.now()}`);
+      const cloudData = await resp.json();
+  
+      // 1. 同步帳本資料
+      if (cloudData.expenses) {
+        // 關鍵：將全域變數 expenses 更新為雲端抓下來的最新完整清單
+        expenses = cloudData.expenses; 
+        localStorage.setItem('expenses', JSON.stringify(expenses));
+        renderExpenseUI(); // 務必呼叫重新渲染
+      }
+  
+      // 2. 同步 Checkbox 資料
+      if (cloudData.checklists) {
+        const userCheckMap = {};
+        cloudData.checklists.forEach(item => {
+          if (!userCheckMap[item.user]) userCheckMap[item.user] = {};
+          if (item.checked) userCheckMap[item.user][item.item] = true;
+        });
+  
+        Object.keys(userCheckMap).forEach(user => {
+          localStorage.setItem('check_' + user, JSON.stringify(userCheckMap[user]));
+        });
+        
+        // 如果正在行前頁面，重新渲染
+        if (document.getElementById('page-pre').classList.contains('active')) {
+          renderChecklists();
+        }
+      }
+      console.log("雲端同步成功");
+    } catch (e) {
+      console.error("同步失敗:", e);
+    }
+  }
+
+  // 寫入資料時加入 token 欄位
+  function cloudPost(action, data) {
+    fetch(G_API_URL, {
+      method: "POST",
+      mode: "no-cors", 
+      body: JSON.stringify({
+        token: G_TOKEN, // 🔑 加入驗證暗號
+        action: action,
+        data: data
+      })
+    });
+  }
+
   async function loadAllData(){ 
     [CONFIG, CHECKLISTS, TODOS, FLIGHTS, HOTELS, ITINERARY] = await Promise.all([
       fetch("./data/config.json").then(r=>r.json()),
@@ -2170,6 +2226,22 @@
 
   document.addEventListener('DOMContentLoaded', async () => {
     await loadAllData();
+    await syncFromCloud();
+    // --- 新增：手動同步功能 ---
+    const titleEl = document.getElementById('hdrTitle');
+    if (titleEl) {
+      titleEl.style.cursor = 'pointer'; // 讓滑鼠移上去顯示手指圖示
+      titleEl.title = '點擊強制同步雲端資料'; // 增加提示文字
+      titleEl.onclick = async () => {
+        // 增加一點視覺回饋（例如標題變色或震動）
+        titleEl.style.opacity = '0.5';
+        console.log("手動觸發同步...");
+        await syncFromCloud();
+        titleEl.style.opacity = '1';
+        alert('同步完成！');
+      };
+    }
+    // -----------------------
     renderGlobalTodos();
     renderUserTabs();
     renderChecklists();
@@ -2302,6 +2374,12 @@
     if(data[item]) { delete data[item]; el.classList.remove('checked'); }
     else { data[item] = true; el.classList.add('checked'); }
     localStorage.setItem('check_'+curUser, JSON.stringify(data));
+
+    // Add data to Google sheet
+    const isChecked = el.classList.contains('checked'); // 判斷現在是勾選還是取消
+
+      // 傳送到雲端
+      cloudPost("updateCheck", { user: curUser, type: "carry", item: item, checked: isChecked });
   }
 
   // ====== 行程 ======
@@ -3954,21 +4032,29 @@ async function renderWeatherJMA(meta){
     const name = document.getElementById('exName').value.trim();
     const cost = Number(document.getElementById('exCost').value);
     const participants = Array.from(curParticipants);
+    
     if(!name || !Number.isFinite(cost) || cost<=0) return alert('請輸入正確項目與金額');
     if(participants.length<=0) return alert('請至少選一位分攤成員');
-
-    expenses.push({
+  
+    // 建立資料物件
+    const newExp = {
       name,
       cost: Math.round(cost),
       payer: curPayer,
       participants,
       type: curExpenseType,
       ts: Date.now()
-    });
+    };
+  
+    // 1. 先更新本地 UI (讓使用者感覺反應很快)
+    expenses.push(newExp);
     localStorage.setItem('expenses', JSON.stringify(expenses));
     document.getElementById('exName').value = '';
     document.getElementById('exCost').value = '';
     renderExpenseUI();
+  
+    // 2. 傳送到雲端
+    cloudPost("addExpense", newExp);
   }
 
   function delExpByTs(ts){
@@ -4139,6 +4225,13 @@ async function renderWeatherJMA(meta){
     window.scrollTo(0, __scrollY);
   }
 
+  // 在你的 script 結尾加入
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      console.log("偵測到回到網頁，啟動同步...");
+      syncFromCloud();
+    }
+  });
 
 </script>
 </body>
