@@ -1801,7 +1801,77 @@
 .timeline-item.is-highlight:before{ inset:-22px -22px; filter: blur(10px); opacity:.95; }
 /* .reserve-badge{ font-size:.62rem; padding:3px 7px; border-radius:7px; border:1.6px solid rgba(219, 64, 56, .9); color:rgb(219,64,56); transform: rotate(-10deg); } */
 .route-meta{ margin-top:4px; font-size:.86rem; color:var(--ink2); font-weight:700; }
+
+    /* ===== Timeline edit toolbar ===== */
+    .timeline-toolbar{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      margin: 10px 2px 14px;
+      padding:10px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.72);
+      border:1px solid rgba(233,225,214,.9);
+      box-shadow:0 10px 22px rgba(0,0,0,.06);
+    }
+    .tl-tool-left{ display:flex; gap:8px; align-items:center; }
+    .tl-tool-right{ display:flex; gap:8px; align-items:center; }
+    .tl-btn{
+      appearance:none;
+      border:none;
+      padding:10px 12px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:.9rem;
+      background:#fff;
+      border:1px solid rgba(0,0,0,.08);
+      box-shadow:0 6px 14px rgba(0,0,0,.06);
+      color:var(--ink1);
+      cursor:pointer;
+    }
+    .tl-btn.primary{ background: var(--primary); color:#fff; border-color: rgba(0,0,0,.0); }
+    .tl-btn.ghost{ background:transparent; }
+    .tl-btn:active{ transform: translateY(1px); }
+    .tl-edit-hint{ font-size:.85rem; color:var(--ink2); font-weight:800; }
+    .edit-badge{
+      position:absolute;
+      right:10px; top:10px;
+      font-size:.8rem;
+      font-weight:900;
+      color: rgba(60,60,60,.65);
+    }
+    .edit-row{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      margin-top:10px;
+    }
+    .time-input{
+      width:110px;
+      padding:9px 10px;
+      border-radius: 12px;
+      border:1px solid rgba(0,0,0,.12);
+      background: rgba(255,255,255,.9);
+      font-weight:900;
+      color: var(--ink1);
+      font-family:'Roboto Mono', monospace;
+    }
+    .mini-btn{
+      padding:9px 10px;
+      border-radius: 12px;
+      border:1px solid rgba(0,0,0,.12);
+      background:#fff;
+      font-weight:900;
+      cursor:pointer;
+      color: var(--ink1);
+      white-space:nowrap;
+    }
+    .mini-btn.danger{ background: rgba(255,64,64,.10); border-color: rgba(255,64,64,.25); color:#B42318; }
+    .timeline-item.is-dragging .tl-content{ box-shadow:0 22px 44px rgba(0,0,0,.14); transform: rotate(-.35deg) scale(1.01); }
+
 </style>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 </head>
 
 <body>
@@ -1855,6 +1925,7 @@
 
     <div id="dayRouteCard"></div>
 
+    <div id="timelineToolbar" class="timeline-toolbar"></div>
     <div id="timelineList" style="padding-bottom: 20px;"></div>
   </div>
 
@@ -2473,7 +2544,9 @@
       const raw = await fetch(url).then(r => r.json());
       dayCache[idx] = Array.isArray(raw) ? raw[0] : raw;
     }
-    const dayData = dayCache[idx];
+    let dayData = dayCache[idx];
+    // ✅ 本機即時編輯（拖曳/改時間/刪除）會存到 localStorage，跨裝置同步則需接雲端（下面有說明）
+    dayData = applyDayEdits(dayData, meta);
     currentDayData = dayData;
     // ✅ 顯示上方 5 張輪播圖（獨立 block）
     renderDayHero(dayData, meta);
@@ -2558,8 +2631,13 @@
         }, 12000);
     }
     
-    // timeline
-    document.getElementById('timelineList').innerHTML = (dayData?.items || []).map((item, i) => {
+    // timeline (支援本機即時編輯：拖曳排序 / 改時間 / 刪除)
+    renderTimelineToolbar(meta);
+    renderTimelineList(dayData);
+    enableTimelineSortable();
+
+    function renderTimelineList(dayData){
+      document.getElementById('timelineList').innerHTML = (dayData?.items || []).map((item, i) => {
       const t = normalizeTime(item.time);
       const stay = item.stay ? `
         <div class="stay-pill"><i class="fas fa-hourglass-half"></i>${escapeHtml(item.stay)}</div>
@@ -2597,6 +2675,7 @@
 
             ${dur ? `<div class="route-mins">${escapeHtml(dur)}</div>` : ``}
             </div>
+            ${__tlEditMode ? `<div style="margin-left:76px; margin-top:-10px;" onclick="event.stopPropagation()">${renderEditRow(i, item)}</div>` : ``}
         </div>
         `;
 
@@ -2617,11 +2696,150 @@
             <div class="tl-title">${escapeHtml(item.title || '').replace(/\n/g,'<br>')}</div>
             <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
             ${stay}
+            ${renderEditRow(i, item)}
           </div>
         </div>
       `;
     }).join('');
+    }
 
+    // ===== timeline edit helpers =====
+    let __tlEditMode = false;
+    let __tlSortable = null;
+
+    function dayEditKey(){ return `day_edits_${meta?.file || ''}`; }
+
+    function applyDayEdits(dayData, meta){
+      try{
+        const key = `day_edits_${meta?.file || ''}`;
+        const saved = JSON.parse(localStorage.getItem(key) || 'null');
+        if(saved && Array.isArray(saved.items)){
+          return { ...dayData, items: saved.items };
+        }
+      }catch(e){}
+      return dayData;
+    }
+
+    function saveDayEdits(){
+      try{
+        const key = dayEditKey();
+        localStorage.setItem(key, JSON.stringify({ items: (currentDayData?.items || []) }));
+      }catch(e){}
+    }
+
+    function resetDayEdits(){
+      try{ localStorage.removeItem(dayEditKey()); }catch(e){}
+    }
+
+    function renderTimelineToolbar(meta){
+      const el = document.getElementById('timelineToolbar');
+      if(!el) return;
+      const label = __tlEditMode ? '編輯中：可拖曳/改時間/刪除' : '檢視模式';
+      el.innerHTML = `
+        <div class="tl-tool-left">
+          <button class="tl-btn ${__tlEditMode ? 'primary':''}" id="tlEditToggle">
+            <i class="fas ${__tlEditMode ? 'fa-check' : 'fa-pen'}"></i>
+            ${__tlEditMode ? '完成' : '編輯'}
+          </button>
+          <div class="tl-edit-hint">${label}</div>
+        </div>
+        <div class="tl-tool-right">
+          <button class="tl-btn ghost" id="tlExportDay"><i class="fas fa-file-export"></i> 匯出</button>
+          <button class="tl-btn ghost" id="tlResetDay"><i class="fas fa-rotate-left"></i> 還原</button>
+        </div>
+      `;
+
+      el.querySelector('#tlEditToggle')?.addEventListener('click', ()=>{
+        __tlEditMode = !__tlEditMode;
+        renderTimelineToolbar(meta);
+        renderTimelineList(currentDayData);
+        enableTimelineSortable();
+      });
+
+      el.querySelector('#tlResetDay')?.addEventListener('click', ()=>{
+        resetDayEdits();
+        // 重新載入原始 dayData
+        loadDay(currentDayIndex);
+      });
+
+      el.querySelector('#tlExportDay')?.addEventListener('click', ()=>{
+        const blob = new Blob([JSON.stringify(currentDayData, null, 2)], {type:'application/json'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = meta?.file || 'day.json';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+      });
+    }
+
+    function enableTimelineSortable(){
+      const list = document.getElementById('timelineList');
+      if(!list) return;
+      if(__tlSortable){ __tlSortable.destroy(); __tlSortable = null; }
+      if(!__tlEditMode) return;
+      if(typeof Sortable === 'undefined') return;
+      __tlSortable = new Sortable(list, {
+        animation: 180,
+        handle: '.tl-content, .route-strip, .tl-time, .route-time-top',
+        ghostClass: 'is-dragging',
+        onStart: (evt)=>{ evt.item.classList.add('is-dragging'); },
+        onEnd: (evt)=>{
+          evt.item.classList.remove('is-dragging');
+          const oldIndex = evt.oldIndex;
+          const newIndex = evt.newIndex;
+          if(oldIndex == null || newIndex == null) return;
+          const arr = (currentDayData?.items || []).slice();
+          const [moved] = arr.splice(oldIndex, 1);
+          arr.splice(newIndex, 0, moved);
+          currentDayData = { ...currentDayData, items: arr };
+          saveDayEdits();
+          renderTimelineList(currentDayData);
+          enableTimelineSortable();
+        }
+      });
+    }
+
+    // 事件委派：改時間 / 刪除
+    document.getElementById('timelineList').addEventListener('input', (e)=>{
+      if(!__tlEditMode) return;
+      const inp = e.target.closest('input[data-edit-time]');
+      if(!inp) return;
+      const idx = Number(inp.dataset.idx);
+      if(!Number.isFinite(idx)) return;
+      const arr = (currentDayData?.items || []).slice();
+      if(!arr[idx]) return;
+      arr[idx] = { ...arr[idx], time: inp.value };
+      currentDayData = { ...currentDayData, items: arr };
+      saveDayEdits();
+    });
+
+    document.getElementById('timelineList').addEventListener('click', (e)=>{
+      if(!__tlEditMode) return;
+      const btn = e.target.closest('[data-delete-idx]');
+      if(!btn) return;
+      const idx = Number(btn.dataset.deleteIdx);
+      if(!Number.isFinite(idx)) return;
+      const arr = (currentDayData?.items || []).slice();
+      arr.splice(idx, 1);
+      currentDayData = { ...currentDayData, items: arr };
+      saveDayEdits();
+      renderTimelineList(currentDayData);
+      enableTimelineSortable();
+    });
+
+    // 讓 renderTimelineList 內能依模式顯示編輯列
+    function renderEditRow(i, item){
+      if(!__tlEditMode) return '';
+      const t = normalizeTime(item.time);
+      return `
+        <div class="edit-row" onclick="event.stopPropagation()">
+          <input class="time-input" type="time" value="${escapeHtml(t)}" data-edit-time="1" data-idx="${i}" />
+          <button class="mini-btn danger" data-delete-idx="${i}"><i class="fas fa-trash"></i> 刪除</button>
+        </div>
+      `;
+    }
 
     await renderWeatherJMA(meta);
 
