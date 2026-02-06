@@ -2632,6 +2632,10 @@
     }
     
     // timeline (支援本機即時編輯：拖曳排序 / 改時間 / 刪除)
+    // ✅ 先宣告編輯模式狀態，避免 TDZ 造成行程渲染失敗
+    let __tlEditMode = false;
+    let __tlSortable = null;
+
     renderTimelineToolbar(meta);
     renderTimelineList(dayData);
     enableTimelineSortable();
@@ -2704,8 +2708,7 @@
     }
 
     // ===== timeline edit helpers =====
-    let __tlEditMode = false;
-    let __tlSortable = null;
+    // (__tlEditMode / __tlSortable 已在上方宣告)
 
     function dayEditKey(){ return `day_edits_${meta?.file || ''}`; }
 
