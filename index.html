@@ -29,7 +29,7 @@
     }
   </script>				
   <script>
-    const G_API_URL = "https://script.google.com/macros/s/AKfycbwnnZxxqKD6VTAUai9PaK3naBSkIMLLTdPRpwYHit4HEzCE7QQfoxkbLLicVOeFqPc/exec"; // 貼上剛才步驟 1 得到的網址
+    const G_API_URL = "https://script.google.com/macros/s/AKfycbyTqLUmqiHp-Fh6knhf28oQ2MRIoY6TgPZBAimOvUMOMTg9rZkK55TF9Exgi38gq1Fo/exec"; // 貼上剛才步驟 1 得到的網址
     const G_TOKEN = "shikoku_2026_secret"; // 必須與 GAS 內的設定一致
   </script>
 
@@ -2156,18 +2156,30 @@
       }
   
       // 2. 同步 Checkbox 資料
+      // 💡 優化 Checkbox 與 Todo 同步邏輯
       if (cloudData.checklists) {
         const userCheckMap = {};
+        const globalTodos = {}; // 新增一個存全球待辦的物件
+  
         cloudData.checklists.forEach(item => {
-          if (!userCheckMap[item.user]) userCheckMap[item.user] = {};
-          if (item.checked) userCheckMap[item.user][item.item] = true;
+          if (item.user === "GLOBAL") {
+            if (item.checked) globalTodos[item.item] = true;
+          } else {
+            if (!userCheckMap[item.user]) userCheckMap[item.user] = {};
+            if (item.checked) userCheckMap[item.user][item.item] = true;
+          }
         });
   
+        // 儲存全員待辦狀態
+        localStorage.setItem('global_todos', JSON.stringify(globalTodos));
+        
+        // 儲存個人清單狀態
         Object.keys(userCheckMap).forEach(user => {
           localStorage.setItem('check_' + user, JSON.stringify(userCheckMap[user]));
         });
         
-        // 如果正在行前頁面，重新渲染
+        // 重新渲染畫面
+        renderGlobalTodos(); // 💡 確保全員待辦 UI 更新
         if (document.getElementById('page-pre').classList.contains('active')) {
           renderChecklists();
         }
@@ -2316,8 +2328,19 @@
   function toggleGlobalTodo(key){
     const k = unescapeHtml(key);
     const saved = JSON.parse(localStorage.getItem('global_todos')) || {};
+    // 1. 切換狀態
     saved[k] = !saved[k];
+    
+    // 2. 存入本地
     localStorage.setItem('global_todos', JSON.stringify(saved));
+  
+    // 3. 💡 新增：同步到雲端 (使用 'GLOBAL' 作為用戶名標記)
+    cloudPost("updateCheck", { 
+      user: "GLOBAL", 
+      type: "todo", 
+      item: k, 
+      checked: saved[k] 
+    });
   }
   function formatDuration(mins){
     const m = Number(mins);
