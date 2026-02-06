@@ -10,13 +10,11 @@
   <link rel="apple-touch-icon" sizes="152x152" href="/icon/apple-touch-icon-152.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/icon/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/icon/favicon-16.png">
-  <link rel="manifest" href="/manifest.webmanifest">
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#F6F3EE" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>	
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const TAG_SVGS = {
       takagi: ['./photos/takagi_01_nobg_v2.svg', './photos/takagi_02_nobg_v2.svg']
@@ -1885,7 +1883,7 @@
       <span class="year-pill" id="hdrYear">2026</span>
     </div>
   </header>
-  <button class="tl-btn" onclick="loginWithEmail()">登入同步</button>
+
   <!-- 行前 -->
   <div id="page-pre" class="page">
     <div class="card">
@@ -2021,28 +2019,6 @@
   </nav>
 
 <script>
-  const SUPABASE_URL = "https://jtfwntkfncomyrinzulw.supabase.co";
-  const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0ZndudGtmbmNvbXlyaW56dWx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzNTY4ODcsImV4cCI6MjA4NTkzMjg4N30._os5iymqnOK4cy9AOMnlVn67uefcuyw0pC1LOaBNMNQ";
-  const TRIP_SLUG = "shikoku-2026";
-
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-
-  async function loginWithEmail(){
-    const email = prompt("輸入 Email（會寄登入連結）:");
-    if(!email) return;
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: location.href }
-    });
-    if(error) alert(error.message);
-    else alert("已寄出登入連結，請到信箱點選完成登入");
-  }
-
-  async function isLoggedIn(){
-    const { data } = await supabase.auth.getSession();
-    return !!data?.session;
-  }
-
   // ====== Globals (JSON 驅動) ======
   let CONFIG, CHECKLISTS, TODOS, FLIGHTS, HOTELS, ITINERARY;
 
@@ -4162,14 +4138,6 @@ async function renderWeatherJMA(meta){
 
     window.scrollTo(0, __scrollY);
   }
-
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("/service-worker.js").catch(console.error);
-    });
-  }
-
-
 
 
 </script>
