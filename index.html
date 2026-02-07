@@ -2180,7 +2180,7 @@
   // Sync data from Google sheet
   async function syncFromCloud() {
     try {
-      // 1. 發送請求，加入 _t 防止瀏覽器快取
+      // 💡 發送請求，加入 _t 防止瀏覽器快取
       const resp = await fetch(`${G_API_URL}?token=${G_TOKEN}&_t=${Date.now()}`);
 
       // 💡 BIOS Debug: 檢查回應的 URL 是否包含 "ServiceLogin"
@@ -2189,26 +2189,30 @@
         return;
       }
 
-      // 💡 檢查回傳內容是否為授權失敗
+      // 1. 先讀取為文字
       const text = await resp.text();
       console.log("雲端回傳原始字串:", text); // 檢查這是否為 JSON
 
+      // 2. 檢查權限
       if (text === "Unauthorized") {
         setCookie("trip_auth_token", "", -1); // 清除無效的 Cookie
         alert("訪問暗號錯誤或已過期，請重新輸入。");
         location.reload(); 
         return;
       }
-      const cloudData = await resp.json();
   
-      // 2. 同步帳本資料
+      // 3. 💡 關鍵修復：改用 JSON.parse() 解析已經讀取的 text 字串
+      // 不要再用 await resp.json()
+      const cloudData = JSON.parse(text);
+
+      // 4-1. 同步帳本資料
       if (cloudData.expenses) {
         expenses = cloudData.expenses; 
         localStorage.setItem('expenses', JSON.stringify(expenses));
         if (typeof renderExpenseUI === 'function') renderExpenseUI(); 
       }
   
-      // 3. 同步 Checkbox 與 全員待辦 (GLOBAL)
+      // 4-2. 同步 Checkbox 與 全員待辦 (GLOBAL)
       if (cloudData.checklists) {
         const userCheckMap = {};
         const globalTodos = {}; 
@@ -2234,7 +2238,7 @@
         }
       }
   
-      // 4. 💡 新增：同步行程異動 (Itinerary Edits)
+      // 4-3. 💡 新增：同步行程異動 (Itinerary Edits)
       if (cloudData.itineraryEdits) {
         const currentFile = itineraryIndex[currentDayIdx]?.file;
         
