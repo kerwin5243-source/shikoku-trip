@@ -2799,6 +2799,86 @@
       cloudPost("updateItinerary", { file: file, items: dataToSave });
     }
 
+    function renderDayHero(dayData, meta){
+        const el = document.getElementById('dayHero');
+        if(!el) return;
+
+        // ✅ 支援兩種格式：
+        // 1) 新格式：[{src,loc,caption}]
+        // 2) 舊格式：[ "url1", "url2" ]
+        let photosRaw = Array.isArray(dayData?.photos) ? dayData.photos.slice(0,5) : [];
+        if(!photosRaw.length){
+            photosRaw = [
+            "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1526481280695-3c687fd5432c?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80",
+            ];
+        }
+
+        const photos = photosRaw.map(p=>{
+            if(typeof p === 'string'){
+                return { src:p, loc: (meta?.loc||''), caption:'' };
+            }
+            return {
+                src: p.src || p.url || '',
+                loc: (p.loc !== undefined) ? (p.loc ?? '') : (meta?.loc || ''),
+                caption: p.caption || ''
+            };
+        }).filter(x=>x.src);
+
+        const slides = photos.map((p, idx)=>`
+          <div class="hero-slide hero--blur">
+            <img
+                src="${escapeHtml(p.src)}"
+                alt="day photo ${idx+1}"
+                loading="lazy"
+                decoding="async"
+                referrerpolicy="no-referrer"
+                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80';"
+                class="hero-bg" alt="" aria-hidden="true"
+            >
+            <img
+                src="${escapeHtml(p.src)}"
+                alt="day photo ${idx+1}"
+                loading="lazy"
+                decoding="async"
+                referrerpolicy="no-referrer"
+                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80';"
+                class="hero-img" alt="day photo ...">
+            >
+            <div class="hero-overlay">
+                ${p.loc ? `<div class="hero-loc"><i class="fas fa-location-dot"></i>${escapeHtml(p.loc)}</div>` : ``}
+                ${p.caption ? `<div class="hero-caption">${escapeHtml(p.caption)}</div>` : ``}
+					  
+								   
+																									
+            </div>
+           </div>
+        `).join('');
+
+        
+        // ❌ dots（小白點）已移除：不顯示也不需要同步
+        el.innerHTML = `<div class="hero-track" id="heroTrack">${slides}</div>`;
+
+        const track = document.getElementById('heroTrack');
+        if(!track) return;
+
+        // ✅ 桌機滾輪也能左右滑
+        enableWheelHorizontal(track);
+
+        if(__heroTimer) clearInterval(__heroTimer);
+
+        // auto slide
+
+        let cur = 0;
+        __heroTimer = setInterval(()=>{
+            cur = (cur + 1) % photos.length;
+            track.scrollTo({ left: cur * track.clientWidth, behavior:'smooth' });
+        }, 12000);
+    }
+
     async function selectDay(idx) {
         currentDayIdx = idx;
         __editHistory = []; 
@@ -3008,10 +3088,12 @@
   function buildGoogleNavUrl(item){
     const hasGeo = item?.geo?.lat != null && item?.geo?.lng != null;
     if(hasGeo){
-      return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(item.geo.lat + ',' + item.geo.lng)}`;
+//      return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(item.geo.lat + ',' + item.geo.lng)}`;
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.geo.lat + ',' + item.geo.lng)}`;
     }
     const q = (item?.addr || item?.title || '').trim();
     if(!q) return 'https://www.google.com/maps';
+//    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
   }
   function travelModeForRoute(mode){
@@ -3705,6 +3787,7 @@ async function renderWeatherJMA(meta){
 
     const r = item.route;
     const tm = travelModeForRoute(r.mode);
+//    window.open(`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(r.from||'')}&destination=${encodeURIComponent(r.to||'')}&travelmode=${tm}`, '_blank', 'noopener');
     window.open(`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(r.from||'')}&destination=${encodeURIComponent(r.to||'')}&travelmode=${tm}`, '_blank', 'noopener');
   }
 
