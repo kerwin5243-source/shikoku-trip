@@ -29,8 +29,33 @@
     }
   </script>				
   <script>
+    // 1. 設定你的 GAS API URL
     const G_API_URL = "https://script.google.com/macros/s/AKfycbwNqQaxH8pNJzsVeq6QANtCgue1FouFO-2CDrhvqSjECCtXxD5Yo8d32V2vLGdUBGpD/exec"; // 貼上剛才步驟 1 得到的網址
-    const G_TOKEN = "shikoku_2026_secret"; // 必須與 GAS 內的設定一致
+//    const G_TOKEN = "shikoku_2026_secret"; // 必須與 GAS 內的設定一致
+    // 2. 改為從 Cookie 讀取 Token
+    let G_TOKEN = getCookie("trip_auth_token") || "";
+  
+    // --- Cookie 操作函式 ---
+    function setCookie(name, value, days) {
+      let expires = "";
+      if (days) {
+        let date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toUTCString();
+      }
+      document.cookie = name + "=" + (value || "") + expires + "; path=/; SameSite=Strict";
+    }
+  
+    function getCookie(name) {
+      let nameEQ = name + "=";
+      let ca = document.cookie.split(';');
+      for(let i=0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+      }
+      return null;
+    }
   </script>
 
 
@@ -2157,6 +2182,15 @@
     try {
       // 1. 發送請求，加入 _t 防止瀏覽器快取
       const resp = await fetch(`${G_API_URL}?token=${G_TOKEN}&_t=${Date.now()}`);
+
+      // 💡 檢查回傳內容是否為授權失敗
+      const text = await resp.text();
+      if (text === "Unauthorized") {
+        setCookie("trip_auth_token", "", -1); // 清除無效的 Cookie
+        alert("訪問暗號錯誤或已過期，請重新輸入。");
+        location.reload(); 
+        return;
+      }
       const cloudData = await resp.json();
   
       // 2. 同步帳本資料
@@ -2270,6 +2304,18 @@
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
+     // 💡 若無 Token 則提示輸入（僅需輸入第一次，後續會存於 Cookie）
+     if (!G_TOKEN) {
+       const inputToken = prompt("請輸入訪問暗號 (Token)：");
+       if (inputToken) {
+         G_TOKEN = inputToken;
+         setCookie("trip_auth_token", G_TOKEN, 30); // 預設存儲 30 天
+         location.reload(); 
+         return;
+       } else {
+         alert("未輸入暗號，同步功能將無法正常運作。");
+       }
+    }
     await loadAllData();
     await syncFromCloud();
     // --- 新增：手動同步功能 ---
