@@ -3104,8 +3104,15 @@
         // 切換 Class
         const listEl = document.getElementById('timelineList');
         if (listEl) {
-          if (__tlEditMode) listEl.classList.add('edit-mode-active');
-          else listEl.classList.remove('edit-mode-active');
+//           if (__tlEditMode) listEl.classList.add('edit-mode-active');
+//           else listEl.classList.remove('edit-mode-active');
+            if (__tlEditMode) {
+              listEl.classList.add('edit-mode-active');
+//               listEl.style.touchAction = 'none'; // 編輯中禁用系統捲動
+            } else {
+              listEl.classList.remove('edit-mode-active');
+//               listEl.style.touchAction = 'pan-y'; // 完成後恢復 y 軸捲動
+            }
         }
       
         renderTimelineToolbar(meta);
@@ -3132,7 +3139,7 @@
         ghostClass: 'is-dragging',
 //         delay: 400,
 //         delayOnTouchOnly: true,
-	delay: 0,
+	delay: 200,
         touchStartThreshold: 5,
     
         onStart: (evt)=>{ 
@@ -4576,7 +4583,8 @@ async function renderWeatherJMA(meta){
           const dist = Math.hypot(e.clientX - startPos.x, e.clientY - startPos.y);
           if (dist < 10) {
             const idx = el.dataset.idx;
-            openModal(idx);
+//             openModal(idx);
+            if (idx !== undefined) openModal(idx);
           }
         }
       };
@@ -4584,7 +4592,12 @@ async function renderWeatherJMA(meta){
       // 如果移動距離過大（在滑動網頁），則取消長壓偵測
       const move = (e) => {
         const dist = Math.hypot(e.clientX - startPos.x, e.clientY - startPos.y);
-        if (dist > 10) clearTimeout(pressTimer);
+//         if (dist > 10) clearTimeout(pressTimer);
+        // ✅ 關鍵：提高「取消長壓」的門檻到 30px
+        // 只要手指移動超過 30 像素，就判定使用者是在「滑動網頁」，立刻殺掉定時器
+        if (dist > 50) {
+          clearTimeout(pressTimer);
+        }
       };
   
       // 綁定所有指針事件
@@ -4679,6 +4692,8 @@ async function renderWeatherJMA(meta){
       const listEl = document.getElementById('timelineList');
       if (listEl) {
         listEl.classList.add('edit-mode-active');
+	// ✅ 防止在拖曳過程中頁面發生意外的滾動行為
+//         listEl.style.touchAction = 'none';
       }
     
       const newTop = targetEl.getBoundingClientRect().top;
