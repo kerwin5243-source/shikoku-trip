@@ -3085,15 +3085,37 @@
         }
       });
     
+//       el.querySelector('#tlEditToggle')?.addEventListener('click', () => {
+//         __tlEditMode = !__tlEditMode;
+//         renderTimelineToolbar(meta);
+// //         renderTimelineList(currentDayData);
+//         // ✅ 修正：只有在「關閉」編輯模式時，為了清理可能的狀態才重新渲染
+//         if (!__tlEditMode) {
+//             renderTimelineList(currentDayData);
+//         }
+//         enableTimelineSortable();
+//       });
       el.querySelector('#tlEditToggle')?.addEventListener('click', () => {
+        // ✅ 如果是開啟編輯模式，紀錄捲動位置
+        const scrollY = window.scrollY;
+        
         __tlEditMode = !__tlEditMode;
-        renderTimelineToolbar(meta);
-//         renderTimelineList(currentDayData);
-        // ✅ 修正：只有在「關閉」編輯模式時，為了清理可能的狀態才重新渲染
-        if (!__tlEditMode) {
-            renderTimelineList(currentDayData);
+      
+        // 切換 Class
+        const listEl = document.getElementById('timelineList');
+        if (listEl) {
+          if (__tlEditMode) listEl.classList.add('edit-mode-active');
+          else listEl.classList.remove('edit-mode-active');
         }
-        enableTimelineSortable();
+      
+        renderTimelineToolbar(meta);
+      
+        if (!__tlEditMode) {
+          renderTimelineList(currentDayData);
+        } else {
+          // ✅ 這裡不重畫 List，但要啟用排序
+          enableTimelineSortable();
+        }
       });
     }
 
@@ -4569,38 +4591,68 @@ async function renderWeatherJMA(meta){
     }
   }
 
-  function triggerEditMode(targetEl) {
-    if (navigator.vibrate) navigator.vibrate(50); // 觸覺回饋
-    
-    // 紀錄目前狀態到歷史紀錄，支援「回復上一步」
-//     if (currentDayData) {
-//       __editHistory.push(JSON.parse(JSON.stringify(currentDayData.items)));
-//       if (__editHistory.length > 10) __editHistory.shift();
+//   function triggerEditMode(targetEl) {
+//     if (navigator.vibrate) navigator.vibrate(50); // 觸覺回饋
+//     
+//     // 紀錄目前狀態到歷史紀錄，支援「回復上一步」
+// //     if (currentDayData) {
+// //       __editHistory.push(JSON.parse(JSON.stringify(currentDayData.items)));
+// //       if (__editHistory.length > 10) __editHistory.shift();
+// //     }
+// 
+//     // ✅ 修改：呼叫統一的歷史紀錄函式，紀錄「進入編輯前」的原始狀態
+//     pushHistory();
+//   
+//     __tlEditMode = true;
+//     
+//     // 重新渲染 UI 以顯示拖曳手柄與工具列
+//     // ✅ 修正：直接操作 CSS Class，不要重新渲染整個列表
+//     const listEl = document.getElementById('timelineList');
+//     if (listEl) {
+//       listEl.classList.add('edit-mode-active');
 //     }
-
-    // ✅ 修改：呼叫統一的歷史紀錄函式，紀錄「進入編輯前」的原始狀態
-    pushHistory();
-  
-    __tlEditMode = true;
+//     renderTimelineToolbar(itineraryIndex[currentDayIdx]);
+// //     renderTimelineList(currentDayData);
+//     enableTimelineSortable();
+//     
+//     // 給選中的項目一個視覺提示
+//     const content = targetEl.querySelector('.tl-content');
+//     if (content) {
+//       content.style.transition = "transform 0.2s";
+//       content.style.transform = "scale(1.05)";
+//       setTimeout(() => content.style.transform = "", 200);
+//     }
+//   }
+    function triggerEditMode(targetEl) {
+      if (navigator.vibrate) navigator.vibrate(50); // 觸覺回饋
+      
+      // ✅ 1. 紀錄切換前的 Viewport 座標 (頂端距離)
+      const oldTop = targetEl.getBoundingClientRect().top;
+      
+      pushHistory();
+      __tlEditMode = true;
     
-    // 重新渲染 UI 以顯示拖曳手柄與工具列
-    // ✅ 修正：直接操作 CSS Class，不要重新渲染整個列表
-    const listEl = document.getElementById('timelineList');
-    if (listEl) {
-      listEl.classList.add('edit-mode-active');
-    }
-    renderTimelineToolbar(itineraryIndex[currentDayIdx]);
-//     renderTimelineList(currentDayData);
-    enableTimelineSortable();
+      // ✅ 2. 切換 Class 顯示編輯列
+      const listEl = document.getElementById('timelineList');
+      if (listEl) {
+        listEl.classList.add('edit-mode-active');
+      }
     
-    // 給選中的項目一個視覺提示
-    const content = targetEl.querySelector('.tl-content');
-    if (content) {
-      content.style.transition = "transform 0.2s";
-      content.style.transform = "scale(1.05)";
-      setTimeout(() => content.style.transform = "", 200);
+      // ✅ 3. 立即計算位移並補償捲動 (核心修正)
+      const newTop = targetEl.getBoundingClientRect().top;
+      window.scrollBy(0, newTop - oldTop);
+    
+      renderTimelineToolbar(itineraryIndex[currentDayIdx]);
+      enableTimelineSortable();
+      
+      // 視覺提示
+      const content = targetEl.querySelector('.tl-content');
+      if (content) {
+        content.style.transition = "transform 0.2s";
+        content.style.transform = "scale(1.05)";
+        setTimeout(() => content.style.transform = "", 200);
+      }
     }
-  }
 
   // 在你的 script 結尾加入
   document.addEventListener('visibilitychange', () => {
