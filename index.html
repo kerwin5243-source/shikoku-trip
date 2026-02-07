@@ -2183,8 +2183,16 @@
       // 1. 發送請求，加入 _t 防止瀏覽器快取
       const resp = await fetch(`${G_API_URL}?token=${G_TOKEN}&_t=${Date.now()}`);
 
+      // 💡 BIOS Debug: 檢查回應的 URL 是否包含 "ServiceLogin"
+      if (resp.url.includes("ServiceLogin")) {
+        console.error("🚨 權限錯誤：GAS 跳轉到了登入頁面。請將 GAS 部署設定為『任何人 (Anyone)』。");
+        return;
+      }
+
       // 💡 檢查回傳內容是否為授權失敗
       const text = await resp.text();
+      console.log("雲端回傳原始字串:", text); // 檢查這是否為 JSON
+
       if (text === "Unauthorized") {
         setCookie("trip_auth_token", "", -1); // 清除無效的 Cookie
         alert("訪問暗號錯誤或已過期，請重新輸入。");
