@@ -3003,22 +3003,6 @@
       enableTimelineSortable();
     });
 
-    // 讓 renderTimelineList 內能依模式顯示編輯列
-    function renderEditRow(i, item){
-      if(!__tlEditMode) return '';
-      const t = normalizeTime(item.time);
-      return `
-        <div class="edit-row" onclick="event.stopPropagation()">
-          <input class="time-input" type="time" value="${escapeHtml(t)}" data-edit-time="1" data-idx="${i}" />
-          <button class="mini-btn danger" data-delete-idx="${i}"><i class="fas fa-trash"></i> 刪除</button>
-        </div>
-      `;
-    }
-
-    await renderWeatherJMA(meta);
-
-
-  }
 
   // ====== Google 導航：優先 geo，其次 addr/title ======
   function buildGoogleNavUrl(item){
