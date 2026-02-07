@@ -3130,8 +3130,9 @@
         animation: 180,
         handle: '.tl-content, .route-strip, .tl-time, .route-time-top',
         ghostClass: 'is-dragging',
-        delay: 400,
-        delayOnTouchOnly: true,
+//         delay: 400,
+//         delayOnTouchOnly: true,
+	delay: 0,
         touchStartThreshold: 5,
     
         onStart: (evt)=>{ 
@@ -4540,18 +4541,31 @@ async function renderWeatherJMA(meta){
         if (!__tlEditMode) e.preventDefault(); 
       };
   
-      const start = (e) => {
-        if (__tlEditMode) return; 
-        
-        isLongPress = false;
-        startPos = { x: e.clientX, y: e.clientY };
-        
-        // 啟動 700ms 定時器
-        pressTimer = setTimeout(() => {
-          isLongPress = true;
-          triggerEditMode(el);
-        }, 700); 
-      };
+//       const start = (e) => {
+//         if (__tlEditMode) return; 
+//         
+//         isLongPress = false;
+//         startPos = { x: e.clientX, y: e.clientY };
+//         
+//         // 啟動 700ms 定時器
+//         pressTimer = setTimeout(() => {
+//           isLongPress = true;
+//           triggerEditMode(el);
+//         }, 700); 
+//       };
+    // ✅ 修改：將原始事件 e 傳入 triggerEditMode
+    const start = (e) => {
+      if (__tlEditMode) return; 
+      
+      isLongPress = false;
+      startPos = { x: e.clientX, y: e.clientY };
+      
+      // 啟動 700ms 定時器
+      pressTimer = setTimeout(() => {
+        isLongPress = true;
+        triggerEditMode(el, e); // 👈 這裡多傳入 e
+      }, 700); 
+    };
   
       const cancel = (e) => {
         clearTimeout(pressTimer);
@@ -4623,29 +4637,64 @@ async function renderWeatherJMA(meta){
 //       setTimeout(() => content.style.transform = "", 200);
 //     }
 //   }
-    function triggerEditMode(targetEl) {
-      if (navigator.vibrate) navigator.vibrate(50); // 觸覺回饋
+//     function triggerEditMode(targetEl) {
+//       if (navigator.vibrate) navigator.vibrate(50); // 觸覺回饋
+//       
+//       // ✅ 1. 紀錄切換前的 Viewport 座標 (頂端距離)
+//       const oldTop = targetEl.getBoundingClientRect().top;
+//       
+//       pushHistory();
+//       __tlEditMode = true;
+//     
+//       // ✅ 2. 切換 Class 顯示編輯列
+//       const listEl = document.getElementById('timelineList');
+//       if (listEl) {
+//         listEl.classList.add('edit-mode-active');
+//       }
+//     
+//       // ✅ 3. 立即計算位移並補償捲動 (核心修正)
+//       const newTop = targetEl.getBoundingClientRect().top;
+//       window.scrollBy(0, newTop - oldTop);
+//     
+//       renderTimelineToolbar(itineraryIndex[currentDayIdx]);
+//       enableTimelineSortable();
+//       
+//       // 視覺提示
+//       const content = targetEl.querySelector('.tl-content');
+//       if (content) {
+//         content.style.transition = "transform 0.2s";
+//         content.style.transform = "scale(1.05)";
+//         setTimeout(() => content.style.transform = "", 200);
+//       }
+//     }
+    // ✅ 修改：接收第二個參數 originalEvent
+    function triggerEditMode(targetEl, originalEvent) {
+      if (navigator.vibrate) navigator.vibrate(50); 
       
-      // ✅ 1. 紀錄切換前的 Viewport 座標 (頂端距離)
       const oldTop = targetEl.getBoundingClientRect().top;
       
       pushHistory();
       __tlEditMode = true;
     
-      // ✅ 2. 切換 Class 顯示編輯列
       const listEl = document.getElementById('timelineList');
       if (listEl) {
         listEl.classList.add('edit-mode-active');
       }
     
-      // ✅ 3. 立即計算位移並補償捲動 (核心修正)
       const newTop = targetEl.getBoundingClientRect().top;
       window.scrollBy(0, newTop - oldTop);
     
       renderTimelineToolbar(itineraryIndex[currentDayIdx]);
+      
+      // 1. 先初始化 Sortable
       enableTimelineSortable();
       
-      // 視覺提示
+      // 2. 💡 關鍵：手動將原始 pointerdown 事件「餵」給 Sortable 實體
+      // 這會讓 Sortable 覺得使用者「剛剛才按下去」，並立即進入拖曳狀態
+      if (__tlSortable && originalEvent) {
+        __tlSortable._onTapStart(originalEvent);
+      }
+    
       const content = targetEl.querySelector('.tl-content');
       if (content) {
         content.style.transition = "transform 0.2s";
