@@ -2239,6 +2239,30 @@
       }
   
       // 4-3. 💡 新增：同步行程異動 (Itinerary Edits)
+//       if (cloudData.itineraryEdits) {
+//         const currentFile = itineraryIndex[currentDayIdx]?.file;
+//         
+//         Object.keys(cloudData.itineraryEdits).forEach(file => {
+//           const key = `day_edits_${file}`;
+//           const editData = cloudData.itineraryEdits[file];
+//           
+//           // 更新 LocalStorage 以供離線使用
+//           localStorage.setItem(key, JSON.stringify(editData));
+//           
+//           // 如果雲端異動的是「目前正在看」的這一天，立即更新快取並重繪
+//           if (file === currentFile) {
+//             dayCache[currentDayIdx] = { ...dayCache[currentDayIdx], items: editData.items };
+//             currentDayData = dayCache[currentDayIdx];
+//             
+//             // 確保在行程頁面時才重繪
+//             if (document.getElementById('page-itinerary').classList.contains('active')) {
+//               renderTimelineList(currentDayData);
+//               if (typeof enableTimelineSortable === 'function') enableTimelineSortable();
+//             }
+//           }
+//         });
+//       }
+       // ✅ 修正行程卡消失後的 syncFromCloud 片段
       if (cloudData.itineraryEdits) {
         const currentFile = itineraryIndex[currentDayIdx]?.file;
         
@@ -2246,15 +2270,17 @@
           const key = `day_edits_${file}`;
           const editData = cloudData.itineraryEdits[file];
           
-          // 更新 LocalStorage 以供離線使用
-          localStorage.setItem(key, JSON.stringify(editData));
+          // 💡 關鍵修正：判斷 editData 是陣列還是物件
+          const itemsArray = Array.isArray(editData) ? editData : (editData.items || []);
           
-          // 如果雲端異動的是「目前正在看」的這一天，立即更新快取並重繪
+          // 更新 LocalStorage 與 快取
+          localStorage.setItem(key, JSON.stringify({ items: itemsArray }));
+          
           if (file === currentFile) {
-            dayCache[currentDayIdx] = { ...dayCache[currentDayIdx], items: editData.items };
+            // 確保將快取中的 items 設為正確的陣列
+            dayCache[currentDayIdx] = { ...dayCache[currentDayIdx], items: itemsArray };
             currentDayData = dayCache[currentDayIdx];
             
-            // 確保在行程頁面時才重繪
             if (document.getElementById('page-itinerary').classList.contains('active')) {
               renderTimelineList(currentDayData);
               if (typeof enableTimelineSortable === 'function') enableTimelineSortable();
@@ -2790,14 +2816,14 @@
     }
     
     // 儲存異動
-    function saveDayEdits() {
-      const meta = itineraryIndex[currentDayIdx];
-      const file = meta?.file;
-      if (!file) return;
-      const dataToSave = { items: (currentDayData?.items || []) };
-      localStorage.setItem(`day_edits_${file}`, JSON.stringify(dataToSave));
-      cloudPost("updateItinerary", { file: file, items: dataToSave });
-    }
+//     function saveDayEdits() {
+//       const meta = itineraryIndex[currentDayIdx];
+//       const file = meta?.file;
+//       if (!file) return;
+//       const dataToSave = { items: (currentDayData?.items || []) };
+//       localStorage.setItem(`day_edits_${file}`, JSON.stringify(dataToSave));
+//       cloudPost("updateItinerary", { file: file, items: dataToSave });
+//     }
 
     function renderDayHero(dayData, meta){
         const el = document.getElementById('dayHero');
@@ -3103,6 +3129,7 @@
       arr[idx] = { ...arr[idx], time: inp.value };
       currentDayData = { ...currentDayData, items: arr };
       saveDayEdits();
+      renderTimelineList(currentDayData);
     });
 
     document.getElementById('timelineList').addEventListener('click', (e)=>{
