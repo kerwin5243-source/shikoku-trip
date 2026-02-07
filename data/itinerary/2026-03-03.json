@@ -57,7 +57,7 @@
         "addr": "",
         "mapcode": "",
         "parking": "",
-        "hours": "",
+        "hours": "09:00–21:00",
         "price": "",
         "stay": "45–75 min",
         "menu": [],
@@ -70,7 +70,7 @@
       {
         "type": "route",
         "time": "08:30-09:45",
-        "title": "道後 → 下灘駅",
+        "title": "道後 → 大洲城",
         "desc": "",
         "durationText": "約 1 小時15 分鐘車程",
         "stay": "1h 15m",
@@ -80,46 +80,8 @@
         "route": {
           "mode": "drive",
           "from": "道後温泉",
-          "to": "下灘駅",
-          "minutes": 75
-        }
-      },
-      {
-        "time": "09:45",
-        "title": "下灘駅（海邊無人車站）",
-        "tag": "sight",
-        "subtag": "車站/絕景",
-        "desc": "青春18車票海報名景，月台對面就是伊予灘海景。",
-        "detail": "注意：停車位少（約5–6台），不要走到軌道上拍照。",
-        "addr": "",
-        "mapcode": "",
-        "parking": "",
-        "hours": "全日開放",
-        "price": "",
-        "stay": "30–45 min",
-        "menu": [],
-        "avoid": [],
-        "guide": [],
-        "links": [],
-        "img": "",
-        "highlight": true,
-        "eta": ""
-      },
-      {
-        "type": "route",
-        "time": "10:30-11:15",
-        "title": "下灘駅 → 大洲城",
-        "desc": "",
-        "durationText": "約 45 分鐘車程",
-        "stay": "45 min",
-        "mode": "drive",
-        "from": "",
-        "to": "",
-        "route": {
-          "mode": "drive",
-          "from": "下灘駅",
           "to": "大洲城",
-          "minutes": 45
+          "minutes": 75
         }
       },
       {
@@ -132,7 +94,7 @@
         "addr": "",
         "mapcode": "",
         "parking": "",
-        "hours": "09:00–17:00（最後入場 16:30）",
+        "hours": "09:00–17:00",
         "price": "成人 550円",
         "stay": "60–90 min",
         "menu": [],
