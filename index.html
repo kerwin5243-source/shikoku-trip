@@ -2915,40 +2915,79 @@
     // ===== timeline edit helpers =====
     // (__tlEditMode / __tlSortable 已在上方宣告)
 
-    function dayEditKey(){ return `day_edits_${meta?.file || ''}`; }
+//    function dayEditKey(){ return `day_edits_${meta?.file || ''}`; }
+     // ✅ 修正後的 dayEditKey：從全域索引中取得 meta
+     function dayEditKey() {
+       const meta = itineraryIndex[currentDayIdx]; // 從全域變數抓取目前的 meta
+       return `day_edits_${meta?.file || ''}`;
+     }
 
-    function applyDayEdits(dayData, meta){
-      try{
+    // ✅ 修正後的 applyDayEdits (確保它也是獨立的)
+    function applyDayEdits(dayData, meta) {
+      try {
         const key = `day_edits_${meta?.file || ''}`;
         const saved = JSON.parse(localStorage.getItem(key) || 'null');
-        if(saved && Array.isArray(saved.items)){
+        if (saved && Array.isArray(saved.items)) {
           return { ...dayData, items: saved.items };
         }
-      }catch(e){}
+      } catch (e) {}
       return dayData;
     }
 
-    function saveDayEdits() {
-      try {
-        const file = itineraryIndex[currentDayIdx]?.file;
-        if (!file) return;
-    
-        const key = dayEditKey();
-        const dataToSave = { items: (currentDayData?.items || []) };
-        
-        // 1. 本地備份
-        localStorage.setItem(key, JSON.stringify(dataToSave));
-    
-        // 2. 雲端同步
-        cloudPost("updateItinerary", {
-          file: file,
-          items: dataToSave // 包含完整的項目順序與時間
-        });
-        console.log(`Day ${currentDayIdx + 1} 行程異動已同步雲端`);
-      } catch (e) {
-        console.error("儲存失敗", e);
-      }
-    }
+//     function applyDayEdits(dayData, meta){
+//       try{
+//         const key = `day_edits_${meta?.file || ''}`;
+//         const saved = JSON.parse(localStorage.getItem(key) || 'null');
+//         if(saved && Array.isArray(saved.items)){
+//           return { ...dayData, items: saved.items };
+//         }
+//       }catch(e){}
+//       return dayData;
+//     }
+
+//     function saveDayEdits() {
+//       try {
+//         const file = itineraryIndex[currentDayIdx]?.file;
+//         if (!file) return;
+//     
+//         const key = dayEditKey();
+//         const dataToSave = { items: (currentDayData?.items || []) };
+//         
+//         // 1. 本地備份
+//         localStorage.setItem(key, JSON.stringify(dataToSave));
+//     
+//         // 2. 雲端同步
+//         cloudPost("updateItinerary", {
+//           file: file,
+//           items: dataToSave // 包含完整的項目順序與時間
+//         });
+//         console.log(`Day ${currentDayIdx + 1} 行程異動已同步雲端`);
+//       } catch (e) {
+//         console.error("儲存失敗", e);
+//       }
+//     }
+     // ✅ 修正後的 saveDayEdits
+     function saveDayEdits() {
+       try {
+         const file = itineraryIndex[currentDayIdx]?.file;
+         if (!file) return;
+     
+         const key = dayEditKey(); // 現在這裡不會再報錯了
+         const dataToSave = { items: (currentDayData?.items || []) };
+         
+         // 1. 本地備份
+         localStorage.setItem(key, JSON.stringify(dataToSave));
+     
+         // 2. 雲端同步
+         cloudPost("updateItinerary", {
+           file: file,
+           items: dataToSave.items // 確保傳送的是陣列
+         });
+         console.log(`Day ${currentDayIdx + 1} 行程異動已同步雲端`);
+       } catch (e) {
+         console.error("儲存失敗", e);
+       }
+     }
 
     function resetDayEdits(){
       try{ localStorage.removeItem(dayEditKey()); }catch(e){}
