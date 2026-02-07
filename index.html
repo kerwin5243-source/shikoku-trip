@@ -29,8 +29,33 @@
     }
   </script>				
   <script>
-    const G_API_URL = "https://script.google.com/macros/s/AKfycbwNqQaxH8pNJzsVeq6QANtCgue1FouFO-2CDrhvqSjECCtXxD5Yo8d32V2vLGdUBGpD/exec"; // 貼上剛才步驟 1 得到的網址
-    const G_TOKEN = "shikoku_2026_secret"; // 必須與 GAS 內的設定一致
+    // 1. 設定你的 GAS API URL
+    const G_API_URL = "https://script.google.com/macros/s/AKfycbz616eqN_z7nL7MvLo6vH98aeOzuD0DxWDquo5LnTnqOPbF8Qqtk1fwbLP-OEdl9pMW/exec"; // 貼上剛才步驟 1 得到的網址
+//    const G_TOKEN = "shikoku_2026_secret"; // 必須與 GAS 內的設定一致
+    // 2. 改為從 Cookie 讀取 Token
+    let G_TOKEN = getCookie("trip_auth_token") || "";
+  
+    // --- Cookie 操作函式 ---
+    function setCookie(name, value, days) {
+      let expires = "";
+      if (days) {
+        let date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toUTCString();
+      }
+      document.cookie = name + "=" + (value || "") + expires + "; path=/; SameSite=Strict";
+    }
+  
+    function getCookie(name) {
+      let nameEQ = name + "=";
+      let ca = document.cookie.split(';');
+      for(let i=0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+      }
+      return null;
+    }
   </script>
 
 
@@ -2155,18 +2180,39 @@
   // Sync data from Google sheet
   async function syncFromCloud() {
     try {
-      // 1. 發送請求，加入 _t 防止瀏覽器快取
+      // 💡 發送請求，加入 _t 防止瀏覽器快取
       const resp = await fetch(`${G_API_URL}?token=${G_TOKEN}&_t=${Date.now()}`);
-      const cloudData = await resp.json();
+
+      // 💡 BIOS Debug: 檢查回應的 URL 是否包含 "ServiceLogin"
+      if (resp.url.includes("ServiceLogin")) {
+        console.error("🚨 權限錯誤：GAS 跳轉到了登入頁面。請將 GAS 部署設定為『任何人 (Anyone)』。");
+        return;
+      }
+
+      // 1. 先讀取為文字
+      const text = await resp.text();
+      console.log("雲端回傳原始字串:", text); // 檢查這是否為 JSON
+
+      // 2. 檢查權限
+      if (text === "Unauthorized") {
+        setCookie("trip_auth_token", "", -1); // 清除無效的 Cookie
+        alert("訪問暗號錯誤或已過期，請重新輸入。");
+        location.reload(); 
+        return;
+      }
   
-      // 2. 同步帳本資料
+      // 3. 💡 關鍵修復：改用 JSON.parse() 解析已經讀取的 text 字串
+      // 不要再用 await resp.json()
+      const cloudData = JSON.parse(text);
+
+      // 4-1. 同步帳本資料
       if (cloudData.expenses) {
         expenses = cloudData.expenses; 
         localStorage.setItem('expenses', JSON.stringify(expenses));
         if (typeof renderExpenseUI === 'function') renderExpenseUI(); 
       }
   
-      // 3. 同步 Checkbox 與 全員待辦 (GLOBAL)
+      // 4-2. 同步 Checkbox 與 全員待辦 (GLOBAL)
       if (cloudData.checklists) {
         const userCheckMap = {};
         const globalTodos = {}; 
@@ -2192,7 +2238,7 @@
         }
       }
   
-      // 4. 💡 新增：同步行程異動 (Itinerary Edits)
+      // 4-3. 💡 新增：同步行程異動 (Itinerary Edits)
       if (cloudData.itineraryEdits) {
         const currentFile = itineraryIndex[currentDayIdx]?.file;
         
@@ -2270,6 +2316,18 @@
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
+     // 💡 若無 Token 則提示輸入（僅需輸入第一次，後續會存於 Cookie）
+     if (!G_TOKEN) {
+       const inputToken = prompt("請輸入訪問暗號 (Token)：");
+       if (inputToken) {
+         G_TOKEN = inputToken;
+         setCookie("trip_auth_token", G_TOKEN, 30); // 預設存儲 30 天
+         location.reload(); 
+         return;
+       } else {
+         alert("未輸入暗號，同步功能將無法正常運作。");
+       }
+    }
     await loadAllData();
     await syncFromCloud();
     // --- 新增：手動同步功能 ---
@@ -2664,46 +2722,83 @@
 //   }
 
 
-
-
-  
-
-
-  async function selectDay(idx) {
-    currentDayIdx = idx;
-    __editHistory = []; // ✅ 切換日期時清空歷史紀錄棧
-    __tlEditMode = false; // ✅ 重設編輯模式
-
-    document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
-    const chip = document.getElementById('chip-'+idx);
-    if(chip) chip.classList.add('active');
-    const scroller = document.getElementById('dayScroller');
-    if(scroller && chip){
-      const left = chip.offsetLeft - (scroller.clientWidth - chip.clientWidth)/2;
-      scroller.scrollTo({ left, behavior:'smooth' });
-    }
-
+    /* --- ✅ 修正：將以下函式移至全域位置（selectDay 的外部） --- */
     
-
-    const meta = itineraryIndex[idx];
-    if(!meta) return;
-
-    document.getElementById('weatherLoc').innerText = meta.loc || '';
-    const h = hotels.find(x => x.id === meta.hotel_id);
-    document.getElementById('stayHotelName').innerText = h ? h.name : '';
-
-    if(!dayCache[idx]) {
-      const url = `./${meta.file}?v=1.0.0`;
-      const raw = await fetch(url).then(r => r.json());
-      dayCache[idx] = Array.isArray(raw) ? raw[0] : raw;
+    function renderTimelineList(dayData) {
+      const listEl = document.getElementById('timelineList');
+      if (!listEl) return;
+    
+      listEl.innerHTML = (dayData?.items || []).map((item, i) => {
+        const t = normalizeTime(item.time);
+        const stay = item.stay ? `
+          <div class="stay-pill"><i class="fas fa-hourglass-half"></i>${escapeHtml(item.stay)}</div>
+        ` : '';
+    
+        // ✅ Route 渲染邏輯
+        if (item.route && (item.route.from || item.route.to)) {
+          const r = item.route;
+          const mode = r.mode || 'drive';
+          const ico = routeIcon(mode);
+          const title = (item.title && item.title.trim()) ? item.title.trim() : `${r.from || ''} → ${r.to || ''}`.trim();
+          const dur = (item.stay && String(item.stay).trim()) ? String(item.stay).trim() : (Number.isFinite(r.minutes) ? `${r.minutes} min` : '');
+          const enc = (s) => encodeURIComponent(String(s ?? ''));
+    
+          return `
+            <div class="timeline-item route-item">
+                <div class="route-strip route-click" data-from="${enc(r.from || '')}" data-to="${enc(r.to || '')}" data-mode="${enc(mode)}">
+                  <div class="route-ico"><i class="fas ${ico}"></i></div>
+                  <div class="route-main">
+                      <div class="route-time-top">${escapeHtml(t)}</div>
+                      <div class="route-title">${escapeHtml(title)}</div>
+                  </div>
+                  ${dur ? `<div class="route-mins">${escapeHtml(dur)}</div>` : ``}
+                </div>
+                ${__tlEditMode ? `<div style="margin-left:76px; margin-top:-10px;" onclick="event.stopPropagation()">${renderEditRow(i, item)}</div>` : ``}
+            </div>`;
+        }
+    
+        // ✅ 一般行程渲染邏輯
+        return `
+          <div class="timeline-item" data-idx="${i}" id="exp-item-${i}">
+            <div class="tl-time">${escapeHtml(t)}</div>
+            <div class="tl-content ${item.highlight ? 'highlight' : ''}" style="position:relative;">
+              ${item.reserved ? `<div class="reserve-badge">予約済</div>` : ``}
+              <div class="tl-tag ${tagClass(item.tag)}">
+                  ${escapeHtml((item.tag || '').toUpperCase())}
+                  <i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"></i>
+              </div>	  
+              <div class="tl-title">${escapeHtml(item.title || '').replace(/\n/g, '<br>')}</div>
+              <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g, '<br>')}</div>
+              ${stay}
+              ${renderEditRow(i, item)}
+            </div>
+          </div>`;
+      }).join('');
+    
+      bindLongPressSelection(); // 渲染完重新綁定
     }
-    let dayData = dayCache[idx];
-    // ✅ 本機即時編輯（拖曳/改時間/刪除）會存到 localStorage，跨裝置同步則需接雲端（下面有說明）
-    dayData = applyDayEdits(dayData, meta);
-    currentDayData = dayData;
-    // ✅ 顯示上方 5 張輪播圖（獨立 block）
-    renderDayHero(dayData, meta);
-    await renderDayRouteCard(dayData);
+    
+    // 渲染編輯列
+    function renderEditRow(i, item) {
+      if (!__tlEditMode) return '';
+      const t = normalizeTime(item.time);
+      return `
+        <div class="edit-row" onclick="event.stopPropagation()">
+          <input class="time-input" type="time" value="${escapeHtml(t)}" data-edit-time="1" data-idx="${i}" />
+          <button class="mini-btn danger" data-delete-idx="${i}"><i class="fas fa-trash"></i> 刪除</button>
+        </div>`;
+    }
+    
+    // 儲存異動
+    function saveDayEdits() {
+      const meta = itineraryIndex[currentDayIdx];
+      const file = meta?.file;
+      if (!file) return;
+      const dataToSave = { items: (currentDayData?.items || []) };
+      localStorage.setItem(`day_edits_${file}`, JSON.stringify(dataToSave));
+      cloudPost("updateItinerary", { file: file, items: dataToSave });
+    }
+
     function renderDayHero(dayData, meta){
         const el = document.getElementById('dayHero');
         if(!el) return;
@@ -2783,139 +2878,116 @@
             track.scrollTo({ left: cur * track.clientWidth, behavior:'smooth' });
         }, 12000);
     }
+
+    async function selectDay(idx) {
+        currentDayIdx = idx;
+        __editHistory = []; 
+        __tlEditMode = false;
     
-//     // timeline (支援本機即時編輯：拖曳排序 / 改時間 / 刪除)
-//     // ✅ 先宣告編輯模式狀態，避免 TDZ 造成行程渲染失敗
-//     let __tlEditMode = false;
-//     let __tlSortable = null;
-
-    renderTimelineToolbar(meta);
-    renderTimelineList(dayData);
-    enableTimelineSortable();
-
-    function renderTimelineList(dayData){
-      document.getElementById('timelineList').innerHTML = (dayData?.items || []).map((item, i) => {
-      const t = normalizeTime(item.time);
-      const stay = item.stay ? `
-        <div class="stay-pill"><i class="fas fa-hourglass-half"></i>${escapeHtml(item.stay)}</div>
-      ` : '';
-    function jsStr(s){ return JSON.stringify(String(s ?? '')); }
-
-    // ✅ route strip：只要有 route 物件就用（不開 modal）
-    if(item.route && (item.route.from || item.route.to)){
-      const r = item.route;
-      const mode = r.mode || 'drive';
-      const ico = routeIcon(mode);
-
-      const title = (item.title && item.title.trim())
-        ? item.title.trim()
-        : `${r.from || ''} → ${r.to || ''}`.trim();
-
-      const dur = (item.stay && String(item.stay).trim())
-        ? String(item.stay).trim()
-        : (Number.isFinite(r.minutes) ? `${r.minutes} min` : '');
-
-      const enc = (s)=> encodeURIComponent(String(s ?? ''));
-      return `
-        <div class="timeline-item route-item">
-            <div class="route-strip route-click"
-            data-from="${enc(r.from || '')}"
-            data-to="${enc(r.to || '')}"
-            data-mode="${enc(mode)}">
-            <div class="route-ico"><i class="fas ${ico}"></i></div>
-
-
-            <div class="route-main">
-                <div class="route-time-top">${escapeHtml(t)}</div>
-                <div class="route-title">${escapeHtml(title)}</div>
-            </div>
-
-            ${dur ? `<div class="route-mins">${escapeHtml(dur)}</div>` : ``}
-            </div>
-            ${__tlEditMode ? `<div style="margin-left:76px; margin-top:-10px;" onclick="event.stopPropagation()">${renderEditRow(i, item)}</div>` : ``}
-        </div>
-        `;
-
+        // UI 更新 (Active Date Chip)
+        document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
+        const chip = document.getElementById('chip-' + idx);
+        if (chip) chip.classList.add('active');
+    
+        const meta = itineraryIndex[idx];
+        if (!meta) return;
+    
+        // 載入資料
+        if (!dayCache[idx]) {
+          const url = `./${meta.file}?v=1.0.0`;
+          const raw = await fetch(url).then(r => r.json());
+          dayCache[idx] = Array.isArray(raw) ? raw[0] : raw;
+        }
+    
+        // 應用編輯 (本地與雲端緩存)
+        currentDayData = applyDayEdits(dayCache[idx], meta);
+    
+        // ✅ 呼叫現在已變成全域的渲染函式
+        renderDayHero(currentDayData, meta);
+        await renderDayRouteCard(currentDayData);
+        renderTimelineToolbar(meta);
+        renderTimelineList(currentDayData);
+        enableTimelineSortable();
+        await renderWeatherJMA(meta);
     }
 
-
-
-    // ✅ 一般行程卡（可點開 modal）
-    // ✅ 一般行程卡：拔掉 onclick，改用 data-idx 配合長壓偵測
-    return `
-      <div class="timeline-item" data-idx="${i}" id="exp-item-${i}">
-        <div class="tl-time">${escapeHtml(t)}</div>
-        <div class="tl-content ${item.highlight ? 'highlight' : ''}" style="position:relative;">
-          ${item.reserved ? `<div class="reserve-badge">予約済</div>` : ``}
-          <div class="tl-tag ${tagClass(item.tag)}">
-              ${escapeHtml((item.tag||'').toUpperCase())}
-              <i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"></i>
-          </div>	  
-          <div class="tl-title">${escapeHtml(item.title || '').replace(/\n/g,'<br>')}</div>
-          <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
-          ${stay}
-          ${renderEditRow(i, item)}
-        </div>
-      </div>
-    `;
-//    return `
-//      <div class="timeline-item" onclick='openModal(${i})'>
-//        <div class="tl-time">${escapeHtml(t)}</div>
-//        <div class="tl-content ${item.highlight ? 'highlight' : ''}" style="position:relative;">
-//          ${item.reserved ? `<div class="reserve-badge">予約済</div>` : ``}
-//          <div class="tl-tag ${tagClass(item.tag)}">
-//              ${escapeHtml((item.tag||'').toUpperCase())}
-//              <i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"></i>
-//          </div>	  
-//          <div class="tl-title">${escapeHtml(item.title || '').replace(/\n/g,'<br>')}</div>
-//          <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
-//          ${stay}
-//          ${renderEditRow(i, item)}
-//        </div>
-//      </div>
-//    `;
-    }).join('');
-
-    bindLongPressSelection();
-    }
 
     // ===== timeline edit helpers =====
     // (__tlEditMode / __tlSortable 已在上方宣告)
 
-    function dayEditKey(){ return `day_edits_${meta?.file || ''}`; }
+//    function dayEditKey(){ return `day_edits_${meta?.file || ''}`; }
+     // ✅ 修正後的 dayEditKey：從全域索引中取得 meta
+     function dayEditKey() {
+       const meta = itineraryIndex[currentDayIdx]; // 從全域變數抓取目前的 meta
+       return `day_edits_${meta?.file || ''}`;
+     }
 
-    function applyDayEdits(dayData, meta){
-      try{
+    // ✅ 修正後的 applyDayEdits (確保它也是獨立的)
+    function applyDayEdits(dayData, meta) {
+      try {
         const key = `day_edits_${meta?.file || ''}`;
         const saved = JSON.parse(localStorage.getItem(key) || 'null');
-        if(saved && Array.isArray(saved.items)){
+        if (saved && Array.isArray(saved.items)) {
           return { ...dayData, items: saved.items };
         }
-      }catch(e){}
+      } catch (e) {}
       return dayData;
     }
 
-    function saveDayEdits() {
-      try {
-        const file = itineraryIndex[currentDayIdx]?.file;
-        if (!file) return;
-    
-        const key = dayEditKey();
-        const dataToSave = { items: (currentDayData?.items || []) };
-        
-        // 1. 本地備份
-        localStorage.setItem(key, JSON.stringify(dataToSave));
-    
-        // 2. 雲端同步
-        cloudPost("updateItinerary", {
-          file: file,
-          items: dataToSave // 包含完整的項目順序與時間
-        });
-        console.log(`Day ${currentDayIdx + 1} 行程異動已同步雲端`);
-      } catch (e) {
-        console.error("儲存失敗", e);
-      }
-    }
+//     function applyDayEdits(dayData, meta){
+//       try{
+//         const key = `day_edits_${meta?.file || ''}`;
+//         const saved = JSON.parse(localStorage.getItem(key) || 'null');
+//         if(saved && Array.isArray(saved.items)){
+//           return { ...dayData, items: saved.items };
+//         }
+//       }catch(e){}
+//       return dayData;
+//     }
+
+//     function saveDayEdits() {
+//       try {
+//         const file = itineraryIndex[currentDayIdx]?.file;
+//         if (!file) return;
+//     
+//         const key = dayEditKey();
+//         const dataToSave = { items: (currentDayData?.items || []) };
+//         
+//         // 1. 本地備份
+//         localStorage.setItem(key, JSON.stringify(dataToSave));
+//     
+//         // 2. 雲端同步
+//         cloudPost("updateItinerary", {
+//           file: file,
+//           items: dataToSave // 包含完整的項目順序與時間
+//         });
+//         console.log(`Day ${currentDayIdx + 1} 行程異動已同步雲端`);
+//       } catch (e) {
+//         console.error("儲存失敗", e);
+//       }
+//     }
+     // ✅ 修正後的 saveDayEdits
+     function saveDayEdits() {
+       try {
+         const file = itineraryIndex[currentDayIdx]?.file;
+         if (!file) return;
+     
+         const key = dayEditKey(); // 現在這裡不會再報錯了
+         const dataToSave = { items: (currentDayData?.items || []) };
+         
+         // 1. 本地備份
+         localStorage.setItem(key, JSON.stringify(dataToSave));
+     
+         // 2. 雲端同步
+         cloudPost("updateItinerary", {
+           file: file,
+           items: dataToSave.items // 確保傳送的是陣列
+         });
+         console.log(`Day ${currentDayIdx + 1} 行程異動已同步雲端`);
+       } catch (e) {
+         console.error("儲存失敗", e);
+       }
+     }
 
     function resetDayEdits(){
       try{ localStorage.removeItem(dayEditKey()); }catch(e){}
@@ -3050,31 +3122,17 @@
       enableTimelineSortable();
     });
 
-    // 讓 renderTimelineList 內能依模式顯示編輯列
-    function renderEditRow(i, item){
-      if(!__tlEditMode) return '';
-      const t = normalizeTime(item.time);
-      return `
-        <div class="edit-row" onclick="event.stopPropagation()">
-          <input class="time-input" type="time" value="${escapeHtml(t)}" data-edit-time="1" data-idx="${i}" />
-          <button class="mini-btn danger" data-delete-idx="${i}"><i class="fas fa-trash"></i> 刪除</button>
-        </div>
-      `;
-    }
-
-    await renderWeatherJMA(meta);
-
-
-  }
 
   // ====== Google 導航：優先 geo，其次 addr/title ======
   function buildGoogleNavUrl(item){
     const hasGeo = item?.geo?.lat != null && item?.geo?.lng != null;
     if(hasGeo){
-      return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(item.geo.lat + ',' + item.geo.lng)}`;
+//      return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(item.geo.lat + ',' + item.geo.lng)}`;
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.geo.lat + ',' + item.geo.lng)}`;
     }
     const q = (item?.addr || item?.title || '').trim();
     if(!q) return 'https://www.google.com/maps';
+//    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
   }
   function travelModeForRoute(mode){
@@ -3768,6 +3826,7 @@ async function renderWeatherJMA(meta){
 
     const r = item.route;
     const tm = travelModeForRoute(r.mode);
+//    window.open(`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(r.from||'')}&destination=${encodeURIComponent(r.to||'')}&travelmode=${tm}`, '_blank', 'noopener');
     window.open(`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(r.from||'')}&destination=${encodeURIComponent(r.to||'')}&travelmode=${tm}`, '_blank', 'noopener');
   }
 

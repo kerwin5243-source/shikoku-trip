@@ -4,7 +4,8 @@
  */
 
 // --- 安全設定 ---
-const WEB_APP_TOKEN = "shikoku_2026_secret"; // 👈 請務必與 index.html 中的 G_TOKEN 一致
+// const WEB_APP_TOKEN = "shikoku_2026_secret"; // 👈 請務必與 index.html 中的 G_TOKEN 一致
+const WEB_APP_TOKEN = PropertiesService.getScriptProperties().getProperty('WEB_APP_TOKEN');
 
 // --- 試算表全域變數 ---
 const SS = SpreadsheetApp.getActiveSpreadsheet();
@@ -14,6 +15,7 @@ const ITIN_SHEET = SS.getSheetByName("ItineraryEdits");
 
 // 權限驗證：確保請求來自你的網頁
 function isAuthorized(token) {
+//  return token === WEB_APP_TOKEN;
   return token === WEB_APP_TOKEN;
 }
 
