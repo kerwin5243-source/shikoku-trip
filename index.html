@@ -3117,12 +3117,10 @@
       
         renderTimelineToolbar(meta);
       
-        if (!__tlEditMode) {
-          renderTimelineList(currentDayData);
-        } else {
-          // ✅ 這裡不重畫 List，但要啟用排序
-          enableTimelineSortable();
-        }
+       // ✅ 不論是進入還是離開，都呼叫一次來確保 Sortable 狀態同步
+       enableTimelineSortable(); 
+       
+       if (!__tlEditMode) renderTimelineList(currentDayData); 
       });
     }
 
@@ -3147,6 +3145,9 @@
           evt.item.classList.add('is-dragging'); 
         },
         onEnd: (evt)=>{
+          // ✅ 新增：恢復觸控動作
+          evt.item.style.touchAction = '';
+
           evt.item.classList.remove('is-dragging');
           const oldIndex = evt.oldIndex;
           const newIndex = evt.newIndex;
@@ -4536,7 +4537,9 @@ async function renderWeatherJMA(meta){
 
   function bindLongPressSelection() {
     // 選取所有非路徑的行程項目
-    const items = document.querySelectorAll('.timeline-item:not(.route-item)');
+//     const items = document.querySelectorAll('.timeline-item:not(.route-item)');
+    // ✅ 修正 1：移除 :not(.route-item)，讓路徑卡片也能長壓進入編輯模式
+    const items = document.querySelectorAll('.timeline-item');
     
     items.forEach(el => {
       let pressTimer;
@@ -4595,7 +4598,7 @@ async function renderWeatherJMA(meta){
 //         if (dist > 10) clearTimeout(pressTimer);
         // ✅ 關鍵：提高「取消長壓」的門檻到 30px
         // 只要手指移動超過 30 像素，就判定使用者是在「滑動網頁」，立刻殺掉定時器
-        if (dist > 50) {
+        if (dist > 10) {
           clearTimeout(pressTimer);
         }
       };
@@ -4680,41 +4683,91 @@ async function renderWeatherJMA(meta){
 //         setTimeout(() => content.style.transform = "", 200);
 //       }
 //     }
-    // ✅ 修改：接收第二個參數 originalEvent
+//     // ✅ 修改：接收第二個參數 originalEvent
+//     function triggerEditMode(targetEl, originalEvent) {
+//       if (navigator.vibrate) navigator.vibrate(50); 
+//       
+//       const oldTop = targetEl.getBoundingClientRect().top;
+//       
+//       pushHistory();
+//       __tlEditMode = true;
+//     
+//       const listEl = document.getElementById('timelineList');
+//       if (listEl) {
+//         listEl.classList.add('edit-mode-active');
+// 	// ✅ 防止在拖曳過程中頁面發生意外的滾動行為
+// //         listEl.style.touchAction = 'none';
+//       }
+//     
+//       const newTop = targetEl.getBoundingClientRect().top;
+//       window.scrollBy(0, newTop - oldTop);
+//     
+//       // ✅ 使用 requestAnimationFrame 確保位移補償生效後再移交事件
+//       requestAnimationFrame(() => {
+//           if (__tlSortable && originalEvent) {
+//               __tlSortable._onTapStart(originalEvent);
+//           }
+//       });
+// 
+//       renderTimelineToolbar(itineraryIndex[currentDayIdx]);
+//       
+//       // 1. 先初始化 Sortable
+//       enableTimelineSortable();
+//       
+//       // 2. 💡 關鍵：手動將原始 pointerdown 事件「餵」給 Sortable 實體
+//       // 這會讓 Sortable 覺得使用者「剛剛才按下去」，並立即進入拖曳狀態
+//       if (__tlSortable && originalEvent) {
+//         __tlSortable._onTapStart(originalEvent);
+//       }
+//     
+//       const content = targetEl.querySelector('.tl-content');
+//       if (content) {
+//         content.style.transition = "transform 0.2s";
+//         content.style.transform = "scale(1.05)";
+//         setTimeout(() => content.style.transform = "", 200);
+//       }
+//     }
     function triggerEditMode(targetEl, originalEvent) {
       if (navigator.vibrate) navigator.vibrate(50); 
       
+      // ✅ 新增：立即鎖定觸控行為，防止瀏覽器在移交事件時跳回捲動模式
+      targetEl.style.touchAction = 'none';
+
       const oldTop = targetEl.getBoundingClientRect().top;
-      
       pushHistory();
       __tlEditMode = true;
     
       const listEl = document.getElementById('timelineList');
       if (listEl) {
         listEl.classList.add('edit-mode-active');
-	// ✅ 防止在拖曳過程中頁面發生意外的滾動行為
-//         listEl.style.touchAction = 'none';
       }
     
       const newTop = targetEl.getBoundingClientRect().top;
       window.scrollBy(0, newTop - oldTop);
-    
+
       renderTimelineToolbar(itineraryIndex[currentDayIdx]);
       
-      // 1. 先初始化 Sortable
+      // ✅ 修正 3：先初始化 SortableJS
       enableTimelineSortable();
       
-      // 2. 💡 關鍵：手動將原始 pointerdown 事件「餵」給 Sortable 實體
-      // 這會讓 Sortable 覺得使用者「剛剛才按下去」，並立即進入拖曳狀態
-      if (__tlSortable && originalEvent) {
-        __tlSortable._onTapStart(originalEvent);
-      }
+      // ✅ 修正 4：使用 requestAnimationFrame 確保位移補償生效後再移交事件
+      // 並移除原本重複的 _onTapStart 呼叫
+//      requestAnimationFrame(() => {
+          if (__tlSortable && originalEvent) {
+              try {
+                  __tlSortable._onTapStart(originalEvent);
+              } catch (e) {
+                  console.warn("事件移交失敗");
+              }
+          }
+//      });
     
-      const content = targetEl.querySelector('.tl-content');
-      if (content) {
-        content.style.transition = "transform 0.2s";
-        content.style.transform = "scale(1.05)";
-        setTimeout(() => content.style.transform = "", 200);
+      // 視覺提示：同時相容一般卡片與路徑卡片
+      const visualTarget = targetEl.querySelector('.tl-content, .route-strip');
+      if (visualTarget) {
+        visualTarget.style.transition = "transform 0.2s";
+        visualTarget.style.transform = "scale(1.05)";
+        setTimeout(() => visualTarget.style.transform = "", 200);
       }
     }
 
