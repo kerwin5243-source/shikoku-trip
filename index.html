@@ -2722,220 +2722,115 @@
 //   }
 
 
-
-
-  
-
-
-  async function selectDay(idx) {
-    currentDayIdx = idx;
-    __editHistory = []; // ✅ 切換日期時清空歷史紀錄棧
-    __tlEditMode = false; // ✅ 重設編輯模式
-
-    document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
-    const chip = document.getElementById('chip-'+idx);
-    if(chip) chip.classList.add('active');
-    const scroller = document.getElementById('dayScroller');
-    if(scroller && chip){
-      const left = chip.offsetLeft - (scroller.clientWidth - chip.clientWidth)/2;
-      scroller.scrollTo({ left, behavior:'smooth' });
-    }
-
+    /* --- ✅ 修正：將以下函式移至全域位置（selectDay 的外部） --- */
     
-
-    const meta = itineraryIndex[idx];
-    if(!meta) return;
-
-    document.getElementById('weatherLoc').innerText = meta.loc || '';
-    const h = hotels.find(x => x.id === meta.hotel_id);
-    document.getElementById('stayHotelName').innerText = h ? h.name : '';
-
-    if(!dayCache[idx]) {
-      const url = `./${meta.file}?v=1.0.0`;
-      const raw = await fetch(url).then(r => r.json());
-      dayCache[idx] = Array.isArray(raw) ? raw[0] : raw;
-    }
-    let dayData = dayCache[idx];
-    // ✅ 本機即時編輯（拖曳/改時間/刪除）會存到 localStorage，跨裝置同步則需接雲端（下面有說明）
-    dayData = applyDayEdits(dayData, meta);
-    currentDayData = dayData;
-    // ✅ 顯示上方 5 張輪播圖（獨立 block）
-    renderDayHero(dayData, meta);
-    await renderDayRouteCard(dayData);
-    function renderDayHero(dayData, meta){
-        const el = document.getElementById('dayHero');
-        if(!el) return;
-
-        // ✅ 支援兩種格式：
-        // 1) 新格式：[{src,loc,caption}]
-        // 2) 舊格式：[ "url1", "url2" ]
-        let photosRaw = Array.isArray(dayData?.photos) ? dayData.photos.slice(0,5) : [];
-        if(!photosRaw.length){
-            photosRaw = [
-            "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1526481280695-3c687fd5432c?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80",
-            ];
+    function renderTimelineList(dayData) {
+      const listEl = document.getElementById('timelineList');
+      if (!listEl) return;
+    
+      listEl.innerHTML = (dayData?.items || []).map((item, i) => {
+        const t = normalizeTime(item.time);
+        const stay = item.stay ? `
+          <div class="stay-pill"><i class="fas fa-hourglass-half"></i>${escapeHtml(item.stay)}</div>
+        ` : '';
+    
+        // ✅ Route 渲染邏輯
+        if (item.route && (item.route.from || item.route.to)) {
+          const r = item.route;
+          const mode = r.mode || 'drive';
+          const ico = routeIcon(mode);
+          const title = (item.title && item.title.trim()) ? item.title.trim() : `${r.from || ''} → ${r.to || ''}`.trim();
+          const dur = (item.stay && String(item.stay).trim()) ? String(item.stay).trim() : (Number.isFinite(r.minutes) ? `${r.minutes} min` : '');
+          const enc = (s) => encodeURIComponent(String(s ?? ''));
+    
+          return `
+            <div class="timeline-item route-item">
+                <div class="route-strip route-click" data-from="${enc(r.from || '')}" data-to="${enc(r.to || '')}" data-mode="${enc(mode)}">
+                  <div class="route-ico"><i class="fas ${ico}"></i></div>
+                  <div class="route-main">
+                      <div class="route-time-top">${escapeHtml(t)}</div>
+                      <div class="route-title">${escapeHtml(title)}</div>
+                  </div>
+                  ${dur ? `<div class="route-mins">${escapeHtml(dur)}</div>` : ``}
+                </div>
+                ${__tlEditMode ? `<div style="margin-left:76px; margin-top:-10px;" onclick="event.stopPropagation()">${renderEditRow(i, item)}</div>` : ``}
+            </div>`;
         }
-
-        const photos = photosRaw.map(p=>{
-            if(typeof p === 'string'){
-                return { src:p, loc: (meta?.loc||''), caption:'' };
-            }
-            return {
-                src: p.src || p.url || '',
-                loc: (p.loc !== undefined) ? (p.loc ?? '') : (meta?.loc || ''),
-                caption: p.caption || ''
-            };
-        }).filter(x=>x.src);
-
-        const slides = photos.map((p, idx)=>`
-          <div class="hero-slide hero--blur">
-            <img
-                src="${escapeHtml(p.src)}"
-                alt="day photo ${idx+1}"
-                loading="lazy"
-                decoding="async"
-                referrerpolicy="no-referrer"
-                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80';"
-                class="hero-bg" alt="" aria-hidden="true"
-            >
-            <img
-                src="${escapeHtml(p.src)}"
-                alt="day photo ${idx+1}"
-                loading="lazy"
-                decoding="async"
-                referrerpolicy="no-referrer"
-                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80';"
-                class="hero-img" alt="day photo ...">
-            >
-            <div class="hero-overlay">
-                ${p.loc ? `<div class="hero-loc"><i class="fas fa-location-dot"></i>${escapeHtml(p.loc)}</div>` : ``}
-                ${p.caption ? `<div class="hero-caption">${escapeHtml(p.caption)}</div>` : ``}
-					  
-								   
-																									
+    
+        // ✅ 一般行程渲染邏輯
+        return `
+          <div class="timeline-item" data-idx="${i}" id="exp-item-${i}">
+            <div class="tl-time">${escapeHtml(t)}</div>
+            <div class="tl-content ${item.highlight ? 'highlight' : ''}" style="position:relative;">
+              ${item.reserved ? `<div class="reserve-badge">予約済</div>` : ``}
+              <div class="tl-tag ${tagClass(item.tag)}">
+                  ${escapeHtml((item.tag || '').toUpperCase())}
+                  <i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"></i>
+              </div>	  
+              <div class="tl-title">${escapeHtml(item.title || '').replace(/\n/g, '<br>')}</div>
+              <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g, '<br>')}</div>
+              ${stay}
+              ${renderEditRow(i, item)}
             </div>
-           </div>
-        `).join('');
-
-        
-        // ❌ dots（小白點）已移除：不顯示也不需要同步
-        el.innerHTML = `<div class="hero-track" id="heroTrack">${slides}</div>`;
-
-        const track = document.getElementById('heroTrack');
-        if(!track) return;
-
-        // ✅ 桌機滾輪也能左右滑
-        enableWheelHorizontal(track);
-
-        if(__heroTimer) clearInterval(__heroTimer);
-
-        // auto slide
-
-        let cur = 0;
-        __heroTimer = setInterval(()=>{
-            cur = (cur + 1) % photos.length;
-            track.scrollTo({ left: cur * track.clientWidth, behavior:'smooth' });
-        }, 12000);
+          </div>`;
+      }).join('');
+    
+      bindLongPressSelection(); // 渲染完重新綁定
     }
     
-//     // timeline (支援本機即時編輯：拖曳排序 / 改時間 / 刪除)
-//     // ✅ 先宣告編輯模式狀態，避免 TDZ 造成行程渲染失敗
-//     let __tlEditMode = false;
-//     let __tlSortable = null;
-
-    renderTimelineToolbar(meta);
-    renderTimelineList(dayData);
-    enableTimelineSortable();
-
-    function renderTimelineList(dayData){
-      document.getElementById('timelineList').innerHTML = (dayData?.items || []).map((item, i) => {
+    // 渲染編輯列
+    function renderEditRow(i, item) {
+      if (!__tlEditMode) return '';
       const t = normalizeTime(item.time);
-      const stay = item.stay ? `
-        <div class="stay-pill"><i class="fas fa-hourglass-half"></i>${escapeHtml(item.stay)}</div>
-      ` : '';
-    function jsStr(s){ return JSON.stringify(String(s ?? '')); }
-
-    // ✅ route strip：只要有 route 物件就用（不開 modal）
-    if(item.route && (item.route.from || item.route.to)){
-      const r = item.route;
-      const mode = r.mode || 'drive';
-      const ico = routeIcon(mode);
-
-      const title = (item.title && item.title.trim())
-        ? item.title.trim()
-        : `${r.from || ''} → ${r.to || ''}`.trim();
-
-      const dur = (item.stay && String(item.stay).trim())
-        ? String(item.stay).trim()
-        : (Number.isFinite(r.minutes) ? `${r.minutes} min` : '');
-
-      const enc = (s)=> encodeURIComponent(String(s ?? ''));
       return `
-        <div class="timeline-item route-item">
-            <div class="route-strip route-click"
-            data-from="${enc(r.from || '')}"
-            data-to="${enc(r.to || '')}"
-            data-mode="${enc(mode)}">
-            <div class="route-ico"><i class="fas ${ico}"></i></div>
-
-
-            <div class="route-main">
-                <div class="route-time-top">${escapeHtml(t)}</div>
-                <div class="route-title">${escapeHtml(title)}</div>
-            </div>
-
-            ${dur ? `<div class="route-mins">${escapeHtml(dur)}</div>` : ``}
-            </div>
-            ${__tlEditMode ? `<div style="margin-left:76px; margin-top:-10px;" onclick="event.stopPropagation()">${renderEditRow(i, item)}</div>` : ``}
-        </div>
-        `;
-
+        <div class="edit-row" onclick="event.stopPropagation()">
+          <input class="time-input" type="time" value="${escapeHtml(t)}" data-edit-time="1" data-idx="${i}" />
+          <button class="mini-btn danger" data-delete-idx="${i}"><i class="fas fa-trash"></i> 刪除</button>
+        </div>`;
+    }
+    
+    // 儲存異動
+    function saveDayEdits() {
+      const meta = itineraryIndex[currentDayIdx];
+      const file = meta?.file;
+      if (!file) return;
+      const dataToSave = { items: (currentDayData?.items || []) };
+      localStorage.setItem(`day_edits_${file}`, JSON.stringify(dataToSave));
+      cloudPost("updateItinerary", { file: file, items: dataToSave });
     }
 
-
-
-    // ✅ 一般行程卡（可點開 modal）
-    // ✅ 一般行程卡：拔掉 onclick，改用 data-idx 配合長壓偵測
-    return `
-      <div class="timeline-item" data-idx="${i}" id="exp-item-${i}">
-        <div class="tl-time">${escapeHtml(t)}</div>
-        <div class="tl-content ${item.highlight ? 'highlight' : ''}" style="position:relative;">
-          ${item.reserved ? `<div class="reserve-badge">予約済</div>` : ``}
-          <div class="tl-tag ${tagClass(item.tag)}">
-              ${escapeHtml((item.tag||'').toUpperCase())}
-              <i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"></i>
-          </div>	  
-          <div class="tl-title">${escapeHtml(item.title || '').replace(/\n/g,'<br>')}</div>
-          <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
-          ${stay}
-          ${renderEditRow(i, item)}
-        </div>
-      </div>
-    `;
-//    return `
-//      <div class="timeline-item" onclick='openModal(${i})'>
-//        <div class="tl-time">${escapeHtml(t)}</div>
-//        <div class="tl-content ${item.highlight ? 'highlight' : ''}" style="position:relative;">
-//          ${item.reserved ? `<div class="reserve-badge">予約済</div>` : ``}
-//          <div class="tl-tag ${tagClass(item.tag)}">
-//              ${escapeHtml((item.tag||'').toUpperCase())}
-//              <i class="fas ${tagIcon(item.tag, item.subtag)} tag-ico"></i>
-//          </div>	  
-//          <div class="tl-title">${escapeHtml(item.title || '').replace(/\n/g,'<br>')}</div>
-//          <div class="tl-desc">${escapeHtml(item.desc || '').replace(/\n/g,'<br>')}</div>
-//          ${stay}
-//          ${renderEditRow(i, item)}
-//        </div>
-//      </div>
-//    `;
-    }).join('');
-
-    bindLongPressSelection();
+    async function selectDay(idx) {
+        currentDayIdx = idx;
+        __editHistory = []; 
+        __tlEditMode = false;
+    
+        // UI 更新 (Active Date Chip)
+        document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
+        const chip = document.getElementById('chip-' + idx);
+        if (chip) chip.classList.add('active');
+    
+        const meta = itineraryIndex[idx];
+        if (!meta) return;
+    
+        // 載入資料
+        if (!dayCache[idx]) {
+          const url = `./${meta.file}?v=1.0.0`;
+          const raw = await fetch(url).then(r => r.json());
+          dayCache[idx] = Array.isArray(raw) ? raw[0] : raw;
+        }
+    
+        // 應用編輯 (本地與雲端緩存)
+        currentDayData = applyDayEdits(dayCache[idx], meta);
+    
+        // ✅ 呼叫現在已變成全域的渲染函式
+        renderDayHero(currentDayData, meta);
+        await renderDayRouteCard(currentDayData);
+        renderTimelineToolbar(meta);
+        renderTimelineList(currentDayData);
+        enableTimelineSortable();
+        await renderWeatherJMA(meta);
     }
+
 
     // ===== timeline edit helpers =====
     // (__tlEditMode / __tlSortable 已在上方宣告)
