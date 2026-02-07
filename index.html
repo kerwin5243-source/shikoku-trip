@@ -1905,6 +1905,20 @@
     .mini-btn.danger{ background: rgba(255,64,64,.10); border-color: rgba(255,64,64,.25); color:#B42318; }
     .timeline-item.is-dragging .tl-content{ box-shadow:0 22px 44px rgba(0,0,0,.14); transform: rotate(-.35deg) scale(1.01); }
 
+    /* ✅ 新增：控制編輯列的顯示與隱藏，避免 DOM 重構導致位移 */
+    .edit-row { 
+      display: none; 
+    }
+    
+    /* 當父容器處於編輯模式時才顯示 */
+    .edit-mode-active .edit-row { 
+      display: flex !important; 
+    }
+    
+    /* 編輯模式時微調間距，確保視覺穩定 */
+    .edit-mode-active .tl-content {
+      padding-bottom: 14px;
+    }
 </style>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 </head>
@@ -2754,6 +2768,10 @@
       const listEl = document.getElementById('timelineList');
       if (!listEl) return;
     
+      // ✅ 根據狀態切換 CSS 類別
+      if (__tlEditMode) listEl.classList.add('edit-mode-active');
+      else listEl.classList.remove('edit-mode-active');
+
       listEl.innerHTML = (dayData?.items || []).map((item, i) => {
         const t = normalizeTime(item.time);
         const stay = item.stay ? `
@@ -2779,7 +2797,9 @@
                   </div>
                   ${dur ? `<div class="route-mins">${escapeHtml(dur)}</div>` : ``}
                 </div>
-                ${__tlEditMode ? `<div style="margin-left:76px; margin-top:-10px;" onclick="event.stopPropagation()">${renderEditRow(i, item)}</div>` : ``}
+                  <div style="margin-left:76px; margin-top:-10px;" onclick="event.stopPropagation()">
+                    ${renderEditRow(i, item)}
+                  </div>
             </div>`;
         }
     
@@ -2806,7 +2826,8 @@
     
     // 渲染編輯列
     function renderEditRow(i, item) {
-      if (!__tlEditMode) return '';
+//      if (!__tlEditMode) return '';
+      // ✅ 移除判斷式，讓編輯列永遠生成，改由 CSS 的 .edit-row { display: none; } 控制
       const t = normalizeTime(item.time);
       return `
         <div class="edit-row" onclick="event.stopPropagation()">
@@ -3067,7 +3088,11 @@
       el.querySelector('#tlEditToggle')?.addEventListener('click', () => {
         __tlEditMode = !__tlEditMode;
         renderTimelineToolbar(meta);
-        renderTimelineList(currentDayData);
+//         renderTimelineList(currentDayData);
+        // ✅ 修正：只有在「關閉」編輯模式時，為了清理可能的狀態才重新渲染
+        if (!__tlEditMode) {
+            renderTimelineList(currentDayData);
+        }
         enableTimelineSortable();
       });
     }
@@ -4559,8 +4584,13 @@ async function renderWeatherJMA(meta){
     __tlEditMode = true;
     
     // 重新渲染 UI 以顯示拖曳手柄與工具列
+    // ✅ 修正：直接操作 CSS Class，不要重新渲染整個列表
+    const listEl = document.getElementById('timelineList');
+    if (listEl) {
+      listEl.classList.add('edit-mode-active');
+    }
     renderTimelineToolbar(itineraryIndex[currentDayIdx]);
-    renderTimelineList(currentDayData);
+//     renderTimelineList(currentDayData);
     enableTimelineSortable();
     
     // 給選中的項目一個視覺提示
