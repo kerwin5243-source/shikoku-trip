@@ -29,13 +29,13 @@
     }
   </script>				
   <script>
-    // 1. 設定你的 GAS API URL
+/*      1. 設定你的 GAS API URL */
     const G_API_URL = "https://script.google.com/macros/s/AKfycbz616eqN_z7nL7MvLo6vH98aeOzuD0DxWDquo5LnTnqOPbF8Qqtk1fwbLP-OEdl9pMW/exec"; // 貼上剛才步驟 1 得到的網址
-//    const G_TOKEN = "shikoku_2026_secret"; // 必須與 GAS 內的設定一致
-    // 2. 改為從 Cookie 讀取 Token
+/*     const G_TOKEN = "shikoku_2026_secret"; // 必須與 GAS 內的設定一致 */
+/*      2. 改為從 Cookie 讀取 Token */
     let G_TOKEN = getCookie("trip_auth_token") || "";
   
-    // --- Cookie 操作函式 ---
+/*      --- Cookie 操作函式 --- */
     function setCookie(name, value, days) {
       let expires = "";
       if (days) {
@@ -2075,15 +2075,15 @@
   </nav>
 
 <script>
-  // ====== Globals (JSON 驅動) ======
+/*    ====== Globals (JSON 驅動) ====== */
   let CONFIG, CHECKLISTS, TODOS, FLIGHTS, HOTELS, ITINERARY;
 
   let users = [];
   let curUser = 'L';
   let curPayer = 'L';
 
-  // timeline (支援本機即時編輯：拖曳排序 / 改時間 / 刪除)
-  // ✅ 先宣告編輯模式狀態，避免 TDZ 造成行程渲染失敗
+/*    timeline (支援本機即時編輯：拖曳排序 / 改時間 / 刪除) */
+/*    ✅ 先宣告編輯模式狀態，避免 TDZ 造成行程渲染失敗 */
   let __tlEditMode = false;
   let __tlSortable = null;
   let __editHistory = [];
@@ -2098,9 +2098,11 @@
   let __sheetSplashTimer = null;
 
   function pickSheetSplashSrcs(item){
-    // 支援：字串 or 陣列
-    // 可用欄位：splash / splash_img / cover / cover_img / image / img
-    // 也支援第二張：splash2 / splash_img2 / cover2 / image2 / img2
+/*
+     支援：字串 or 陣列
+     可用欄位：splash / splash_img / cover / cover_img / image / img
+     也支援第二張：splash2 / splash_img2 / cover2 / image2 / img2
+*/
     const main =
       item?.splash || item?.splash_img ||
       item?.cover  || item?.cover_img  ||
@@ -2111,7 +2113,7 @@
       item?.cover2  || item?.cover_img2  ||
       item?.image2  || item?.img2 || '';
 
-    // 若 main 本身就是陣列：["a","b"]
+/*      若 main 本身就是陣列：["a","b"] */
     let list = [];
     if(Array.isArray(main)){
       list = main;
@@ -2119,7 +2121,7 @@
       list = [main, second].filter(Boolean);
     }
 
-    // 正規化 & 最多兩張
+/*      正規化 & 最多兩張 */
     return list.map(s => normalizeAssetUrl(s)).filter(Boolean).slice(0,2);
   }
 
@@ -2151,20 +2153,20 @@
     const img2  = document.getElementById('sheetSplashImg2');
     if(!ov || !sheet || !grid || !img1 || !img2) return;
 
-    // reset timer
+/*      reset timer */
     if(__sheetSplashTimer) clearTimeout(__sheetSplashTimer);
 
-    // 先重置
+/*      先重置 */
     img1.style.display = 'none';
     img2.style.display = 'none';
     img1.removeAttribute('src');
     img2.removeAttribute('src');
 
-    // 套 1/2 張模式 class
+/*      套 1/2 張模式 class */
     grid.classList.remove('one','two');
     grid.classList.add(srcs.length >= 2 ? 'two' : 'one');
 
-    // 塞圖
+/*      塞圖 */
     img1.src = srcs[0];
     img1.style.display = 'block';
 
@@ -2175,15 +2177,15 @@
 
     ov.classList.add('active');
     sheet.classList.add('splash-on');
-    // ✅ shutter flash (120ms)
+/*      ✅ shutter flash (120ms) */
     const frame = document.getElementById('sheetSplashFrame');
     if(frame){
-      frame.classList.remove('flash');      // reset
+      frame.classList.remove('flash');       /* reset */
       requestAnimationFrame(()=> frame.classList.add('flash'));
     }
 
 
-    // 點一下提前跳過
+/*      點一下提前跳過 */
     ov.onclick = () => {
       if(__sheetSplashTimer) clearTimeout(__sheetSplashTimer);
       hideSheetSplash();
@@ -2196,44 +2198,46 @@
 
 
 
-  // ====== Load Data ======
+/*    ====== Load Data ====== */
 
-  // Sync data from Google sheet
+/*    Sync data from Google sheet */
   async function syncFromCloud() {
     try {
-      // 💡 發送請求，加入 _t 防止瀏覽器快取
+/*        💡 發送請求，加入 _t 防止瀏覽器快取 */
       const resp = await fetch(`${G_API_URL}?token=${G_TOKEN}&_t=${Date.now()}`);
 
-      // 💡 BIOS Debug: 檢查回應的 URL 是否包含 "ServiceLogin"
+/*        💡 BIOS Debug: 檢查回應的 URL 是否包含 "ServiceLogin" */
       if (resp.url.includes("ServiceLogin")) {
         console.error("🚨 權限錯誤：GAS 跳轉到了登入頁面。請將 GAS 部署設定為『任何人 (Anyone)』。");
         return;
       }
 
-      // 1. 先讀取為文字
+/*        1. 先讀取為文字 */
       const text = await resp.text();
-      console.log("雲端回傳原始字串:", text); // 檢查這是否為 JSON
+      console.log("雲端回傳原始字串:", text); /*  檢查這是否為 JSON */
 
-      // 2. 檢查權限
+/*        2. 檢查權限 */
       if (text === "Unauthorized") {
-        setCookie("trip_auth_token", "", -1); // 清除無效的 Cookie
+        setCookie("trip_auth_token", "", -1);  /* 清除無效的 Cookie */
         alert("訪問暗號錯誤或已過期，請重新輸入。");
         location.reload(); 
         return;
       }
   
-      // 3. 💡 關鍵修復：改用 JSON.parse() 解析已經讀取的 text 字串
-      // 不要再用 await resp.json()
+/*
+       3. 💡 關鍵修復：改用 JSON.parse() 解析已經讀取的 text 字串
+       不要再用 await resp.json()
+*/
       const cloudData = JSON.parse(text);
 
-      // 4-1. 同步帳本資料
+/*        4-1. 同步帳本資料 */
       if (cloudData.expenses) {
         expenses = cloudData.expenses; 
         localStorage.setItem('expenses', JSON.stringify(expenses));
         if (typeof renderExpenseUI === 'function') renderExpenseUI(); 
       }
   
-      // 4-2. 同步 Checkbox 與 全員待辦 (GLOBAL)
+/*        4-2. 同步 Checkbox 與 全員待辦 (GLOBAL) */
       if (cloudData.checklists) {
         const userCheckMap = {};
         const globalTodos = {}; 
@@ -2252,38 +2256,40 @@
           localStorage.setItem('check_' + user, JSON.stringify(userCheckMap[user]));
         });
         
-        // 重新渲染畫面
+/*          重新渲染畫面 */
         if (typeof renderGlobalTodos === 'function') renderGlobalTodos();
         if (document.getElementById('page-pre').classList.contains('active')) {
           if (typeof renderChecklists === 'function') renderChecklists();
         }
       }
   
+/*
       // 4-3. 💡 新增：同步行程異動 (Itinerary Edits)
-//       if (cloudData.itineraryEdits) {
-//         const currentFile = itineraryIndex[currentDayIdx]?.file;
-//         
-//         Object.keys(cloudData.itineraryEdits).forEach(file => {
-//           const key = `day_edits_${file}`;
-//           const editData = cloudData.itineraryEdits[file];
-//           
-//           // 更新 LocalStorage 以供離線使用
-//           localStorage.setItem(key, JSON.stringify(editData));
-//           
-//           // 如果雲端異動的是「目前正在看」的這一天，立即更新快取並重繪
-//           if (file === currentFile) {
-//             dayCache[currentDayIdx] = { ...dayCache[currentDayIdx], items: editData.items };
-//             currentDayData = dayCache[currentDayIdx];
-//             
-//             // 確保在行程頁面時才重繪
-//             if (document.getElementById('page-itinerary').classList.contains('active')) {
-//               renderTimelineList(currentDayData);
-//               if (typeof enableTimelineSortable === 'function') enableTimelineSortable();
-//             }
-//           }
-//         });
-//       }
-       // ✅ 修正行程卡消失後的 syncFromCloud 片段
+       if (cloudData.itineraryEdits) {
+         const currentFile = itineraryIndex[currentDayIdx]?.file;
+         
+         Object.keys(cloudData.itineraryEdits).forEach(file => {
+           const key = `day_edits_${file}`;
+           const editData = cloudData.itineraryEdits[file];
+           
+           // 更新 LocalStorage 以供離線使用
+           localStorage.setItem(key, JSON.stringify(editData));
+           
+           // 如果雲端異動的是「目前正在看」的這一天，立即更新快取並重繪
+           if (file === currentFile) {
+             dayCache[currentDayIdx] = { ...dayCache[currentDayIdx], items: editData.items };
+             currentDayData = dayCache[currentDayIdx];
+             
+             // 確保在行程頁面時才重繪
+             if (document.getElementById('page-itinerary').classList.contains('active')) {
+               renderTimelineList(currentDayData);
+               if (typeof enableTimelineSortable === 'function') enableTimelineSortable();
+             }
+           }
+         });
+       }
+*/
+/*         ✅ 修正行程卡消失後的 syncFromCloud 片段 */
       if (cloudData.itineraryEdits) {
         const currentFile = itineraryIndex[currentDayIdx]?.file;
         
@@ -2291,12 +2297,13 @@
           const key = `day_edits_${file}`;
           const editData = cloudData.itineraryEdits[file];
           
-          // 💡 關鍵修正：判斷 editData 是陣列還是物件
+/*            💡 關鍵修正：判斷 editData 是陣列還是物件 */
           const itemsArray = Array.isArray(editData) ? editData : (editData.items || []);
           
-          // 更新 LocalStorage 與 快取
+/*            更新 LocalStorage 與 快取 */
           localStorage.setItem(key, JSON.stringify({ items: itemsArray }));
           
+/*
           // if (file === currentFile) {
           //   // 確保將快取中的 items 設為正確的陣列
           //   dayCache[currentDayIdx] = { ...dayCache[currentDayIdx], items: itemsArray };
@@ -2307,6 +2314,7 @@
           //     if (typeof enableTimelineSortable === 'function') enableTimelineSortable();
           //   }
           // }
+*/
           if (cloudData.itineraryEdits) {
             Object.keys(cloudData.itineraryEdits).forEach(file => {
               const key = `day_edits_${file}`;
@@ -2315,7 +2323,7 @@
               localStorage.setItem(key, JSON.stringify({ items: itemsArray }));
             });
 
-            // 如果目前就在行程頁，重繪當天（用 applyDayEdits 套用最新 localStorage）
+/*              如果目前就在行程頁，重繪當天（用 applyDayEdits 套用最新 localStorage） */
             if (document.getElementById('page-itinerary').classList.contains('active')) {
               const meta = itineraryIndex[currentDayIdx];
               if (dayCache[currentDayIdx]) {
@@ -2334,13 +2342,13 @@
     }
   }
 
-  // 寫入資料時加入 token 欄位
+/*    寫入資料時加入 token 欄位 */
   function cloudPost(action, data) {
     fetch(G_API_URL, {
       method: "POST",
       mode: "no-cors", 
       body: JSON.stringify({
-        token: G_TOKEN, // 🔑 加入驗證暗號
+        token: G_TOKEN,  /* 🔑 加入驗證暗號 */
         action: action,
         data: data
       })
@@ -2367,7 +2375,7 @@
 
     const title = (CONFIG?.trip_title || '四國巡禮');
 
-    // 2) subtitle 不顯示 L,K,R,Y,J
+/*      2) subtitle 不顯示 L,K,R,Y,J */
     const sub = `${CONFIG?.days || 9}天${CONFIG?.nights || 8}夜${CONFIG?.mode ? CONFIG.mode : ''}`;
     
     document.getElementById('hdrTitle').innerText = title;
@@ -2381,12 +2389,12 @@
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
-     // 💡 若無 Token 則提示輸入（僅需輸入第一次，後續會存於 Cookie）
+/*       💡 若無 Token 則提示輸入（僅需輸入第一次，後續會存於 Cookie） */
      if (!G_TOKEN) {
        const inputToken = prompt("請輸入訪問暗號 (Token)：");
        if (inputToken) {
          G_TOKEN = inputToken;
-         setCookie("trip_auth_token", G_TOKEN, 30); // 預設存儲 30 天
+         setCookie("trip_auth_token", G_TOKEN, 30);  /* 預設存儲 30 天 */
          location.reload(); 
          return;
        } else {
@@ -2395,11 +2403,11 @@
     }
     await loadAllData();
     await syncFromCloud();
-    // --- 新增：手動同步功能 ---
+/*      --- 新增：手動同步功能 --- */
     const titleEl = document.getElementById('hdrTitle');
     if (titleEl) {
-      titleEl.style.cursor = 'pointer'; // 讓滑鼠移上去顯示手指圖示
-      titleEl.title = '點擊強制同步雲端資料'; // 增加提示文字
+      titleEl.style.cursor = 'pointer';  /* 讓滑鼠移上去顯示手指圖示 */
+      titleEl.title = '點擊強制同步雲端資料';/*  增加提示文字 */
       titleEl.onclick = async () => {
         // 增加一點視覺回饋（例如標題變色或震動）
         titleEl.style.opacity = '0.5';
@@ -2409,7 +2417,7 @@
         alert('同步完成！');
       };
     }
-    // -----------------------
+/*      ----------------------- */
     renderGlobalTodos();
     renderUserTabs();
     renderChecklists();
@@ -2455,7 +2463,7 @@
     window.scrollTo(0,0);
   }
 
-  // ====== 全員待辦 ======
+/*    ====== 全員待辦 ====== */
   function renderGlobalTodos(){
     const el = document.getElementById('globalTodoList');
     if(!el) return;
@@ -2484,13 +2492,13 @@
   function toggleGlobalTodo(key){
     const k = unescapeHtml(key);
     const saved = JSON.parse(localStorage.getItem('global_todos')) || {};
-    // 1. 切換狀態
+/*      1. 切換狀態 */
     saved[k] = !saved[k];
     
-    // 2. 存入本地
+/*      2. 存入本地 */
     localStorage.setItem('global_todos', JSON.stringify(saved));
   
-    // 3. 💡 新增：同步到雲端 (使用 'GLOBAL' 作為用戶名標記)
+/*      3. 💡 新增：同步到雲端 (使用 'GLOBAL' 作為用戶名標記) */
     cloudPost("updateCheck", { 
       user: "GLOBAL", 
       type: "todo", 
@@ -2509,7 +2517,7 @@
   }
 
 
-  // ====== 個人清單 ======
+/*    ====== 個人清單 ====== */
   function renderUserTabs() {
     document.getElementById('userSwitch').innerHTML = users.map(u =>
       `<div class="user-tab ${u===curUser?'active':''}" onclick="switchUser('${u}')">${u}</div>`
@@ -2554,14 +2562,14 @@
     else { data[item] = true; el.classList.add('checked'); }
     localStorage.setItem('check_'+curUser, JSON.stringify(data));
 
-    // Add data to Google sheet
-    const isChecked = el.classList.contains('checked'); // 判斷現在是勾選還是取消
+/*      Add data to Google sheet */
+    const isChecked = el.classList.contains('checked'); /*  判斷現在是勾選還是消 */
 
-      // 傳送到雲端
+/*        傳送到雲端 */
       cloudPost("updateCheck", { user: curUser, type: "carry", item: item, checked: isChecked });
   }
 
-  // ====== 行程 ======
+/*    ====== 行程 ====== */
   function renderDateScroller() {
     document.getElementById('dayScroller').innerHTML = itineraryIndex.map((d, i) => `
       <div class="date-chip" id="chip-${i}" onclick="selectDay(${i})">
@@ -2583,15 +2591,17 @@
         return 'tag-transport';
     }
 
-// 回傳對應 Font Awesome icon class（不含 "fa-solid" 那種前綴）
-// 規則：先看 subtag（子分類）→ 沒命中再看 tag（大分類）→ 都沒有就用預設圓點
+/*
+ 回傳對應 Font Awesome icon class（不含 "fa-solid" 那種前綴）
+ 規則：先看 subtag（子分類）→ 沒命中再看 tag（大分類）→ 都沒有就用預設圓點
+*/
   function tagIcon(tag, subtag){
 
-    // t = 大分類（food / sight / transport / hotel / shop）
+/*      t = 大分類（food / sight / transport / hotel / shop） */
     const t  = (tag || '').toLowerCase().trim();
 
 
-    // st = 子分類（ramen / sushi / train / onsen ...）
+/*      st = 子分類（ramen / sushi / train / onsen ...） */
     const ALIAS = {
       '汽車':'car','飛機':'plane','火車':'train','巴士':'bus','纜車':'cablecar','輪船':'ferry','起飛':'departure','抵達':'arrived',
       '生魚片':'sashimi','壽司':'sushi','咖哩飯':'curry','牛排':'steak','buffet':'buffet','拉麵':'ramen','串燒':'yakitori','居酒屋':'izakaya','咖啡廳':'cafe',
@@ -2605,86 +2615,90 @@
     };
 
 
-    // -----------------------------
-    // ✅ 子分類 icon（優先）
-    // 你在資料中寫 subtag，就會優先用這裡的 icon
-    // 例如：tag=food, subtag=ramen → fa-bowl-food
-    // -----------------------------
+/*
+     -----------------------------
+     ✅ 子分類 icon（優先）
+     你在資料中寫 subtag，就會優先用這裡的 icon
+     例如：tag=food, subtag=ramen → fa-bowl-food
+     -----------------------------
+*/
     const SUB = {
 
-      // ===== transport 交通子分類 =====
-      car:      'fa-car',            // 汽車
-      plane:    'fa-plane',          // 飛機
-      train:    'fa-train',          // 火車
-      bus:      'fa-bus',            // 巴士
-      cablecar: 'fa-cable-car',      // 纜車（FA 版本若沒有，改成 fa-mountain/ fa-train 都行）
-      ferry:    'fa-ship',           // 輪船/渡輪
-      departure:'fas fa-plane-departure',  //起飛
-      arrived:  'fas fa-plane-arrival',  //抵達
+/*        ===== transport 交通子分類 ===== */
+      car:      'fa-car',             /* 汽車 */
+      plane:    'fa-plane',           /* 飛機 */
+      train:    'fa-train',           /* 火車 */
+      bus:      'fa-bus',             /* 巴士 */
+      cablecar: 'fa-cable-car',       /* 纜車（FA 版本若沒有，改成 fa-mountain/ fa-train 都行） */
+      ferry:    'fa-ship',            /* 輪船/渡輪 */
+      departure:'fas fa-plane-departure',  /* 起飛 */
+      arrived:  'fas fa-plane-arrival',  /* 抵達 */
 
-      // ===== food 餐飲子分類 =====
-      sashimi:  'fa-fish',           // 生魚片（保守 icon，通常版本都會有）
-      sushi:    'fa-fish-fins',      // 壽司（若你版本沒有 → 換 fa-fish）
-      curry:    'fa-pepper-hot',     // 咖哩飯（若覺得不貼 → 換 fa-utensils）
-      steak:    'fa-drumstick-bite', // 牛排（若版本沒有 → 換 fa-utensils）
-      buffet:   'fa-plate-wheat',    // buffet（若版本沒有 → 換 fa-utensils）
-      ramen:    'fa-bowl-food',      // 拉麵（FA6 才比較穩）
-      yakitori: 'fa-fire-flame-curved', // 串燒/炭火（FA6 才比較穩；保守可換 fa-fire）
-      izakaya:  'fa-beer-mug-empty', // 居酒屋（FA6 才比較穩；保守可換 fa-mug-hot）
-      cafe:     'fa-mug-hot',        // 咖啡廳
+/*        ===== food 餐飲子分類 ===== */
+      sashimi:  'fa-fish',            /* 生魚片（保守 icon，通常版本都會有） */
+      sushi:    'fa-fish-fins',       /* 壽司（若你版本沒有 → 換 fa-fish） */
+      curry:    'fa-pepper-hot',      /* 咖哩飯（若覺得不貼 → 換 fa-utensils） */
+      steak:    'fa-drumstick-bite',  /* 牛排（若版本沒有 → 換 fa-utensils） */
+      buffet:   'fa-plate-wheat',     /* buffet（若版本沒有 → 換 fa-utensils） */
+      ramen:    'fa-bowl-food',       /* 拉麵（FA6 才比較穩） */
+      yakitori: 'fa-fire-flame-curved',  /* 串燒/炭火（FA6 才比較穩；保守可換 fa-fire） */
+      izakaya:  'fa-beer-mug-empty',  /* 居酒屋（FA6 才比較穩；保守可換 fa-mug-hot） */
+      cafe:     'fa-mug-hot',         /* 咖啡廳 */
 
-      // ===== sight 景點子分類 =====
-      beach:    'fa-umbrella-beach', // 海水浴場
-      cat:      'fa-cat',            // 貓咪
-      castle:   'fa-chess-rook',     // 城池
-      onsen:    'fa-hot-tub-person', // 溫泉（FA6 才比較穩；保守可換 fa-water）
-      station:  'fa-train-subway',   // 車站（若版本沒有 → 換 fa-train）
-      river:    'fa-water',          // 河川
-      botanic:  'fa-seedling',       // 植物園
-      zoo:      'fa-paw',            // 動物園
-      park:     'fa-tree',           // 公園
-      torii:    'fa-torii-gate',     // 鳥居
-      shrine:   'fa-torii-gate',     // 神社（同鳥居）
-      museum:   'fa-landmark',        // 博物館
+/*        ===== sight 景點子分類 ===== */
+      beach:    'fa-umbrella-beach',  /* 海水浴場 */
+      cat:      'fa-cat',             /* 貓咪 */
+      castle:   'fa-chess-rook',      /* 城池 */
+      onsen:    'fa-hot-tub-person',  /* 溫泉（FA6 才比較穩；保守可換 fa-water） */
+      station:  'fa-train-subway',    /* 車站（若版本沒有 → 換 fa-train） */
+      river:    'fa-water',           /* 河川 */
+      botanic:  'fa-seedling',        /* 植物園 */
+      zoo:      'fa-paw',             /* 動物園 */
+      park:     'fa-tree',            /* 公園 */
+      torii:    'fa-torii-gate',      /* 鳥居 */
+      shrine:   'fa-torii-gate',      /* 神社（同鳥居） */
+      museum:   'fa-landmark',        /* 博物館 */
       takagi:   ''
     };
 
-    // -----------------------------
-    // ✅ 大分類 icon（fallback）
-    // 當 subtag 沒寫或沒命中時，退回看 tag
-    // 例如：tag=food, subtag="" → fa-utensils
-    // -----------------------------
+/*
+     -----------------------------
+     ✅ 大分類 icon（fallback）
+     當 subtag 沒寫或沒命中時，退回看 tag
+     例如：tag=food, subtag="" → fa-utensils
+     -----------------------------
+*/
     const TAG = {
-      food:      'fa-utensils',      // 餐飲
-      sight:     'fa-torii-gate',    // 景點（預設用鳥居）
-      transport: 'fa-route',         // 交通
-      hotel:     'fa-bed',           // 住宿
-      shop:      'fa-bag-shopping'   // 購物
+      food:      'fa-utensils',       /* 餐飲 */
+      sight:     'fa-torii-gate',     /* 景點（預設用鳥居） */
+      transport: 'fa-route',          /* 交通 */
+      hotel:     'fa-bed',            /* 住宿 */
+      shop:      'fa-bag-shopping'    /* 購物 */
     };
 
-    // ✅ 回傳順序：子分類 → 大分類 → 預設
-    return SUB[st] || TAG[t] || 'fa-circle';  // fa-circle = 沒分類時用圓點
+/*      ✅ 回傳順序：子分類 → 大分類 → 預設 */
+    return SUB[st] || TAG[t] || 'fa-circle';   /* fa-circle = 沒分類時用圓點 */
   }
 
 
   function durationChip(item){
-    // 1) 優先顯示 stay（你 JSON 已經有）
+/*      1) 優先顯示 stay（你 JSON 已經有） */
     const stay = (item.stay || '').trim();
     if(stay) return `<span class="tl-chip"><i class="fas fa-hourglass-half"></i> ${escapeHtml(stay)}</span>`;
 
-    // 2) 如果有 route.minutes，顯示車程
+/*      2) 如果有 route.minutes，顯示車程 */
     const mins = item?.route?.minutes;
     if(Number.isFinite(mins)) return `<span class="tl-chip"><i class="fas fa-car"></i> ${mins} min</span>`;
 
     return '';
   }
   function normalizeTime(t){
-    // 只取 HH:MM（避免 Before 05:00 / 13:20-13:45 破版）
+/*      只取 HH:MM（避免 Before 05:00 / 13:20-13:45 破版） */
     const s = String(t ?? '').trim();
     const m = s.match(/(\d{1,2}:\d{2})/);
     if(m) return m[1].padStart(5,'0');
     if(s === '—' || s === '-' || !s) return '—';
-    return s; // 真的不是時間就原樣（但建議 json 就別放這種）
+    return s;  /* 真的不是時間就原樣（但建議 json 就別放這種） */
   }
 
   function routeIcon(mode){
@@ -2731,7 +2745,7 @@
       <i class="fas fa-hourglass-half" style="color:#9CA3AF;"></i>${escapeHtml(item.stay)}
     </div>` : '';
 
-    // ✅ 關鍵：移除 onclick，改用 data-idx 供 JS 識別
+/*      ✅ 關鍵：移除 onclick，改用 data-idx 供 JS 識別 */
     return `
       <div class="timeline-item" data-idx="${i}" id="exp-item-${i}">
         <div class="tl-time">${escapeHtml(t)}</div>
@@ -2748,6 +2762,7 @@
         </div>
       </div>
     `;
+/*
 //     return `
 //       <div class="timeline-item" onclick='openModal(${i})'>
 //         <div class="tl-time">${escapeHtml(item.time || '')}</div>
@@ -2766,9 +2781,10 @@
 //         </div>
 //       </div>
 //     `;
+*/
   }
   function openDirections(from, to, mode='drive'){
-    const tm = travelModeForRoute(mode); // 你下面已經有這個 function
+    const tm = travelModeForRoute(mode);  /* 你下面已經有這個 function */
     const url = `https://www.google.com/maps/dir/?api=1`
         + `&origin=${encodeURIComponent(from||'')}`
         + `&destination=${encodeURIComponent(to||'')}`
@@ -2780,11 +2796,13 @@
 
 
 
+/*
 //   function openDirections(from, to){
 //     // Google Maps Directions
 //     const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(from||'')}&destination=${encodeURIComponent(to||'')}&travelmode=driving`;
 //     window.open(url, '_blank');
 //   }
+*/
 
 
     /* --- ✅ 修正：將以下函式移至全域位置（selectDay 的外部） --- */
@@ -2793,7 +2811,7 @@
       const listEl = document.getElementById('timelineList');
       if (!listEl) return;
     
-      // ✅ 根據狀態切換 CSS 類別
+/*        ✅ 根據狀態切換 CSS 類別 */
       if (__tlEditMode) listEl.classList.add('edit-mode-active');
       else listEl.classList.remove('edit-mode-active');
 
@@ -2803,7 +2821,7 @@
           <div class="stay-pill"><i class="fas fa-hourglass-half"></i>${escapeHtml(item.stay)}</div>
         ` : '';
     
-        // ✅ Route 渲染邏輯
+/*          ✅ Route 渲染邏輯 */
         if (item.route && (item.route.from || item.route.to)) {
           const r = item.route;
           const mode = r.mode || 'drive';
@@ -2828,7 +2846,7 @@
             </div>`;
         }
     
-        // ✅ 一般行程渲染邏輯
+/*          ✅ 一般行程渲染邏輯 */
         return `
           <div class="timeline-item" data-idx="${i}" id="exp-item-${i}">
             <div class="tl-time">${escapeHtml(t)}</div>
@@ -2846,13 +2864,13 @@
           </div>`;
       }).join('');
     
-      bindLongPressSelection(); // 渲染完重新綁定
+      bindLongPressSelection();  /* 渲染完重新綁定 */
     }
     
-    // 渲染編輯列
+/*      渲染編輯列 */
     function renderEditRow(i, item) {
-//      if (!__tlEditMode) return '';
-      // ✅ 移除判斷式，讓編輯列永遠生成，改由 CSS 的 .edit-row { display: none; } 控制
+/*       if (!__tlEditMode) return ''; */
+/*        ✅ 移除判斷式，讓編輯列永遠生成，改由 CSS 的 .edit-row { display: none; } 控制 */
       const t = normalizeTime(item.time);
       return `
         <div class="edit-row" onclick="event.stopPropagation()">
@@ -2861,6 +2879,7 @@
         </div>`;
     }
     
+/*
     // 儲存異動
 //     function saveDayEdits() {
 //       const meta = itineraryIndex[currentDayIdx];
@@ -2870,14 +2889,17 @@
 //       localStorage.setItem(`day_edits_${file}`, JSON.stringify(dataToSave));
 //       cloudPost("updateItinerary", { file: file, items: dataToSave });
 //     }
+*/
 
     function renderDayHero(dayData, meta){
         const el = document.getElementById('dayHero');
         if(!el) return;
 
-        // ✅ 支援兩種格式：
-        // 1) 新格式：[{src,loc,caption}]
-        // 2) 舊格式：[ "url1", "url2" ]
+/*
+         ✅ 支援兩種格式：
+         1) 新格式：[{src,loc,caption}]
+         2) 舊格式：[ "url1", "url2" ]
+*/
         let photosRaw = Array.isArray(dayData?.photos) ? dayData.photos.slice(0,5) : [];
         if(!photosRaw.length){
             photosRaw = [
@@ -2931,18 +2953,18 @@
         `).join('');
 
         
-        // ❌ dots（小白點）已移除：不顯示也不需要同步
+/*          ❌ dots（小白點）已移除：不顯示也不需要同步 */
         el.innerHTML = `<div class="hero-track" id="heroTrack">${slides}</div>`;
 
         const track = document.getElementById('heroTrack');
         if(!track) return;
 
-        // ✅ 桌機滾輪也能左右滑
+/*          ✅ 桌機滾輪也能左右滑 */
         enableWheelHorizontal(track);
 
         if(__heroTimer) clearInterval(__heroTimer);
 
-        // auto slide
+/*          auto slide */
 
         let cur = 0;
         __heroTimer = setInterval(()=>{
@@ -2956,7 +2978,7 @@
         __editHistory = []; 
         __tlEditMode = false;
     
-        // UI 更新 (Active Date Chip)
+/*          UI 更新 (Active Date Chip) */
         document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
         const chip = document.getElementById('chip-' + idx);
         if (chip) chip.classList.add('active');
@@ -2964,12 +2986,14 @@
         const meta = itineraryIndex[idx];
         if (!meta) return;
     
+/*
         // 載入資料
         // if (!dayCache[idx]) {
         //   const url = `./${meta.file}?v=${Date.now()}`;
         //   const raw = await fetch(url).then(r => r.json());
         //   dayCache[idx] = Array.isArray(raw) ? raw[0] : raw;
         // }
+*/
 
         const needFetch =
           !dayCache[idx] ||
@@ -2983,10 +3007,10 @@
         }
 
     
-        // 應用編輯 (本地與雲端緩存)
+/*          應用編輯 (本地與雲端緩存) */
         currentDayData = applyDayEdits(dayCache[idx], meta);
     
-        // ✅ 呼叫現在已變成全域的渲染函式
+/*          ✅ 呼叫現在已變成全域的渲染函式 */
         renderDayHero(currentDayData, meta);
         await renderDayRouteCard(currentDayData);
         renderTimelineToolbar(meta);
@@ -2996,17 +3020,17 @@
     }
 
 
-    // ===== timeline edit helpers =====
-    // (__tlEditMode / __tlSortable 已在上方宣告)
+/*      ===== timeline edit helpers ===== */
+/*      (__tlEditMode / __tlSortable 已在上方宣告) */
 
-//    function dayEditKey(){ return `day_edits_${meta?.file || ''}`; }
-     // ✅ 修正後的 dayEditKey：從全域索引中取得 meta
+/*     function dayEditKey(){ return `day_edits_${meta?.file || ''}`; } */
+/*       ✅ 修正後的 dayEditKey：從全域索引中取得 meta */
      function dayEditKey() {
-       const meta = itineraryIndex[currentDayIdx]; // 從全域變數抓取目前的 meta
+       const meta = itineraryIndex[currentDayIdx];  /* 從全域變數抓取目前的 meta */
        return `day_edits_${meta?.file || ''}`;
      }
 
-    // ✅ 修正後的 applyDayEdits (確保它也是獨立的)
+/*      ✅ 修正後的 applyDayEdits (確保它也是獨立的) */
     function applyDayEdits(dayData, meta) {
       try {
         const key = `day_edits_${meta?.file || ''}`;
@@ -3018,6 +3042,7 @@
       return dayData;
     }
 
+/*
 //     function applyDayEdits(dayData, meta){
 //       try{
 //         const key = `day_edits_${meta?.file || ''}`;
@@ -3050,22 +3075,23 @@
 //         console.error("儲存失敗", e);
 //       }
 //     }
-     // ✅ 修正後的 saveDayEdits
+*/
+/*       ✅ 修正後的 saveDayEdits */
      function saveDayEdits() {
        try {
          const file = itineraryIndex[currentDayIdx]?.file;
          if (!file) return;
      
-         const key = dayEditKey(); // 現在這裡不會再報錯了
+         const key = dayEditKey();  /* 現在這裡不會再報錯了 */
          const dataToSave = { items: (currentDayData?.items || []) };
          
-         // 1. 本地備份
+/*           1. 本地備份 */
          localStorage.setItem(key, JSON.stringify(dataToSave));
      
-         // 2. 雲端同步
+/*           2. 雲端同步 */
          cloudPost("updateItinerary", {
            file: file,
-           items: dataToSave.items // 確保傳送的是陣列
+           items: dataToSave.items  /* 確保傳送的是陣列 */
          });
          console.log(`Day ${currentDayIdx + 1} 行程異動已同步雲端`);
        } catch (e) {
@@ -3077,7 +3103,7 @@
       try{ localStorage.removeItem(dayEditKey()); }catch(e){}
     }
 
-//     let __editHistory = []; // 用於存放上一步的狀態
+/*      let __editHistory = []; // 用於存放上一步的狀態 */
     
     function renderTimelineToolbar(meta) {
       const el = document.getElementById('timelineToolbar');
@@ -3096,7 +3122,7 @@
         </div>
       `;
     
-      // --- 重置功能 ---
+/*        --- 重置功能 --- */
       el.querySelector('#tlResetDay')?.addEventListener('click', async () => {
         const file = itineraryIndex[currentDayIdx]?.file;
         if (!file || !confirm('確定要將此日行程「重置default」嗎？')) return;
@@ -3106,7 +3132,7 @@
         await selectDay(currentDayIdx);
       });
     
-      // --- 回復上一步 (Undo) ---
+/*        --- 回復上一步 (Undo) --- */
       el.querySelector('#tlUndoEdit')?.addEventListener('click', () => {
         if (__editHistory.length > 0) {
           const prevState = __editHistory.pop();
@@ -3114,7 +3140,7 @@
           
           saveDayEdits();
           renderTimelineList(currentDayData);
-          enableTimelineSortable(); // ✅ 關鍵：回復後必須重新啟用排序監聽
+          enableTimelineSortable();  /* ✅ 關鍵：回復後必須重新啟用排序監聽 */
           
           console.log("已回復上一步，剩餘步數:", __editHistory.length);
         } else {
@@ -3122,6 +3148,7 @@
         }
       });
     
+/*
 //       el.querySelector('#tlEditToggle')?.addEventListener('click', () => {
 //         __tlEditMode = !__tlEditMode;
 //         renderTimelineToolbar(meta);
@@ -3132,29 +3159,32 @@
 //         }
 //         enableTimelineSortable();
 //       });
+*/
       el.querySelector('#tlEditToggle')?.addEventListener('click', () => {
-        // ✅ 如果是開啟編輯模式，紀錄捲動位置
+/*          ✅ 如果是開啟編輯模式，紀錄捲動位置 */
         const scrollY = window.scrollY;
         
         __tlEditMode = !__tlEditMode;
       
-        // 切換 Class
+/*          切換 Class */
         const listEl = document.getElementById('timelineList');
         if (listEl) {
-//           if (__tlEditMode) listEl.classList.add('edit-mode-active');
-//           else listEl.classList.remove('edit-mode-active');
+/*
+           if (__tlEditMode) listEl.classList.add('edit-mode-active');
+           else listEl.classList.remove('edit-mode-active');
+*/
             if (__tlEditMode) {
               listEl.classList.add('edit-mode-active');
-//               listEl.style.touchAction = 'none'; // 編輯中禁用系統捲動
+/*                listEl.style.touchAction = 'none'; // 編輯中禁用系統捲動 */
             } else {
               listEl.classList.remove('edit-mode-active');
-//               listEl.style.touchAction = 'pan-y'; // 完成後恢復 y 軸捲動
+/*                listEl.style.touchAction = 'pan-y'; // 完成後恢復 y 軸捲動 */
             }
         }
       
         renderTimelineToolbar(meta);
       
-       // ✅ 不論是進入還是離開，都呼叫一次來確保 Sortable 狀態同步
+/*         ✅ 不論是進入還是離開，都呼叫一次來確保 Sortable 狀態同步 */
        enableTimelineSortable(); 
        
        if (!__tlEditMode) renderTimelineList(currentDayData); 
@@ -3172,8 +3202,10 @@
         animation: 180,
         handle: '.tl-content, .route-strip, .tl-time, .route-time-top',
         ghostClass: 'is-dragging',
-//         delay: 400,
-//         delayOnTouchOnly: true,
+/*
+         delay: 400,
+         delayOnTouchOnly: true,
+*/
 	delay: 200,
         touchStartThreshold: 5,
     
@@ -3182,17 +3214,17 @@
           evt.item.classList.add('is-dragging'); 
         },
         onEnd: (evt)=>{
-          // ✅ 新增：恢復觸控動作
+/*            ✅ 新增：恢復觸控動作 */
           evt.item.style.touchAction = '';
 
           evt.item.classList.remove('is-dragging');
           const oldIndex = evt.oldIndex;
           const newIndex = evt.newIndex;
           
-          // ✅ 檢查：如果位置沒有變動，就不需要紀錄歷史與重新渲染
+/*            ✅ 檢查：如果位置沒有變動，就不需要紀錄歷史與重新渲染 */
           if(oldIndex === newIndex || oldIndex == null || newIndex == null) return;
     
-          // ✅ 關鍵：在修改陣列順序之前，先存入目前的狀態到「上一步」
+/*            ✅ 關鍵：在修改陣列順序之前，先存入目前的狀態到「上一步」 */
           pushHistory();
     
           const arr = (currentDayData?.items || []).slice();
@@ -3207,13 +3239,13 @@
       });
     }
 
-    // 事件委派：改時間 / 刪除
+/*      事件委派：改時間 / 刪除 */
     document.getElementById('timelineList').addEventListener('input', (e)=>{
       if(!__tlEditMode) return;
       const inp = e.target.closest('input[data-edit-time]');
       if(!inp) return;
 
-      pushHistory(); // 💡 新增：修改前紀錄狀態
+      pushHistory();  /* 💡 新增：修改前紀錄狀態 */
 
       const idx = Number(inp.dataset.idx);
       if(!Number.isFinite(idx)) return;
@@ -3230,7 +3262,7 @@
       const btn = e.target.closest('[data-delete-idx]');
       if(!btn) return;
 
-      pushHistory(); // 💡 新增：修改前紀錄狀態
+      pushHistory();  /* 💡 新增：修改前紀錄狀態 */
 
       const idx = Number(btn.dataset.deleteIdx);
       if(!Number.isFinite(idx)) return;
@@ -3243,16 +3275,17 @@
     }, true);
 
 
-  // ====== Google 導航：優先 geo，其次 addr/title ======
+/*    ====== Google 導航：優先 geo，其次 addr/title ====== */
   function buildGoogleNavUrl(item){
     const hasGeo = item?.geo?.lat != null && item?.geo?.lng != null;
     if(hasGeo){
-//      return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(item.geo.lat + ',' + item.geo.lng)}`;
+/*      return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(item.geo.lat + ',' +
+	     item.geo.lng)}`; */
       return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.geo.lat + ',' + item.geo.lng)}`;
     }
     const q = (item?.addr || item?.title || '').trim();
     if(!q) return 'https://www.google.com/maps';
-//    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
+/*     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`; */
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
   }
   function travelModeForRoute(mode){
@@ -3265,12 +3298,12 @@
   }
 
   function getLatLonForMeta(meta){
-    // ✅ 優先：itinerary.index.json 每天直接帶 lat/lon
+/*      ✅ 優先：itinerary.index.json 每天直接帶 lat/lon */
     if(Number.isFinite(meta?.lat) && Number.isFinite(meta?.lon)){
         return { lat: meta.lat, lon: meta.lon };
     }
 
-    // ✅ 次選：hotels.json 裡的 geo（如果你有存）
+/*      ✅ 次選：hotels.json 裡的 geo（如果你有存） */
     const h = hotels.find(x => x.id === meta.hotel_id);
     const lat = h?.geo?.lat;
     const lon = h?.geo?.lng ?? h?.geo?.lon;
@@ -3287,10 +3320,12 @@
     const rawPts = route?.points || [];
     const mode = route?.mode || 'drive';
 
-    // ✅ 支援三種格式：
-    // 1) "lat,lng"  (字串)
-    // 2) "地點名稱" (字串：只用於 Google，縮圖不畫點)
-    // 3) { q:"地點名稱", lat:34.12, lng:134.56 } (物件：Google + 縮圖都能用)
+/*
+     ✅ 支援三種格式：
+     1) "lat,lng"  (字串)
+     2) "地點名稱" (字串：只用於 Google，縮圖不畫點)
+     3) { q:"地點名稱", lat:34.12, lng:134.56 } (物件：Google + 縮圖都能用)
+*/
     const pts = rawPts.map(p=>{
       if(p == null) return null;
 
@@ -3320,22 +3355,22 @@
 
     const gUrl = buildGoogleDirUrlFromPoints(pts, mode);
 
-    // --- Stops (中間的停靠點數量) ---
+/*      --- Stops (中間的停靠點數量) --- */
     const stopCount = Math.max(0, pts.length - 2);
 
-    // --- 先準備座標點（只有有 lat/lng 的才拿來畫縮圖 + OSRM）---
+/*      --- 先準備座標點（只有有 lat/lng 的才拿來畫縮圖 + OSRM）--- */
     const stopLatLngs = pts.filter(p=>Number.isFinite(p.lat) && Number.isFinite(p.lng)).map(p=>({lat:p.lat, lng:p.lng}));
 
-    // --- center / zoom ---
+/*      --- center / zoom --- */
     const centerObj = parseLatLng(route?.preview?.center || '') || (stopLatLngs[0] || null);
     const centerStr = centerObj ? `${centerObj.lat},${centerObj.lng}` : '';
     const zoom = route?.preview?.zoom || 11;
 
-    // --- Road distance (優先：route.distance_km > OSRM > (不顯示/直線估算)) ---
+/*      --- Road distance (優先：route.distance_km > OSRM > (不顯示/直線估算)) --- */
     let roadKm = (route?.distance_km != null) ? Number(route.distance_km) : null;
     if(!Number.isFinite(roadKm)) roadKm = null;
 
-    // OSRM 取得道路路徑 + 距離（不需要 API Key；但可能因網路/CORS 失敗）
+/*      OSRM 取得道路路徑 + 距離（不需要 API Key；但可能因網路/CORS 失敗） */
     let pathLatLngs = null;
     if(roadKm == null && stopLatLngs.length >= 2){
       try{
@@ -3343,17 +3378,17 @@
         if(osrm?.distanceKm != null) roadKm = osrm.distanceKm.toFixed(1);
         if(osrm?.pathLatLngs?.length) pathLatLngs = osrm.pathLatLngs;
       }catch(e){
-        // 失敗就不顯示 km（避免再回到直線 65km 那種誤差）
+/*          失敗就不顯示 km（避免再回到直線 65km 那種誤差） */
         console.warn('OSRM route failed:', e);
       }
     }
 
-    // 沒有 OSRM 路徑就用停靠點直線（至少能畫出大概）
+/*      沒有 OSRM 路徑就用停靠點直線（至少能畫出大概） */
     if(!pathLatLngs) pathLatLngs = stopLatLngs;
 
     const meta = `${stopCount} 個停留點` + (roadKm != null ? ` · 預計行駛 ${roadKm} km` : '');
 
-    // --- UI：維持你第 3 張那個卡片排版 ---
+/*      --- UI：維持你第 3 張那個卡片排版 --- */
     el.innerHTML = `
       <div class="route-card">
         <div class="route-thumb" id="routeMiniMap"></div>
@@ -3370,7 +3405,7 @@
       </div>
     `;
 
-    // --- 縮圖地圖（用 OSRM 的道路路徑畫出「像第4張」的走法）---
+/*      --- 縮圖地圖（用 OSRM 的道路路徑畫出「像第4張」的走法）--- */
     if(stopLatLngs.length){
       renderRouteMiniMap(pathLatLngs, stopLatLngs, centerStr, zoom);
     }
@@ -3378,13 +3413,13 @@
 
 
   function buildGoogleDirUrlFromPoints(points, mode='drive'){
-    // points: [{q,lat,lng}, ...]
+/*      points: [{q,lat,lng}, ...] */
     const list = points.map(p => (p?.q || (p?.lat!=null && p?.lng!=null ? `${p.lat},${p.lng}` : '')).trim()).filter(Boolean);
     if(list.length < 2) return 'https://www.google.com/maps';
 
     const origin = list[0];
     const dest   = list[list.length - 1];
-    const wps    = list.slice(1, -1).join('|');  // pipe-separated
+    const wps    = list.slice(1, -1).join('|');   /* pipe-separated */
 
     const tm = travelModeForRoute(mode);
     return `https://www.google.com/maps/dir/?api=1`
@@ -3394,12 +3429,12 @@
       + `&travelmode=${tm}`;
   }
   function buildGoogleDirPathUrl(points){
-    // https://www.google.com/maps/dir/點1/點2/點3/點4
+/*      https://www.google.com/maps/dir/點1/點2/點3/點4 */
     const path = points.map(p => encodeURIComponent(p)).join('/');
     return `https://www.google.com/maps/dir/${path}`;
   }
   function parseLatLng(s){
-    // 支援 "lat,lng" 字串
+/*      支援 "lat,lng" 字串 */
     if(!s) return null;
     const m = String(s).trim().match(/^(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)$/);
     if(!m) return null;
@@ -3424,7 +3459,7 @@
 
 
   function haversineKm(a, b){
-    const R = 6371; // Earth radius km
+    const R = 6371; /* Earth radius km */
     const toRad = (d)=> d*Math.PI/180;
     const dLat = toRad(b.lat - a.lat);
     const dLng = toRad(b.lng - a.lng);
@@ -3439,7 +3474,7 @@
 
   
 function estimateRouteKm(points){
-  // Fallback: straight-line (haversine) distance in km (UNDER-estimates driving distance).
+/*    Fallback: straight-line (haversine) distance in km (UNDER-estimates driving distance). */
   const coords = (points||[]).map(parseLatLng).filter(Boolean);
   if(coords.length < 2) return null;
   let sum = 0;
@@ -3449,20 +3484,20 @@ function estimateRouteKm(points){
   return sum;
 }
 
-// ✅ Preferred: get road route from OSRM and return { distanceKm, pathLatLngs }
+/*  ✅ Preferred: get road route from OSRM and return { distanceKm, pathLatLngs } */
 async function fetchOsrmRoute(latlngPoints, mode){
   try{
-    // latlngPoints 目前在 renderDayRouteCard 給的是 [{lat,lng}, ...]
+/*      latlngPoints 目前在 renderDayRouteCard 給的是 [{lat,lng}, ...] */
     const pts = (latlngPoints || [])
-      .map(normalizeLatLng)     // -> {lat,lng}
+      .map(normalizeLatLng)     /*  -> {lat,lng} */
       .filter(Boolean);
 
     if(pts.length < 2) return null;
 
-    // OSRM 需要 lon,lat
+/*      OSRM 需要 lon,lat */
     const coords = pts.map(p => `${p.lng},${p.lat}`).join(';');
 
-    // OSRM demo server profiles: driving / walking / cycling
+/*      OSRM demo server profiles: driving / walking / cycling */
     const m = (mode || 'drive').toLowerCase();
     const profile = (m === 'walk') ? 'walking' : 'driving';
 
@@ -3475,7 +3510,7 @@ async function fetchOsrmRoute(latlngPoints, mode){
 
     const distKm = (j.routes[0].distance || 0) / 1000;
 
-    // 轉成 [{lat,lng}, ...]（跟你其他地方一致，renderRouteMiniMap 才能畫「道路曲線」）
+/*      轉成 [{lat,lng}, ...]（跟你其他地方一致，renderRouteMiniMap 才能畫「道路曲線」） */
     const line = j.routes[0]?.geometry?.coordinates || [];
     const pathLatLngs = line.map(([lon, lat]) => ({ lat, lng: lon }));
 
@@ -3488,24 +3523,26 @@ async function fetchOsrmRoute(latlngPoints, mode){
 
 
 function buildOsmStaticThumb(center, zoom, points){
-    // OSM 靜態地圖服務（免 key）
-    // 需要 center，否則就用第一個點（若是座標可用）或 fallback 一張 placeholder
+/*
+     OSM 靜態地圖服務（免 key）
+     需要 center，否則就用第一個點（若是座標可用）或 fallback 一張 placeholder
+*/
     const base = 'https://staticmap.openstreetmap.fr/staticmap.php';
 
     const c = (center && center.includes(',')) ? center : null;
 
-    // markers：最多建議放 5 個，不然 URL 太長（你要更多點就只放起訖）
+/*      markers：最多建議放 5 個，不然 URL 太長（你要更多點就只放起訖） */
     const mk = [];
     const pick = points.length <= 5 ? points : [points[0], points[points.length-1]];
 
-    // 若 pick 是 "lat,lng" 才能當 marker；若是文字地址 OSM 靜態圖沒辦法地理編碼
+/*      若 pick 是 "lat,lng" 才能當 marker；若是文字地址 OSM 靜態圖沒辦法地理編碼 */
     pick.forEach(p=>{
       if(/^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(p)){
         mk.push(`&markers=${encodeURIComponent(p)},lightblue1`);
       }
     });
 
-    // 沒 center 又沒有座標 marker → 給一張淡底圖（避免 broken image）
+/*      沒 center 又沒有座標 marker → 給一張淡底圖（避免 broken image） */
     if(!c && mk.length === 0){
       return 'data:image/svg+xml,' + encodeURIComponent(
         `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450">
@@ -3531,7 +3568,7 @@ function renderRouteMiniMap(pathLatLngs, stopLatLngs, fallbackCenterStr, zoom){
   const container = document.getElementById('routeMiniMap');
   if(!container) return;
 
-  // reset old map instance
+/*    reset old map instance */
   if(window.__routeMap){
     try{ window.__routeMap.remove(); }catch(e){}
     window.__routeMap = null;
@@ -3551,7 +3588,7 @@ function renderRouteMiniMap(pathLatLngs, stopLatLngs, fallbackCenterStr, zoom){
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
-  // --- route line (用 OSRM 的道路 polyline 會更像 Google 那種走法) ---
+/*    --- route line (用 OSRM 的道路 polyline 會更像 Google 那種走法) --- */
   if(Array.isArray(pathLatLngs) && pathLatLngs.length >= 2){
     const line = L.polyline(pathLatLngs.map(p=>[p.lat,p.lng]), {
       weight: 5,
@@ -3560,7 +3597,7 @@ function renderRouteMiniMap(pathLatLngs, stopLatLngs, fallbackCenterStr, zoom){
       lineJoin: 'round'
     }).addTo(map);
 
-    // subtle outline
+/*      subtle outline */
     L.polyline(pathLatLngs.map(p=>[p.lat,p.lng]), {
       weight: 10,
       opacity: .18,
@@ -3574,7 +3611,7 @@ function renderRouteMiniMap(pathLatLngs, stopLatLngs, fallbackCenterStr, zoom){
     try{ map.fitBounds(line.getBounds(), {padding:[14,14]}); }catch(e){}
   }
 
-  // --- stop markers (只放停靠點，不要把整條 polyline 每點都變 marker) ---
+/*    --- stop markers (只放停靠點，不要把整條 polyline 每點都變 marker) --- */
   (stopLatLngs || []).forEach((p, i)=>{
     const isStart = (i === 0);
     const isEnd   = (i === (stopLatLngs.length - 1));
@@ -3597,11 +3634,13 @@ async function renderWeatherJMA(meta){
         const el = document.getElementById('weatherStrip');
         if(!el) return;
 
-        // 你想要 01:00~24:00
+/*          你想要 01:00~24:00 */
         const pad2 = (n)=>String(n).padStart(2,'0');
 
-        // ✅ 16 天限制：如果日期太遠，顯示提示（避免你覺得“不准”）
-        // 這裡用「今天」對比 meta.file 裡的 YYYY-MM-DD（如果你不想依賴 file，可改你自己的 date_range）
+/*
+         ✅ 16 天限制：如果日期太遠，顯示提示（避免你覺得“不准”）
+         這裡用「今天」對比 meta.file 裡的 YYYY-MM-DD（如果你不想依賴 file，可改你自己的 date_range）
+*/
         const m = String(meta?.file || '').match(/\d{4}-\d{2}-\d{2}/);
         const iso = m ? m[0] : '';
         if(!iso){
@@ -3677,22 +3716,22 @@ async function renderWeatherJMA(meta){
 
 
   function buildGoogleDirUrlForItem(item){
-    // route item：用 directions
+/*      route item：用 directions */
     const r = item?.route;
     if(r?.from && r?.to){
       const tm = travelModeForRoute(r.mode);
       return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(r.from)}&destination=${encodeURIComponent(r.to)}&travelmode=${tm}`;
     }
-    // 一般景點：用 search
+/*      一般景點：用 search */
     return buildGoogleNavUrl(item);
   }
 
   function normalizeAssetUrl(src){
     const s = String(src || '').trim();
     if(!s) return '';
-    // 外部連結 / base64 不動
+/*      外部連結 / base64 不動 */
     if(/^https?:\/\//i.test(s) || s.startsWith('data:')) return s;
-    // 以 / 開頭：改成相對路徑，讓它跟 index.html 同層開始找
+/*      以 / 開頭：改成相對路徑，讓它跟 index.html 同層開始找 */
     return s.startsWith('/') ? ('.' + s) : s;
   }
 
@@ -3719,7 +3758,7 @@ async function renderWeatherJMA(meta){
 
 
 
-  // ====== Modal：預計到達/地址/停車/Mapcode/介紹 + Google 導航 ======
+/*    ====== Modal：預計到達/地址/停車/Mapcode/介紹 + Google 導航 ====== */
   function openModal(itemIdx) {
     const item = currentDayData?.items?.[itemIdx];
     if(!item) return;
@@ -3750,7 +3789,7 @@ async function renderWeatherJMA(meta){
             const zh = escapeHtml(m.zh || '');
             const isRec = m.rec === true || m.recommend === true;
 
-            // ✅ 只讓推薦的項目可以點開（維持你原本邏輯）
+/*              ✅ 只讓推薦的項目可以點開（維持你原本邏輯） */
             const pillCls = `menu-row ${isRec ? 'menuPill' : ''}`;
 
             return `
@@ -3785,10 +3824,10 @@ async function renderWeatherJMA(meta){
 
     const detailText = item.detail || item.desc || '';
 
-    // ✅ 支援 links 是「物件」或「陣列包一個物件」
+/*      ✅ 支援 links 是「物件」或「陣列包一個物件」 */
     const links = Array.isArray(item.links) ? (item.links[0] || {}) : (item.links || {});
 
-    // ✅ 用 JSON.stringify 避免引號/特殊字元把 onclick 撐爆
+/*      ✅ 用 JSON.stringify 避免引號/特殊字元把 onclick 撐爆 */
     const linkBtns = [
         links.official ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.official))})'>官網</button>` : '',
         links.reserve  ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.reserve))})'>reserveseat</button>` : '',
@@ -3799,7 +3838,7 @@ async function renderWeatherJMA(meta){
 
     const linkBtnsHtml = linkBtns ? `<div class="link-grid">${linkBtns}</div>` : '';
 
-    // ✅ 你要的欄位（eta/arrive/arrival 皆可）
+/*      ✅ 你要的欄位（eta/arrive/arrival 皆可） */
     const eta = item.eta || item.arrive || item.arrival || '';
     const addr = item.addr || '';
     const parking = item.parking || '';
@@ -3891,6 +3930,7 @@ async function renderWeatherJMA(meta){
     document.getElementById('modalSheet').classList.add('active');
     showSheetSplash(item);
 
+/*
     // === menu pill click + 喇叭 click：事件委派（只綁一次）===
     // document.getElementById('modalSheet')?.addEventListener('click', (e) => {
     //   const speakBtn = e.target.closest?.('.menuSpeak');
@@ -3911,9 +3951,11 @@ async function renderWeatherJMA(meta){
     //   const m = window.__activeModalItem?.menu?.[idx];
     //   if(m) openMenuCard(m);
     // });
+*/
 
   }
 
+/*
   // function openRouteMap(ev, idx){
   //   ev?.stopPropagation?.();
 
@@ -3939,6 +3981,7 @@ async function renderWeatherJMA(meta){
   //     'noopener'
   //   );
   // }
+*/
   function openRouteMap(ev, idx){
     ev?.stopPropagation?.();
     const item = currentDayData?.items?.[idx];
@@ -3946,7 +3989,8 @@ async function renderWeatherJMA(meta){
 
     const r = item.route;
     const tm = travelModeForRoute(r.mode);
-//    window.open(`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(r.from||'')}&destination=${encodeURIComponent(r.to||'')}&travelmode=${tm}`, '_blank', 'noopener');
+/*     window.open(`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(r.from||'')}&destination=${encodeURIComponent(r.to||'')}&travelmode=${tm}`,
+	    '_blank', 'noopener'); */
     window.open(`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(r.from||'')}&destination=${encodeURIComponent(r.to||'')}&travelmode=${tm}`, '_blank', 'noopener');
   }
 
@@ -3959,18 +4003,18 @@ async function renderWeatherJMA(meta){
     const overlay = document.getElementById('modalOverlay');
     const sheet   = document.getElementById('modalSheet');
 
-    // ✅ 避免拖曳關閉時殘留 inline style 造成 transitionend 怪怪的
+/*      ✅ 避免拖曳關閉時殘留 inline style 造成 transitionend 怪怪的 */
     overlay.style.opacity = '';
     sheet.style.transition = '';
     sheet.style.transform  = '';
     hideSheetSplash();
     
 
-    // 先讓 sheet 開始下滑
+/*      先讓 sheet 開始下滑 */
     sheet.classList.remove('active');
     closeMenuCard();
 
-    // ✅ overlay 先淡出/先不擋視覺（你就不會覺得「多蓋一層灰」）
+/*      ✅ overlay 先淡出/先不擋視覺（你就不會覺得「多蓋一層灰」） */
     overlay.classList.remove('active');
 
     const done = ()=>{
@@ -3978,7 +4022,7 @@ async function renderWeatherJMA(meta){
       __closingModal = false;
     };
 
-    // ✅ 保險：transitionend 有時候會不觸發（或被重排打斷）
+/*      ✅ 保險：transitionend 有時候會不觸發（或被重排打斷） */
     const onEnd = (e)=>{
       if(e.target !== sheet) return;
       sheet.removeEventListener('transitionend', onEnd);
@@ -3987,7 +4031,7 @@ async function renderWeatherJMA(meta){
 
     sheet.addEventListener('transitionend', onEnd);
 
-    // fallback（比你的 .18s 稍長一點就好）
+/*      fallback（比你的 .18s 稍長一點就好） */
     setTimeout(()=>{
       sheet.removeEventListener('transitionend', onEnd);
       done();
@@ -4033,7 +4077,7 @@ async function renderWeatherJMA(meta){
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'ja-JP';
 
-    // 嘗試挑 ja-JP voice（有的瀏覽器要 voiceschanged 後才拿得到）
+/*      嘗試挑 ja-JP voice（有的瀏覽器要 voiceschanged 後才拿得到） */
     const pickVoice = () => {
       const vs = window.speechSynthesis.getVoices?.() || [];
       const v = vs.find(v => (v.lang||'').toLowerCase().startsWith('ja'));
@@ -4048,11 +4092,11 @@ async function renderWeatherJMA(meta){
 
 
 
-  // ===== Modal drag to close =====
+/*    ===== Modal drag to close ===== */
   (function initModalDrag(){
     const sheet   = document.getElementById('modalSheet');
     const overlay = document.getElementById('modalOverlay');
-    const handle  = document.querySelector('.modal-header'); // 或改成 .modal-drag-handle
+    const handle  = document.querySelector('.modal-header');  /* 或改成 .modal-drag-handle */
 
     if(!sheet || !overlay || !handle) return;
 
@@ -4063,15 +4107,15 @@ async function renderWeatherJMA(meta){
     function setTranslate(y){
       sheet.style.transform = `translateX(-50%) translateY(${y}px)`;
       sheet.style.transition = 'none';
-      // 讓遮罩跟著變淡（可選）
+/*        讓遮罩跟著變淡（可選） */
       const k = Math.max(0, 1 - y / 280);
       overlay.style.opacity = (0.38 * k).toFixed(3);
     }
 
     function reset(){
       sheet.style.transition = '';
-      sheet.style.transform = '';       // 交回給 .active 的 transform
-      overlay.style.opacity = '';       // 交回給 CSS
+      sheet.style.transform = '';        /* 交回給 .active 的 transform */
+      overlay.style.opacity = '';        /* 交回給 CSS */
     }
 
     
@@ -4086,7 +4130,7 @@ async function renderWeatherJMA(meta){
 
     handle.addEventListener('pointermove', (e)=>{
       if(!dragging) return;
-      dy = Math.max(0, e.clientY - startY); // 只允許往下拖
+      dy = Math.max(0, e.clientY - startY);  /* 只允許往下拖 */
       setTranslate(dy);
     });
 
@@ -4095,12 +4139,12 @@ async function renderWeatherJMA(meta){
       dragging = false;
       sheet.releasePointerCapture?.(e.pointerId);
 
-      // 拖超過門檻就關掉，否則彈回
+/*        拖超過門檻就關掉，否則彈回 */
       if(dy > 120){
         reset();
         closeModal();
       }else{
-        // 彈回原位
+/*          彈回原位 */
         sheet.style.transition = 'transform .18s cubic-bezier(.16,1,.3,1)';
         sheet.style.transform  = 'translateX(-50%) translateY(0)';
         overlay.style.opacity  = '0.38';
@@ -4121,7 +4165,7 @@ async function renderWeatherJMA(meta){
     window.open(url, '_blank', 'noopener');
   }
 
-  // ====== 住宿/航班/記帳（沿用你原本邏輯） ======
+/*    ====== 住宿/航班/記帳（沿用你原本邏輯） ====== */
   function renderHotels() {
     document.getElementById('hotelList').innerHTML = (HOTELS || []).map(h => {
       const dateText = h.stay ? `${h.stay.from} - ${h.stay.to}` : '';
@@ -4189,12 +4233,12 @@ async function renderWeatherJMA(meta){
     }).join('');
   }
 
-  // ====== 記帳（支援：參與者多選 / 行中 vs 預付） ======
+/*    ====== 記帳（支援：參與者多選 / 行中 vs 預付） ====== */
   let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
   let curParticipants = new Set();
-  let curExpenseType = 'trip'; // 'trip' | 'prepaid'
+  let curExpenseType = 'trip';  /* 'trip' | 'prepaid' */
 
-  // 兼容舊資料（沒有 participants/type 時補上）
+/*    兼容舊資料（沒有 participants/type 時補上） */
   function normalizeExpenses(){
     expenses = (Array.isArray(expenses) ? expenses : []).map(e => {
       const payer = (e?.payer || users[0] || 'L');
@@ -4223,7 +4267,7 @@ async function renderWeatherJMA(meta){
 
   function toggleParticipant(u){
     if(curParticipants.has(u)){
-      // 至少留 1 個
+/*        至少留 1 個 */
       if(curParticipants.size <= 1) return;
       curParticipants.delete(u);
     }else{
@@ -4233,17 +4277,17 @@ async function renderWeatherJMA(meta){
   }
 
   function renderExpenseUI() {
-    // 初始化 participants：預設全選
+/*      初始化 participants：預設全選 */
     if(curParticipants.size === 0){
       users.forEach(u => curParticipants.add(u));
     }
 
-    // payer tabs
+/*      payer tabs */
     document.getElementById('payerSwitch').innerHTML = users.map(u =>
       `<div class="user-tab ${u===curPayer?'active':''}" onclick="curPayer='${u}'; renderExpenseUI();">${escapeHtml(u)}</div>`
     ).join('');
 
-    // type segmented
+/*      type segmented */
     const typeEl = document.getElementById('expTypeSwitch');
     if(typeEl){
       typeEl.querySelectorAll('.seg-btn').forEach(btn => {
@@ -4252,7 +4296,7 @@ async function renderWeatherJMA(meta){
       });
     }
 
-    // participants chips
+/*      participants chips */
     const partEl = document.getElementById('partSwitch');
     if(partEl){
       partEl.innerHTML = users.map(u => {
@@ -4263,7 +4307,7 @@ async function renderWeatherJMA(meta){
       }).join('');
     }
 
-    // list
+/*      list */
     const listEl = document.getElementById('expenseList');
     if(listEl){
       listEl.innerHTML = expenses
@@ -4293,7 +4337,7 @@ async function renderWeatherJMA(meta){
         }).join('');
     }
 
-    // balances
+/*      balances */
     let bal = {};
     users.forEach(u => bal[u]=0);
 
@@ -4301,10 +4345,10 @@ async function renderWeatherJMA(meta){
       const parts = Array.isArray(e.participants) && e.participants.length ? e.participants : users;
       const share = e.cost / parts.length;
 
-      // payer 先拿回全部
+/*        payer 先拿回全部 */
       if(users.includes(e.payer)) bal[e.payer] += e.cost;
 
-      // 參與者分攤
+/*        參與者分攤 */
       parts.forEach(u => {
         if(users.includes(u)) bal[u] -= share;
       });
@@ -4322,7 +4366,7 @@ async function renderWeatherJMA(meta){
       }).join('');
     }
 
-    // summary
+/*      summary */
     const sumEl = document.getElementById('expenseSummary');
     if(sumEl){
       const totalAll = expenses.reduce((a,e)=>a+Number(e.cost||0),0);
@@ -4355,7 +4399,7 @@ async function renderWeatherJMA(meta){
     if(!name || !Number.isFinite(cost) || cost<=0) return alert('請輸入正確項目與金額');
     if(participants.length<=0) return alert('請至少選一位分攤成員');
   
-    // 建立資料物件
+/*      建立資料物件 */
     const newExp = {
       name,
       cost: Math.round(cost),
@@ -4365,14 +4409,14 @@ async function renderWeatherJMA(meta){
       ts: Date.now()
     };
   
-    // 1. 先更新本地 UI (讓使用者感覺反應很快)
+/*      1. 先更新本地 UI (讓使用者感覺反應很快) */
     expenses.push(newExp);
     localStorage.setItem('expenses', JSON.stringify(expenses));
     document.getElementById('exName').value = '';
     document.getElementById('exCost').value = '';
     renderExpenseUI();
   
-    // 2. 傳送到雲端
+/*      2. 傳送到雲端 */
     cloudPost("addExpense", newExp);
   }
 
@@ -4380,24 +4424,24 @@ async function renderWeatherJMA(meta){
     const t = Number(ts);
     if (!Number.isFinite(t)) return;
   
-    // 1. 使用確認對話框 (優化語氣)
+/*      1. 使用確認對話框 (優化語氣) */
     if (!confirm('確定要永久刪除這筆紀錄嗎？此動作將同步移除雲端資料。')) return;
   
-    // 2. 本地資料過濾
+/*      2. 本地資料過濾 */
     const index = expenses.findIndex(e => Number(e.ts) === t);
     if (index === -1) return;
   
-    // 備份一份資料，萬一失敗可以回滾 (BIOS 工程師習慣的備援機制)
+/*      備份一份資料，萬一失敗可以回滾 (BIOS 工程師習慣的備援機制) */
     const deletedItem = expenses[index];
     
-    // 先從本地陣列移除
+/*      先從本地陣列移除 */
     expenses.splice(index, 1);
     localStorage.setItem('expenses', JSON.stringify(expenses));
     
-    // 3. 立即刷新 UI (Optimistic UI 更新，讓使用者感覺很快)
+/*      3. 立即刷新 UI (Optimistic UI 更新，讓使用者感覺很快) */
     renderExpenseUI();
   
-    // 4. 同步至雲端
+/*      4. 同步至雲端 */
     fetch(G_API_URL, {
       method: "POST",
       mode: "no-cors",
@@ -4415,11 +4459,11 @@ async function renderWeatherJMA(meta){
   }
 
   
-  // ====== Desktop: wheel -> horizontal scroll for horizontal strips ======
+/*    ====== Desktop: wheel -> horizontal scroll for horizontal strips ====== */
   function enableWheelHorizontal(el){
     if(!el) return;
     el.addEventListener('wheel', (e)=>{
-      // 只在滑鼠停在可水平滾動區塊時，把滾輪轉成水平移動
+/*        只在滑鼠停在可水平滾動區塊時，把滾輪轉成水平移動 */
       if(Math.abs(e.deltaY) > Math.abs(e.deltaX)){
         e.preventDefault();
         el.scrollLeft += e.deltaY;
@@ -4427,7 +4471,7 @@ async function renderWeatherJMA(meta){
     }, { passive:false });
   }
 
-// utils
+/*  utils */
   function escapeHtml(str){
     return String(str ?? '').replace(/[&<>"']/g, m => ({
       '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
@@ -4456,7 +4500,7 @@ async function renderWeatherJMA(meta){
     u.rate = 0.95;
     u.pitch = 1.0;
 
-    // 嘗試挑 ja-JP voice
+/*      嘗試挑 ja-JP voice */
     const voices = speechSynthesis.getVoices?.() || [];
     const ja = voices.find(v => (v.lang||'').toLowerCase().startsWith('ja'));
     if(ja) u.voice = ja;
@@ -4465,7 +4509,7 @@ async function renderWeatherJMA(meta){
     speechSynthesis.speak(u);
   }
 
-  // 確保 menu card 的 DOM 存在
+/*    確保 menu card 的 DOM 存在 */
   function ensureMenuCardUI(){
     if(document.getElementById('menuCardOverlay')) return;
 
@@ -4552,8 +4596,8 @@ async function renderWeatherJMA(meta){
   function lockBodyScroll(){
     __scrollY = window.scrollY || 0;
 
-    // iOS 最穩：把 body 固定住
-    document.body.classList.add('body-no-scroll'); // 你原本那個 class 可以留著
+/*      iOS 最穩：把 body 固定住 */
+    document.body.classList.add('body-no-scroll'); /*  你原本那個 class 可以留著 */
     document.body.style.position = 'fixed';
     document.body.style.top = `-${__scrollY}px`;
     document.body.style.left = '0';
@@ -4573,9 +4617,9 @@ async function renderWeatherJMA(meta){
   }
 
   function bindLongPressSelection() {
-    // 選取所有非路徑的行程項目
-//     const items = document.querySelectorAll('.timeline-item:not(.route-item)');
-    // ✅ 修正 1：移除 :not(.route-item)，讓路徑卡片也能長壓進入編輯模式
+/*      選取所有非路徑的行程項目 */
+/*      const items = document.querySelectorAll('.timeline-item:not(.route-item)'); */
+/*      ✅ 修正 1：移除 :not(.route-item)，讓路徑卡片也能長壓進入編輯模式 */
     const items = document.querySelectorAll('.timeline-item');
     
     items.forEach(el => {
@@ -4583,11 +4627,12 @@ async function renderWeatherJMA(meta){
       let isLongPress = false;
       let startPos = { x: 0, y: 0 };
   
-      // 攔截系統選單中斷
+/*        攔截系統選單中斷 */
       el.oncontextmenu = (e) => {
         if (!__tlEditMode) e.preventDefault(); 
       };
   
+/*
 //       const start = (e) => {
 //         if (__tlEditMode) return; 
 //         
@@ -4600,47 +4645,50 @@ async function renderWeatherJMA(meta){
 //           triggerEditMode(el);
 //         }, 700); 
 //       };
-    // ✅ 修改：將原始事件 e 傳入 triggerEditMode
+*/
+/*      ✅ 修改：將原始事件 e 傳入 triggerEditMode */
     const start = (e) => {
       if (__tlEditMode) return; 
       
       isLongPress = false;
       startPos = { x: e.clientX, y: e.clientY };
       
-      // 啟動 700ms 定時器
+/*        啟動 700ms 定時器 */
       pressTimer = setTimeout(() => {
         isLongPress = true;
-        triggerEditMode(el, e); // 👈 這裡多傳入 e
+        triggerEditMode(el, e);  /* 👈 這裡多傳入 e */
       }, 700); 
     };
   
       const cancel = (e) => {
         clearTimeout(pressTimer);
         
-        // 如果不是長壓，且是正常放開指針，則視為「點擊」打開 Modal
+/*          如果不是長壓，且是正常放開指針，則視為「點擊」打開 Modal */
         if (!isLongPress && e.type === 'pointerup') {
-          // 檢查位移，避免滑動時意外開啟 Modal
+/*            檢查位移，避免滑動時意外開啟 Modal */
           const dist = Math.hypot(e.clientX - startPos.x, e.clientY - startPos.y);
           if (dist < 10) {
             const idx = el.dataset.idx;
-//             openModal(idx);
+/*              openModal(idx); */
             if (idx !== undefined) openModal(idx);
           }
         }
       };
   
-      // 如果移動距離過大（在滑動網頁），則取消長壓偵測
+/*        如果移動距離過大（在滑動網頁），則取消長壓偵測 */
       const move = (e) => {
         const dist = Math.hypot(e.clientX - startPos.x, e.clientY - startPos.y);
-//         if (dist > 10) clearTimeout(pressTimer);
-        // ✅ 關鍵：提高「取消長壓」的門檻到 30px
-        // 只要手指移動超過 30 像素，就判定使用者是在「滑動網頁」，立刻殺掉定時器
+/*          if (dist > 10) clearTimeout(pressTimer); */
+/*
+         ✅ 關鍵：提高「取消長壓」的門檻到 30px
+         只要手指移動超過 30 像素，就判定使用者是在「滑動網頁」，立刻殺掉定時器
+*/
         if (dist > 20) {
           clearTimeout(pressTimer);
         }
       };
   
-      // 綁定所有指針事件
+/*        綁定所有指針事件 */
       el.addEventListener('pointerdown', start);
       el.addEventListener('pointerup', cancel);
       el.addEventListener('pointermove', move);
@@ -4648,16 +4696,17 @@ async function renderWeatherJMA(meta){
     });
   }
 
-  // ✅ 新增：統一的歷史紀錄推送函式
+/*    ✅ 新增：統一的歷史紀錄推送函式 */
   function pushHistory() {
     if (currentDayData && currentDayData.items) {
       __editHistory.push(JSON.parse(JSON.stringify(currentDayData.items)));
-      // 限制 Stack 大小為 10 步
+/*        限制 Stack 大小為 10 步 */
       if (__editHistory.length > 10) __editHistory.shift();
       console.log("已紀錄歷史狀態，當前步數:", __editHistory.length);
     }
   }
 
+/*
 //   function triggerEditMode(targetEl) {
 //     if (navigator.vibrate) navigator.vibrate(50); // 觸覺回饋
 //     
@@ -4764,10 +4813,11 @@ async function renderWeatherJMA(meta){
 //         setTimeout(() => content.style.transform = "", 200);
 //       }
 //     }
+*/
     function triggerEditMode(targetEl, originalEvent) {
       if (navigator.vibrate) navigator.vibrate(50); 
       
-      // ✅ 新增：立即鎖定觸控行為，防止瀏覽器在移交事件時跳回捲動模式
+/*        ✅ 新增：立即鎖定觸控行為，防止瀏覽器在移交事件時跳回捲動模式 */
       targetEl.style.touchAction = 'none';
 
       const oldTop = targetEl.getBoundingClientRect().top;
@@ -4784,12 +4834,14 @@ async function renderWeatherJMA(meta){
 
       renderTimelineToolbar(itineraryIndex[currentDayIdx]);
       
-      // ✅ 修正 3：先初始化 SortableJS
+/*        ✅ 修正 3：先初始化 SortableJS */
       enableTimelineSortable();
       
-      // ✅ 修正 4：使用 requestAnimationFrame 確保位移補償生效後再移交事件
-      // 並移除原本重複的 _onTapStart 呼叫
-//      requestAnimationFrame(() => {
+/*
+       ✅ 修正 4：使用 requestAnimationFrame 確保位移補償生效後再移交事件
+       並移除原本重複的 _onTapStart 呼叫
+*/
+/*       requestAnimationFrame(() => { */
           if (__tlSortable && originalEvent) {
               try {
                   __tlSortable._onTapStart(originalEvent);
@@ -4797,9 +4849,9 @@ async function renderWeatherJMA(meta){
                   console.warn("事件移交失敗");
               }
           }
-//      });
+/*       }); */
     
-      // 視覺提示：同時相容一般卡片與路徑卡片
+/*        視覺提示：同時相容一般卡片與路徑卡片 */
       const visualTarget = targetEl.querySelector('.tl-content, .route-strip');
       if (visualTarget) {
         visualTarget.style.transition = "transform 0.2s";
@@ -4808,7 +4860,7 @@ async function renderWeatherJMA(meta){
       }
     }
 
-  // 在你的 script 結尾加入
+/*    在你的 script 結尾加入 */
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
       console.log("偵測到回到網頁，啟動同步...");
