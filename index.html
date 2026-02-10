@@ -1850,8 +1850,8 @@
       border:1px solid rgba(233,225,214,.9);
       box-shadow:0 10px 22px rgba(0,0,0,.06);
     }
-    .tl-tool-left{ display:flex; gap:8px; align-items:center; }
-    .tl-tool-right{ display:flex; gap:8px; align-items:center; }
+    .tl-tool-left{ display:flex; gap:6px; align-items:center; }
+    .tl-tool-right{ display:flex; gap:6px; align-items:center; }
     .tl-btn{
       appearance:none;
       border:none;
@@ -1903,7 +1903,7 @@
       white-space:nowrap;
     }
     .mini-btn.danger{ background: rgba(255,64,64,.10); border-color: rgba(255,64,64,.25); color:#B42318; }
-//    .timeline-item.is-dragging .tl-content{ box-shadow:0 22px 44px rgba(0,0,0,.14); transform: rotate(-.35deg) scale(1.01); }
+    /* .timeline-item.is-dragging .tl-content{ box-shadow:0 22px 44px rgba(0,0,0,.14); transform: rotate(-.35deg) scale(1.01); } */
     /* ✅ 新增：讓路徑物件在拖曳時也有視覺反饋 */
     .timeline-item.is-dragging .tl-content,
     .timeline-item.is-dragging .route-strip {
@@ -2297,14 +2297,32 @@
           // 更新 LocalStorage 與 快取
           localStorage.setItem(key, JSON.stringify({ items: itemsArray }));
           
-          if (file === currentFile) {
-            // 確保將快取中的 items 設為正確的陣列
-            dayCache[currentDayIdx] = { ...dayCache[currentDayIdx], items: itemsArray };
-            currentDayData = dayCache[currentDayIdx];
+          // if (file === currentFile) {
+          //   // 確保將快取中的 items 設為正確的陣列
+          //   dayCache[currentDayIdx] = { ...dayCache[currentDayIdx], items: itemsArray };
+          //   currentDayData = dayCache[currentDayIdx];
             
+          //   if (document.getElementById('page-itinerary').classList.contains('active')) {
+          //     renderTimelineList(currentDayData);
+          //     if (typeof enableTimelineSortable === 'function') enableTimelineSortable();
+          //   }
+          // }
+          if (cloudData.itineraryEdits) {
+            Object.keys(cloudData.itineraryEdits).forEach(file => {
+              const key = `day_edits_${file}`;
+              const editData = cloudData.itineraryEdits[file];
+              const itemsArray = Array.isArray(editData) ? editData : (editData.items || []);
+              localStorage.setItem(key, JSON.stringify({ items: itemsArray }));
+            });
+
+            // 如果目前就在行程頁，重繪當天（用 applyDayEdits 套用最新 localStorage）
             if (document.getElementById('page-itinerary').classList.contains('active')) {
-              renderTimelineList(currentDayData);
-              if (typeof enableTimelineSortable === 'function') enableTimelineSortable();
+              const meta = itineraryIndex[currentDayIdx];
+              if (dayCache[currentDayIdx]) {
+                currentDayData = applyDayEdits(dayCache[currentDayIdx], meta);
+                renderTimelineList(currentDayData);
+                if (__tlEditMode) enableTimelineSortable();
+              }
             }
           }
         });
@@ -2947,11 +2965,23 @@
         if (!meta) return;
     
         // 載入資料
-        if (!dayCache[idx]) {
-          const url = `./${meta.file}?v=1.0.0`;
+        // if (!dayCache[idx]) {
+        //   const url = `./${meta.file}?v=${Date.now()}`;
+        //   const raw = await fetch(url).then(r => r.json());
+        //   dayCache[idx] = Array.isArray(raw) ? raw[0] : raw;
+        // }
+
+        const needFetch =
+          !dayCache[idx] ||
+          (!Array.isArray(dayCache[idx]?.photos) || dayCache[idx].photos.length === 0) ||
+          (dayCache[idx]?.items && !dayCache[idx]?.route && !dayCache[idx]?.loc); // 依你資料型態自行微調
+
+        if (needFetch) {
+          const url = `./${meta.file}?v=${Date.now()}`;
           const raw = await fetch(url).then(r => r.json());
           dayCache[idx] = Array.isArray(raw) ? raw[0] : raw;
         }
+
     
         // 應用編輯 (本地與雲端緩存)
         currentDayData = applyDayEdits(dayCache[idx], meta);
@@ -3210,7 +3240,7 @@
       saveDayEdits();
       renderTimelineList(currentDayData);
       enableTimelineSortable();
-    });
+    }, true);
 
 
   // ====== Google 導航：優先 geo，其次 addr/title ======

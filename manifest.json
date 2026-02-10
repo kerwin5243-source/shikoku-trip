@@ -1,0 +1,14 @@
+{
+  "name": "2026 四國巡禮",
+  "short_name": "四國巡禮",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F6F3EE",
+  "theme_color": "#F6F3EE",
+  "icons": [
+    { "src": "/icon/pwa-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon/pwa-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon/pwa-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
