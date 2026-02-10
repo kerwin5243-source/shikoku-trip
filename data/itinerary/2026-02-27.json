@@ -5,10 +5,10 @@
     "loc": "高松",
     "hotel_id": "H1",
     "photos": [
-      { "src": "/photos/day1/01.png", "loc": "", "caption": "" },
-      { "src": "/photos/day1/02.jpg", "loc": "Yadon", "caption": "" },
-      { "src": "/photos/day1/03.jpg", "loc": "金刀比羅宮", "caption": "一生必來一次!" },
-      { "src": "/photos/day1/04.jpg", "loc": "AEON 高松", "caption": "" }
+      { "src": "./photos/day1/01.png", "loc": "", "caption": "" },
+      { "src": "./photos/day1/02.jpg", "loc": "Yadon", "caption": "" },
+      { "src": "./photos/day1/03.jpg", "loc": "金刀比羅宮", "caption": "一生必來一次!" },
+      { "src": "./photos/day1/04.jpg", "loc": "AEON 高松", "caption": "" }
     ],
     "items": [
       {
