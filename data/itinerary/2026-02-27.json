@@ -5,10 +5,26 @@
     "loc": "高松",
     "hotel_id": "H1",
     "photos": [
-      { "src": "/photos/day1/01.png", "loc": "", "caption": "" },
-      { "src": "/photos/day1/02.jpg", "loc": "Yadon", "caption": "" },
-      { "src": "/photos/day1/03.jpg", "loc": "金刀比羅宮", "caption": "一生必來一次" },
-      { "src": "/photos/day1/04.jpg", "loc": "AEON 高松", "caption": "" }
+        {
+          "src": "/photos/day1/01.png",
+          "loc": "",
+          "caption": ""
+        },
+        {
+          "src": "/photos/day1/02.jpg",
+          "loc": "Yadon",
+          "caption": ""
+        },
+        {
+          "src": "/photos/day1/03.jpg",
+          "loc": "金刀比羅宮",
+          "caption": "一生必來一次!"
+        },
+        {
+          "src": "/photos/day1/04.jpg",
+          "loc": "AEON 高松",
+          "caption": ""
+        }
     ],
     "items": [
       {
@@ -131,7 +147,7 @@
         "tag": "food",
         "subtag": "拉麵",
         "desc": "烏龍麵＋關東煮 香川第一碗",
-        "detail": "🌟 Tabelog：3.61 \n必吃：\n- 鍋焼うどん（鳥肉）：招牌推薦，鐵鍋上桌超有記憶點\n- 牛たまうどん：蛋＋牛肉的滿足系\n- おでん（関東煮）：很多人會先拿幾串再等烏龍麵上桌",
+        "detail": "食べログ( Tabelog )：🌟 3.61 \n必吃：\n- 鍋焼うどん（鳥肉）：招牌推薦，鐵鍋上桌超有記憶點\n- 牛たまうどん：蛋＋牛肉的滿足系\n- おでん（関東煮）：很多人會先拿幾串再等烏龍麵上桌",
         "addr": "香川県高松市香南町岡1358-1",
         "mapcode": "60 212 057*81",
         "parking": "餐廳停車場",
