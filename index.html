@@ -2981,8 +2981,18 @@
 /*          UI 更新 (Active Date Chip) */
         document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
         const chip = document.getElementById('chip-' + idx);
-        if (chip) chip.classList.add('active');
-    
+/*         if (chip) chip.classList.add('active'); */
+        if (chip) {
+            chip.classList.add('active');
+
+            /* ✅ 新增：將所選日期置中捲動的邏輯 */
+            const scroller = document.getElementById('dayScroller');
+            if (scroller) {
+                const scrollPos = chip.offsetLeft - (scroller.clientWidth / 2) + (chip.clientWidth / 2);
+                scroller.scrollTo({ left: scrollPos, behavior: 'smooth' });
+            }
+        } 
+
         const meta = itineraryIndex[idx];
         if (!meta) return;
     
