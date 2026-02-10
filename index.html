@@ -2948,7 +2948,7 @@
     
         // 載入資料
         if (!dayCache[idx]) {
-          const url = `./${meta.file}?v=1.0.1`;
+          const url = `./${meta.file}?v=${Date.now()}`;
           const raw = await fetch(url).then(r => r.json());
           dayCache[idx] = Array.isArray(raw) ? raw[0] : raw;
         }
