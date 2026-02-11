@@ -4476,14 +4476,18 @@ async function renderWeatherJMA(meta){
       expenses.push(expData);
     }
   
-/*      1. 先更新本地 UI (讓使用者感覺反應很快) */
+    /*      1. 先更新本地 UI (讓使用者感覺反應很快) */
     localStorage.setItem('expenses', JSON.stringify(expenses));
     document.getElementById('exName').value = '';
     document.getElementById('exCost').value = '';
     renderExpenseUI();
   
-/*      2. 傳送到雲端 */
+    /*      2. 傳送到雲端 */
     cloudPost("addExpense", expData);
+    // 清空輸入框
+    document.getElementById('exName').value = '';
+    document.getElementById('exCost').value = '';
+
   }
 
   /* 💡 新增：啟動編輯模式的 Function */
@@ -4499,9 +4503,13 @@ async function renderWeatherJMA(meta){
     curExpenseType = e.type || 'trip';
     curParticipants = new Set(e.participants);
     
-    // 切換 UI 狀態
-    document.getElementById('submitExpBtn').innerText = "更新紀錄 (取消請重整)";
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // 捲回頂部方便修改
+    // 💡 修正 1：變更按鈕文字以提供回饋
+    const btn = document.querySelector('#page-money .btn');
+    if(btn) btn.innerText = "更新紀錄 (取消請重整)";
+    
+    // 💡 修正 2：確保頁面捲回「新增支出」的區塊
+    // 如果你有使用 header 或 padding，捲動到 0 或是該 Card 的位置
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     renderExpenseUI();
   }
 
