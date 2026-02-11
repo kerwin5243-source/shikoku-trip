@@ -1998,9 +1998,13 @@
   <div id="page-money" class="page">
     <div class="card">
       <div class="section-title">新增支出</div>
+      <div class="seg" id="currencySwitch" style="margin-bottom: 12px;">
+        <div class="seg-btn active" data-curr="JPY" onclick="setCurrency('JPY')">日幣 (¥)</div>
+        <div class="seg-btn" data-curr="TWD" onclick="setCurrency('TWD')">台幣 ($)</div>
+      </div>
       <div style="display:flex; gap:10px; margin-bottom:15px;">
         <input type="text" id="exName" placeholder="項目 (例: 晚餐)" style="padding:12px; border:1px solid rgba(233,225,214,.9); border-radius:14px; flex:1; background:rgba(255,255,255,.8);">
-        <input type="number" id="exCost" placeholder="金額 (¥)" style="padding:12px; border:1px solid rgba(233,225,214,.9); border-radius:14px; width:110px; background:rgba(255,255,255,.8);">
+        <input type="number" id="exCost" placeholder="金額" style="padding:12px; border:1px solid rgba(233,225,214,.9); border-radius:14px; width:110px; background:rgba(255,255,255,.8);">
       </div>
       <div class="user-tabs" id="payerSwitch" style="background:rgba(233,225,214,.9); margin-bottom:15px;"></div>
 
@@ -4013,18 +4017,18 @@ async function renderWeatherJMA(meta){
     const overlay = document.getElementById('modalOverlay');
     const sheet   = document.getElementById('modalSheet');
 
-/*      ✅ 避免拖曳關閉時殘留 inline style 造成 transitionend 怪怪的 */
+    /*      ✅ 避免拖曳關閉時殘留 inline style 造成 transitionend 怪怪的 */
     overlay.style.opacity = '';
     sheet.style.transition = '';
     sheet.style.transform  = '';
     hideSheetSplash();
     
 
-/*      先讓 sheet 開始下滑 */
+    /*      先讓 sheet 開始下滑 */
     sheet.classList.remove('active');
     closeMenuCard();
 
-/*      ✅ overlay 先淡出/先不擋視覺（你就不會覺得「多蓋一層灰」） */
+    /*      ✅ overlay 先淡出/先不擋視覺（你就不會覺得「多蓋一層灰」） */
     overlay.classList.remove('active');
 
     const done = ()=>{
@@ -4032,7 +4036,7 @@ async function renderWeatherJMA(meta){
       __closingModal = false;
     };
 
-/*      ✅ 保險：transitionend 有時候會不觸發（或被重排打斷） */
+    /*      ✅ 保險：transitionend 有時候會不觸發（或被重排打斷） */
     const onEnd = (e)=>{
       if(e.target !== sheet) return;
       sheet.removeEventListener('transitionend', onEnd);
@@ -4041,11 +4045,32 @@ async function renderWeatherJMA(meta){
 
     sheet.addEventListener('transitionend', onEnd);
 
-/*      fallback（比你的 .18s 稍長一點就好） */
+    /*      fallback（比你的 .18s 稍長一點就好） */
     setTimeout(()=>{
       sheet.removeEventListener('transitionend', onEnd);
       done();
     }, 260);
+  }
+
+
+  function showUserDetail(userName) {
+    const userExpenses = expenses.filter(e => e.payer === userName || e.participants.includes(userName));
+    let html = `<div style="padding:10px;">`;
+    userExpenses.forEach(e => {
+      const isPayer = e.payer === userName;
+      const symbol = e.currency === 'TWD' ? '$' : '¥';
+      html += `<div style="margin-bottom:10px; border-bottom:1px dashed #DDD; padding-bottom:5px;">
+        <div style="font-weight:800;">${e.name} (${e.currency})</div>
+        <div style="font-size:0.85rem; color:#666;">${isPayer ? '你付了' : '你分攤'} ${symbol}${e.cost}</div>
+      </div>`;
+    });
+    html += `</div>`;
+
+    // 填入您現有的 Modal
+    document.getElementById('modalSticky').innerHTML = `<div class="modal-title">${userName} 的個人明細</div>`;
+    document.getElementById('modalBody').innerHTML = html;
+    document.getElementById('modalOverlay').classList.add('active');
+    document.getElementById('modalSheet').classList.add('active');
   }
 
 
@@ -4245,8 +4270,12 @@ async function renderWeatherJMA(meta){
 
 /*    ====== 記帳（支援：參與者多選 / 行中 vs 預付） ====== */
   let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+  let curCurrency = 'JPY';  // 預設日幣
+  const JPY_TWD_RATE = 0.21; // 您可以根據需求修改匯率
+  let editingTs = null;      // 追蹤是否正在編輯
   let curParticipants = new Set();
   let curExpenseType = 'trip';  /* 'trip' | 'prepaid' */
+  
 
 /*    兼容舊資料（沒有 participants/type 時補上） */
   function normalizeExpenses(){
@@ -4287,17 +4316,17 @@ async function renderWeatherJMA(meta){
   }
 
   function renderExpenseUI() {
-/*      初始化 participants：預設全選 */
+    /*      初始化 participants：預設全選 */
     if(curParticipants.size === 0){
       users.forEach(u => curParticipants.add(u));
     }
 
-/*      payer tabs */
+    /*      payer tabs */
     document.getElementById('payerSwitch').innerHTML = users.map(u =>
       `<div class="user-tab ${u===curPayer?'active':''}" onclick="curPayer='${u}'; renderExpenseUI();">${escapeHtml(u)}</div>`
     ).join('');
 
-/*      type segmented */
+    /*      type segmented */
     const typeEl = document.getElementById('expTypeSwitch');
     if(typeEl){
       typeEl.querySelectorAll('.seg-btn').forEach(btn => {
@@ -4306,7 +4335,7 @@ async function renderWeatherJMA(meta){
       });
     }
 
-/*      participants chips */
+    /*      participants chips */
     const partEl = document.getElementById('partSwitch');
     if(partEl){
       partEl.innerHTML = users.map(u => {
@@ -4317,7 +4346,7 @@ async function renderWeatherJMA(meta){
       }).join('');
     }
 
-/*      list */
+    /*      list */
     const listEl = document.getElementById('expenseList');
     if(listEl){
       listEl.innerHTML = expenses
@@ -4327,6 +4356,7 @@ async function renderWeatherJMA(meta){
           const parts = Array.isArray(e.participants) && e.participants.length ? e.participants : users;
           const typeLabel = e.type === 'prepaid' ? '預付' : '行中';
           const typeCls = e.type === 'prepaid' ? 'prepaid' : 'trip';
+          const symbol = e.currency === 'TWD' ? '$' : '¥';
           return `
             <div style="display:flex; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid rgba(233,225,214,.8);">
               <div style="min-width:0;">
@@ -4338,6 +4368,11 @@ async function renderWeatherJMA(meta){
                   ${escapeHtml(e.payer)} 付款 · 分攤：${escapeHtml(parts.join('、'))}
                 </div>
               </div>
+              <div style="font-weight:900;">${symbol}${e.cost}</div>
+              <div style="display:flex; gap:10px;">
+                <span style="color:var(--accent); cursor:pointer;" onclick="startEdit(${e.ts})">編輯</span>
+                <span style="color:#B42318; cursor:pointer;" onclick="delExpByTs(${e.ts})">刪除</span>
+              </div>
               <div style="text-align:right; flex:0 0 auto;">
                 <div style="font-weight:900;">¥${escapeHtml(String(e.cost))}</div>
                 <div style="font-size:0.8rem; color:#B42318; cursor:pointer; font-weight:900;" onclick="delExpByTs(${escapeHtml(String(e.ts))})">刪除</div>
@@ -4347,36 +4382,33 @@ async function renderWeatherJMA(meta){
         }).join('');
     }
 
-/*      balances */
-    let bal = {};
-    users.forEach(u => bal[u]=0);
+    // 修改計算 bal 的邏輯，拆成兩組
+    let balJPY = {}, balTWD = {};
+    users.forEach(u => { balJPY[u]=0; balTWD[u]=0; });
 
     expenses.forEach(e => {
-      const parts = Array.isArray(e.participants) && e.participants.length ? e.participants : users;
+      const parts = e.participants || users;
       const share = e.cost / parts.length;
+      const targetBal = (e.currency === 'TWD') ? balTWD : balJPY; // 💡 判斷要加到哪組
 
-/*        payer 先拿回全部 */
-      if(users.includes(e.payer)) bal[e.payer] += e.cost;
-
-/*        參與者分攤 */
-      parts.forEach(u => {
-        if(users.includes(u)) bal[u] -= share;
-      });
+      if(users.includes(e.payer)) targetBal[e.payer] += e.cost;
+      parts.forEach(u => { if(users.includes(u)) targetBal[u] -= share; });
     });
 
-    const debtEl = document.getElementById('debtList');
-    if(debtEl){
-      debtEl.innerHTML = users.map(u => {
-        let val = Math.round(bal[u]);
-        let color = val>=0 ? '#2F8F5B' : '#B42318';
-        return `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(233,225,214,.8); font-weight:900;">
-          <span>${escapeHtml(u)}</span>
-          <span style="color:${color}; font-weight:900;">${val>=0?'收':'付'} ¥${Math.abs(val)}</span>
+    // 渲染時顯示兩行
+    debtEl.innerHTML = users.map(u => {
+      return `
+        <div style="padding:10px 0; border-bottom:1px solid #EEE;" onclick="showUserDetail('${u}')">
+          <div style="font-weight:900; color:var(--primary); cursor:pointer;">👤 ${u} (點擊明細)</div>
+          <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
+            <span style="color:${balJPY[u]>=0?'#2F8F5B':'#B42318'}">日幣：${balJPY[u]>=0?'收':'付'} ¥${Math.abs(Math.round(balJPY[u]))}</span>
+            <span style="color:${balTWD[u]>=0?'#2F8F5B':'#B42318'}">台幣：${balTWD[u]>=0?'收':'付'} $${Math.abs(Math.round(balTWD[u]))}</span>
+          </div>
         </div>`;
-      }).join('');
-    }
+    }).join('');
+    
 
-/*      summary */
+    /*      summary */
     const sumEl = document.getElementById('expenseSummary');
     if(sumEl){
       const totalAll = expenses.reduce((a,e)=>a+Number(e.cost||0),0);
@@ -4416,8 +4448,20 @@ async function renderWeatherJMA(meta){
       payer: curPayer,
       participants,
       type: curExpenseType,
-      ts: Date.now()
+      currency: curCurrency, // 💡 紀錄這筆錢是日幣還是台幣
+      ts: editingTs || Date.now() // 💡 如果是編輯，延用舊的時間戳記
     };
+    if (editingTs) {
+      // 編輯模式：取代舊資料
+      const idx = expenses.findIndex(e => e.ts === editingTs);
+      if(idx !== -1) expenses[idx] = expData;
+      editingTs = null; // 重置
+      document.getElementById('submitExpBtn').innerText = "加入紀錄";
+    } 
+    else {
+      // 新增模式
+      expenses.push(newExp);
+    }
   
 /*      1. 先更新本地 UI (讓使用者感覺反應很快) */
     expenses.push(newExp);
@@ -4428,6 +4472,25 @@ async function renderWeatherJMA(meta){
   
 /*      2. 傳送到雲端 */
     cloudPost("addExpense", newExp);
+  }
+
+  /* 💡 新增：啟動編輯模式的 Function */
+  function startEdit(ts) {
+    const e = expenses.find(exp => exp.ts === ts);
+    if(!e) return;
+    
+    editingTs = ts;
+    document.getElementById('exName').value = e.name;
+    document.getElementById('exCost').value = e.cost;
+    curPayer = e.payer;
+    curCurrency = e.currency || 'JPY';
+    curExpenseType = e.type || 'trip';
+    curParticipants = new Set(e.participants);
+    
+    // 切換 UI 狀態
+    document.getElementById('submitExpBtn').innerText = "更新紀錄 (取消請重整)";
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // 捲回頂部方便修改
+    renderExpenseUI();
   }
 
   function delExpByTs(ts) {
