@@ -127,7 +127,7 @@ function doPost(e) {
       }
     }
 
-    // --- [動作 C]：更新勾選狀態 ---
+    // --- [動作 C]：更新勾選狀態 (個人清單 & 全員待辦)
     else if (action === "updateCheck" && d) {
       const dataRows = CHK_SHEET.getDataRange().getValues();
       let found = false;
@@ -140,7 +140,7 @@ function doPost(e) {
       if (!found) CHK_SHEET.appendRow([d.user, d.type, d.item, d.checked]);
     }
 
-    // --- [動作 D]：更新行程編輯 ---
+    // --- [動作 D]：更新行程編輯 (排序/時間修改) ---
     else if (action === "updateItinerary" && d.file) {
       const itinRows = ITIN_SHEET.getDataRange().getValues();
       let found = false;
@@ -153,7 +153,7 @@ function doPost(e) {
       if (!found) ITIN_SHEET.appendRow([d.file, JSON.stringify(d.items)]);
     }
 
-    // --- [動作 E]：重置行程 ---
+    // --- [動作 E]：重置行程為 Default (刪除異動紀錄) ---
     else if (action === "resetItinerary" && d.file) {
       const itinRows = ITIN_SHEET.getDataRange().getValues();
       for (let i = itinRows.length - 1; i >= 1; i--) {
