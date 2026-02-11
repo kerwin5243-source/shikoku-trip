@@ -4275,7 +4275,17 @@ async function renderWeatherJMA(meta){
   let editingTs = null;      // 追蹤是否正在編輯
   let curParticipants = new Set();
   let curExpenseType = 'trip';  /* 'trip' | 'prepaid' */
-  
+  /* 💡 在 curCurrency = 'JPY' 附近添加 */
+  function setCurrency(curr) {
+      curCurrency = curr;
+      // 更新按鈕 UI 高亮狀態
+      document.querySelectorAll('#currencySwitch .seg-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-curr') === curr);
+      });
+      // 重新渲染，這會讓輸入框或列表即時反應
+      renderExpenseUI(); 
+  }
+    
 
 /*    兼容舊資料（沒有 participants/type 時補上） */
   function normalizeExpenses(){
@@ -4357,6 +4367,9 @@ async function renderWeatherJMA(meta){
           const typeLabel = e.type === 'prepaid' ? '預付' : '行中';
           const typeCls = e.type === 'prepaid' ? 'prepaid' : 'trip';
           const symbol = e.currency === 'TWD' ? '$' : '¥';
+          const altSymbol = e.currency === 'TWD' ? '¥' : '$';
+          // 簡單換算邏輯
+          const altCost = e.currency === 'TWD' ? Math.round(e.cost / JPY_TWD_RATE) : Math.round(e.cost * JPY_TWD_RATE);
           return `
             <div style="display:flex; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid rgba(233,225,214,.8);">
               <div style="min-width:0;">
@@ -4368,14 +4381,13 @@ async function renderWeatherJMA(meta){
                   ${escapeHtml(e.payer)} 付款 · 分攤：${escapeHtml(parts.join('、'))}
                 </div>
               </div>
-              <div style="font-weight:900;">${symbol}${e.cost}</div>
-              <div style="display:flex; gap:10px;">
-                <span style="color:var(--accent); cursor:pointer;" onclick="startEdit(${e.ts})">編輯</span>
-                <span style="color:#B42318; cursor:pointer;" onclick="delExpByTs(${e.ts})">刪除</span>
-              </div>
               <div style="text-align:right; flex:0 0 auto;">
-                <div style="font-weight:900;">¥${escapeHtml(String(e.cost))}</div>
-                <div style="font-size:0.8rem; color:#B42318; cursor:pointer; font-weight:900;" onclick="delExpByTs(${escapeHtml(String(e.ts))})">刪除</div>
+                <div style="font-weight:900;">${symbol}${e.cost}</div>
+                <div style="font-size:0.75rem; color:#999; font-weight:700;">(${altSymbol}${altCost})</div>
+                <div style="font-size:0.8rem; margin-top:4px;">
+                  <span style="color:var(--accent); cursor:pointer; font-weight:900; margin-right:8px;" onclick="startEdit(${e.ts})">編輯</span>
+                  <span style="color:#B42318; cursor:pointer; font-weight:900;" onclick="delExpByTs(${e.ts})">刪除</span>
+                </div>
               </div>
             </div>
           `;
@@ -4442,7 +4454,7 @@ async function renderWeatherJMA(meta){
     if(participants.length<=0) return alert('請至少選一位分攤成員');
   
 /*      建立資料物件 */
-    const newExp = {
+    const expData = {
       name,
       cost: Math.round(cost),
       payer: curPayer,
@@ -4456,22 +4468,22 @@ async function renderWeatherJMA(meta){
       const idx = expenses.findIndex(e => e.ts === editingTs);
       if(idx !== -1) expenses[idx] = expData;
       editingTs = null; // 重置
-      document.getElementById('submitExpBtn').innerText = "加入紀錄";
+      const btn = document.querySelector('#page-money .btn');
+      if(btn) btn.innerText = "加入紀錄";
     } 
     else {
       // 新增模式
-      expenses.push(newExp);
+      expenses.push(expData);
     }
   
 /*      1. 先更新本地 UI (讓使用者感覺反應很快) */
-    expenses.push(newExp);
     localStorage.setItem('expenses', JSON.stringify(expenses));
     document.getElementById('exName').value = '';
     document.getElementById('exCost').value = '';
     renderExpenseUI();
   
 /*      2. 傳送到雲端 */
-    cloudPost("addExpense", newExp);
+    cloudPost("addExpense", expData);
   }
 
   /* 💡 新增：啟動編輯模式的 Function */
