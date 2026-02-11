@@ -4303,7 +4303,8 @@ async function renderWeatherJMA(meta){
         payer,
         participants,
         type,
-        ts: e?.ts || Date.now()
+        ts: e?.ts || Date.now(),
+        currency: e?.currency || 'JPY'  /* ✅ 補上這行，確保幣別資料被保留 */
       };
     }).filter(e => e.name && e.cost > 0);
     localStorage.setItem('expenses', JSON.stringify(expenses));
@@ -4428,6 +4429,7 @@ async function renderWeatherJMA(meta){
     /* 7. 渲染結算清單 (Debt List) */
     const debtEl = document.getElementById('debtList');
     if (debtEl) {
+/*
       debtEl.innerHTML = users.map(u => `
         <div style="padding:10px 0; border-bottom:1px solid #EEE; cursor:pointer;" onclick="showUserDetail('${u}')">
           <div style="font-weight:900; color:var(--primary);">👤 ${u} (點擊明細)</div>
@@ -4436,11 +4438,32 @@ async function renderWeatherJMA(meta){
             <span style="color:${balTWD[u] >= 0 ? '#2F8F5B' : '#B42318'}">台幣：${balTWD[u] >= 0 ? '收' : '付'} $${Math.abs(Math.round(balTWD[u]))}</span>
           </div>
         </div>`).join('');
+*/
+      debtEl.innerHTML = users.map(u => {
+        const jpyRounded = Math.round(balJPY[u]);
+        const twdRounded = Math.round(balTWD[u]);
+        
+        // 💡 只有在金額不為 0 時才顯示該幣別
+        const jpyHtml = jpyRounded !== 0 ? `<span style="color:${jpyRounded > 0 ? '#2F8F5B' : '#B42318'}">日幣：${jpyRounded > 0 ? '收' : '付'} ¥${Math.abs(jpyRounded)}</span>` : '';
+        const twdHtml = twdRounded !== 0 ? `<span style="color:${twdRounded > 0 ? '#2F8F5B' : '#B42318'}">台幣：${twdRounded > 0 ? '收' : '付'} $${Math.abs(twdRounded)}</span>` : '';
+
+        return `
+        <div style="padding:10px 0; border-bottom:1px solid #EEE; cursor:pointer;" onclick="showUserDetail('${u}')">
+          <div style="font-weight:900; color:var(--primary);">👤 ${u} (點擊明細)</div>
+          <div style="display:flex; justify-content:space-between; font-size:0.9rem; gap:10px;">
+            ${jpyHtml || '<span style="color:#999">日幣：已清</span>'}
+            ${twdHtml || '<span style="color:#999">台幣：已清</span>'}
+          </div>
+        </div>`;
+      }).join('');
     }
 
-    /* 8. 渲染小記 (Summary) - 顯示雙幣別 */
+    /* 8. 渲染小記 (Summary) - 增加換算總額 */
     const sumEl = document.getElementById('expenseSummary');
     if (sumEl) {
+      // ✅ 計算換算後的總台幣支出
+      const grandTotalTWD = (sumTripTWD + sumPrepaidTWD) + (sumTripJPY + sumPrepaidJPY) * JPY_TWD_RATE;
+
       sumEl.innerHTML = `
         <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(233,225,214,.5); font-weight:900;">
           <span>行中支出</span>
@@ -4451,8 +4474,8 @@ async function renderWeatherJMA(meta){
           <div style="text-align:right;"><div>¥${Math.round(sumPrepaidJPY)}</div><div style="font-size:0.8rem; color:#888;">$${Math.round(sumPrepaidTWD)}</div></div>
         </div>
         <div style="display:flex; justify-content:space-between; padding:8px 0; font-weight:900; color:var(--accent);">
-          <span>目前總花費 (不含換算)</span>
-          <div style="text-align:right;"><div>¥${Math.round(sumTripJPY + sumPrepaidJPY)}</div><div>$${Math.round(sumTripTWD + sumPrepaidTWD)}</div></div>
+          <span>預估總支出 (換算台幣)</span>
+          <div style="text-align:right; font-size:1.2rem;">$${Math.round(grandTotalTWD)}</div>
         </div>
       `;
     }
