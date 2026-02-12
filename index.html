@@ -4339,6 +4339,15 @@ async function renderWeatherJMA(meta){
         `<div class="user-tab ${u === curPayer ? 'active' : ''}" onclick="curPayer='${u}'; renderExpenseUI();">${escapeHtml(u)}</div>`
       ).join('');
     }
+    /* ✅ 新增 2.5：同步幣別切換按鈕的高亮狀態 */
+    const currEl = document.getElementById('currencySwitch');
+    if (currEl) {
+      currEl.querySelectorAll('.seg-btn').forEach(btn => {
+        /* 💡 根據全域變數 curCurrency 的值，決定哪個按鈕該有 active 類別 */
+        const btnCurr = btn.getAttribute('data-curr');
+        btn.classList.toggle('active', btn.getAttribute('data-curr') === curCurrency);
+      });
+    }
 
     /* 3. 類型切換 (Type Segmented) */
     const typeEl = document.getElementById('expTypeSwitch');
@@ -4628,6 +4637,10 @@ async function renderWeatherJMA(meta){
       editingTs = null; // 重置
       const btn = document.querySelector('#page-money .btn');
       if(btn) btn.innerText = "加入紀錄";
+      /* ✅ 儲存後將全域狀態恢復為預設，避免影響下一筆 */
+      curCurrency = 'JPY'; 
+      curPayer = users[0] || 'L';
+      curParticipants = new Set(users);
     } 
     else {
       // 新增模式
