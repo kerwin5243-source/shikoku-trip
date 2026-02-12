@@ -1369,6 +1369,27 @@
       color:var(--ink2); font-size:.9rem;
       font-weight:800;
     }
+    
+    /* ✅ 手機版：行李一整行；出發左下；抵達右下 */
+    @media (max-width: 520px){
+      .boarding-bottom{
+        display:grid;
+        grid-template-columns: 1fr 1fr;
+        gap:10px 12px;          /* row gap / col gap */
+        align-items:center;
+      }
+      .boarding-bottom .bb-bag{
+        grid-column: 1 / -1;    /* 行李佔滿整行 */
+      }
+      .boarding-bottom .bb-dep{
+        grid-column: 1 / 2;     /* 出發在左下 */
+      }
+      .boarding-bottom .bb-arr{
+        grid-column: 2 / 3;     /* 抵達在右下 */
+        text-align:right;
+        justify-self:end;       /* 更保險：靠右貼齊 */
+      }
+    }
     .wx-head{
         display:flex;
         justify-content:space-between;
@@ -4261,9 +4282,9 @@ async function renderWeatherJMA(meta){
           </div>
 
           <div class="boarding-bottom">
-            <div><i class="fas fa-suitcase-rolling"></i> 行李：${escapeHtml(baggage)}</div>
-            <div><i class="fas fa-plane-departure"></i> 出發：${escapeHtml(f.from?.city || '')} ${escapeHtml(f.from?.terminal || '')}</div>
-            <div><i class="fas fa-plane-arrival"></i> 抵達：${escapeHtml(f.to?.city || '')}</div>
+            <div class="bb-bag"><i class="fas fa-suitcase-rolling"></i> 行李：${escapeHtml(baggage)}</div>
+            <div class="bb-dep"><i class="fas fa-plane-departure"></i> 出發：${escapeHtml(f.from?.city || '')} ${escapeHtml(f.from?.terminal || '')}</div>
+            <div class="bb-arr"><i class="fas fa-plane-arrival"></i> 抵達：${escapeHtml(f.to?.city || '')}</div>
           </div>
         </div>
       `;
