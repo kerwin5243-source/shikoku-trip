@@ -2999,85 +2999,126 @@
 */
 
     function renderDayHero(dayData, meta){
-        const el = document.getElementById('dayHero');
-        if(!el) return;
+      const el = document.getElementById('dayHero');
+      if(!el) return;
 
-/*
-         ✅ 支援兩種格式：
-         1) 新格式：[{src,loc,caption}]
-         2) 舊格式：[ "url1", "url2" ]
-*/
-        let photosRaw = Array.isArray(dayData?.photos) ? dayData.photos.slice(0,5) : [];
-        if(!photosRaw.length){
-            photosRaw = [
-            "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1526481280695-3c687fd5432c?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80",
-            "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80",
-            ];
+      /*
+        ✅ 支援兩種格式：
+        1) 新格式：[{src,loc,caption}]
+        2) 舊格式：[ "url1", "url2" ]
+      */
+      let photosRaw = Array.isArray(dayData?.photos) ? dayData.photos.slice(0,5) : [];
+      if(!photosRaw.length){
+        photosRaw = [
+          "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80",
+          "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+          "https://images.unsplash.com/photo-1526481280695-3c687fd5432c?auto=format&fit=crop&w=1200&q=80",
+          "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80",
+          "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80",
+        ];
+      }
+
+      // ✅ 正規化：支援舊 string / 新 {src,loc,caption}
+      const photos = photosRaw.map(p=>{
+        if(typeof p === 'string'){
+          return { src:p, loc:(meta?.loc||''), caption:'' };
         }
+        return {
+          src: p.src || p.url || '',
+          loc: (p.loc !== undefined) ? (p.loc ?? '') : (meta?.loc || ''),
+          caption: p.caption || ''
+        };
+      }).filter(x=>x.src);
 
-        const photos = photosRaw.map(p=>{
-            if(typeof p === 'string'){
-                return { src:p, loc: (meta?.loc||''), caption:'' };
+      if(!photos.length){ el.innerHTML=''; return; }
+
+      // ✅ 多塞一張「第一張」到最後，讓你可以再往右滑進去
+      const loopPhotos = photos.length > 1 ? [...photos, photos[0]] : photos;
+
+      const slides = loopPhotos.map((p, idx)=>`
+        <div class="hero-slide hero--blur">
+          <img
+            src="${escapeHtml(p.src)}"
+            alt="day photo ${idx+1}"
+            loading="lazy"
+            decoding="async"
+            referrerpolicy="no-referrer"
+            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80';"
+            class="hero-bg" aria-hidden="true"
+          >
+          <img
+            src="${escapeHtml(p.src)}"
+            alt="day photo ${idx+1}"
+            loading="lazy"
+            decoding="async"
+            referrerpolicy="no-referrer"
+            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80';"
+            class="hero-img"
+          >
+          <div class="hero-overlay">
+            ${p.loc ? `<div class="hero-loc"><i class="fas fa-location-dot"></i>${escapeHtml(p.loc)}</div>` : ``}
+            ${p.caption ? `<div class="hero-caption">${escapeHtml(p.caption)}</div>` : ``}
+          </div>
+        </div>
+      `).join('');
+
+      
+      /*          ❌ dots（小白點）已移除：不顯示也不需要同步 */
+      el.innerHTML = `<div class="hero-track" id="heroTrack">${slides}</div>`;
+
+      const track = document.getElementById('heroTrack');
+      if(!track) return;
+
+      /*          ✅ 桌機滾輪也能左右滑 */
+      enableWheelHorizontal(track);
+
+      if(__heroTimer) clearInterval(__heroTimer);
+
+      /*          auto slide */
+
+      let cur = 0;
+      let rafLock = 0;
+      let snapTimer = 0;
+
+      function getIndex(){
+        const w = track.clientWidth || 1;
+        const idx = Math.round(track.scrollLeft / w);
+        // clamp：避免超界
+        return Math.max(0, Math.min(idx, photos.length)); // 注意：最大允許到 photos.length（clone）
+      }
+
+      // ✅ 初始化 cur：避免一開始 timer 跟當下位置不同步
+      cur = Math.min(getIndex(), photos.length - 1);
+
+      track.addEventListener('scroll', () => {
+        if (rafLock) cancelAnimationFrame(rafLock);
+        rafLock = requestAnimationFrame(() => {
+          const idx = getIndex();
+
+          // idx 可能是 0..photos.length（最後一格是 clone）
+          cur = Math.min(idx, photos.length - 1);
+
+          // ✅ 停下來後，如果人在 clone（最右邊那張），瞬間跳回第 1 張
+          clearTimeout(snapTimer);
+          snapTimer = setTimeout(() => {
+            if (photos.length > 1 && getIndex() === photos.length) {
+              track.scrollTo({ left: 0, behavior: 'auto' });
+              cur = 0;
             }
-            return {
-                src: p.src || p.url || '',
-                loc: (p.loc !== undefined) ? (p.loc ?? '') : (meta?.loc || ''),
-                caption: p.caption || ''
-            };
-        }).filter(x=>x.src);
+          }, 80);
+        });
+      });
 
-        const slides = photos.map((p, idx)=>`
-          <div class="hero-slide hero--blur">
-            <img
-                src="${escapeHtml(p.src)}"
-                alt="day photo ${idx+1}"
-                loading="lazy"
-                decoding="async"
-                referrerpolicy="no-referrer"
-                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80';"
-                class="hero-bg" alt="" aria-hidden="true"
-            >
-            <img
-                src="${escapeHtml(p.src)}"
-                alt="day photo ${idx+1}"
-                loading="lazy"
-                decoding="async"
-                referrerpolicy="no-referrer"
-                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80';"
-                class="hero-img" alt="day photo ...">
-            >
-            <div class="hero-overlay">
-                ${p.loc ? `<div class="hero-loc"><i class="fas fa-location-dot"></i>${escapeHtml(p.loc)}</div>` : ``}
-                ${p.caption ? `<div class="hero-caption">${escapeHtml(p.caption)}</div>` : ``}
-					  
-								   
-																									
-            </div>
-           </div>
-        `).join('');
+      if (__heroTimer) clearInterval(__heroTimer);
+      __heroTimer = setInterval(() => {
+        if (photos.length <= 1) return;
 
-        
-/*          ❌ dots（小白點）已移除：不顯示也不需要同步 */
-        el.innerHTML = `<div class="hero-track" id="heroTrack">${slides}</div>`;
+        const next = cur + 1;
+        track.scrollTo({ left: next * track.clientWidth, behavior: 'smooth' });
 
-        const track = document.getElementById('heroTrack');
-        if(!track) return;
-
-/*          ✅ 桌機滾輪也能左右滑 */
-        enableWheelHorizontal(track);
-
-        if(__heroTimer) clearInterval(__heroTimer);
-
-/*          auto slide */
-
-        let cur = 0;
-        __heroTimer = setInterval(()=>{
-            cur = (cur + 1) % photos.length;
-            track.scrollTo({ left: cur * track.clientWidth, behavior:'smooth' });
-        }, 12000);
+        // 若 next 到 clone，先預設回 0（scroll handler 也會保險修正）
+        cur = (next >= photos.length) ? 0 : next;
+      }, 12000);
     }
 
     async function selectDay(idx) {
