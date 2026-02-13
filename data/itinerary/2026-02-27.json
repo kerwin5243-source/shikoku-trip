@@ -6,22 +6,22 @@
     "hotel_id": "H1",
     "photos": [
         {
-          "src": "/photos/day1/01.png",
+          "src": "/photos/day1/022701.png",
           "loc": "",
           "caption": ""
         },
         {
-          "src": "/photos/day1/02.jpg",
+          "src": "/photos/day1/022702.jpg",
           "loc": "Yadon",
           "caption": ""
         },
         {
-          "src": "/photos/day1/03.jpg",
+          "src": "/photos/day1/022703.jpg",
           "loc": "金刀比羅宮",
           "caption": "一生必來一次!"
         },
         {
-          "src": "/photos/day1/04.jpg",
+          "src": "/photos/day1/022704.jpg",
           "loc": "AEON 高松",
           "caption": ""
         }
