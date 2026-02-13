@@ -363,6 +363,9 @@
         "addr": "",
         "mapcode": "",
         "parking": "",
+        "reservations": [
+          { "label": "預約電話", "value": "+86 88-678-5995" }
+        ],
         "hours": "",
         "price": "",
         "stay": "60–90 min",

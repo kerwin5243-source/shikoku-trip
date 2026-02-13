@@ -256,9 +256,13 @@
         "addr": "",
         "mapcode": "",
         "parking": "三井のリパーク 松山喜与町２丁目 駐車場",
+        "tel":"",
         "hours": "11:00–19:30",
         "price": "2600-3700",
         "stay": "60 min",
+        "reservations": [
+          { "label": "預約電話", "value": "+86 89-948-4343" }
+        ],
         "menu": [
           {"jp": "宇和島鯛めし-じゃこ天セット", "zh": "炸魚餅套餐", "rec": true, "img": "/photos/day2/022802.png" },
           {"jp": "宇和島鯛めし-鯛大盛", "zh": "鯛魚加量","rec": true, "img": "/photos/day2/022804.jpg" }
