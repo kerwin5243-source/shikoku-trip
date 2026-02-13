@@ -1328,6 +1328,49 @@
     }
     .nav-item.active{ color:#2B2723; transform:translateY(-1px); }
 
+    /* ✅ 浮在 bottom-nav 上方的按鈕層（跟 bottom-nav 同寬同置中） */
+    .fab-layer{
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      width:min(520px, calc(100vw - 40px));
+      bottom:max(10px, env(safe-area-inset-bottom));
+      z-index:1101;          /* 比 bottom-nav(1000) 高一點 */
+      pointer-events:none;   /* 讓空白處不擋點擊 */
+    }
+
+    /* ✅ 回頂按鈕本體：預設隱藏，出現時加 .show */
+    .toTopBtn{
+      position:absolute;
+      right:12px;
+      bottom:calc(100% + 12px);  /* 在 bottom-nav 上方 */
+      width:46px;
+      height:46px;
+      border-radius:999px;
+      border:1px solid rgba(233,225,214,.9);
+      background:rgba(255,255,255,.88);
+      backdrop-filter:blur(16px);
+      box-shadow:0 14px 36px rgba(0,0,0,.14);
+      color:#2B2723;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      opacity:0;
+      transform:translateY(10px) scale(.96);
+      transition:opacity .18s ease, transform .18s ease;
+      pointer-events:auto;   /* 只有按鈕可點 */
+    }
+
+    .toTopBtn i{ font-size:18px; opacity:.9; }
+
+    .toTopBtn.show{
+      opacity:1;
+      transform:translateY(0) scale(1);
+    }
+
+    .toTopBtn:active{ transform:translateY(1px) scale(.98); }
+
     /* boarding */
     .boarding{
       background:rgba(255,255,255,.76);
@@ -2092,7 +2135,12 @@
     </div>
   </div>
 
-
+  <!-- ✅ 回到最上面（浮在 bottom-nav 上方右側） -->
+  <div class="fab-layer" aria-hidden="false">
+    <button id="toTopBtn" class="toTopBtn" type="button" aria-label="回到最上面">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+  </div>
 
   <nav class="bottom-nav">
     <div class="nav-item active" onclick="nav('itinerary', this)"><i class="fas fa-map-location-dot"></i> 行程</div>
@@ -2416,7 +2464,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
-/*       💡 若無 Token 則提示輸入（僅需輸入第一次，後續會存於 Cookie） */
+    /*       💡 若無 Token 則提示輸入（僅需輸入第一次，後續會存於 Cookie） */
      if (!G_TOKEN) {
        const inputToken = prompt("請輸入訪問暗號 (Token)：");
        if (inputToken) {
@@ -2430,7 +2478,7 @@
     }
     await loadAllData();
     await syncFromCloud();
-/*      --- 新增：手動同步功能 --- */
+    /*      --- 新增：手動同步功能 --- */
     const titleEl = document.getElementById('hdrTitle');
     if (titleEl) {
       titleEl.style.cursor = 'pointer';  /* 讓滑鼠移上去顯示手指圖示 */
@@ -2444,7 +2492,7 @@
         alert('同步完成！');
       };
     }
-/*      ----------------------- */
+    /*      ----------------------- */
     renderGlobalTodos();
     renderUserTabs();
     renderChecklists();
@@ -2455,7 +2503,32 @@
     renderFlights();
     normalizeExpenses();
     renderExpenseUI();
+    initToTopButton();
   });
+
+  function initToTopButton(){
+    const btn = document.getElementById('toTopBtn');
+    if(!btn) return;
+
+    const THRESHOLD = 260; // 往下滑超過多少 px 才出現（可自行調）
+
+    const update = () => {
+      const y = window.scrollY || document.documentElement.scrollTop || 0;
+      btn.classList.toggle('show', y > THRESHOLD);
+    };
+
+    // 初始：一定隱藏
+    update();
+
+    // 滾動時：再判斷要不要出現
+    window.addEventListener('scroll', update, { passive:true });
+
+    // 點擊：平滑回到最上面
+    btn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
 
   document.getElementById('modalSheet')?.addEventListener(
     'touchmove',
