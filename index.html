@@ -780,6 +780,8 @@
       border-radius:99px;
       margin:8px auto 6px;
       flex-shrink:0;
+      touch-action:none;
+      user-select:none;
     }
 
     /* ✅ X 永遠可見（在 header 內） */
@@ -1343,7 +1345,7 @@
     .toTopBtn{
       position:absolute;
       right:10px;
-      bottom:calc(100% + 50px);  /* 在 bottom-nav 上方 */
+      bottom:calc(100% + 60px);  /* 在 bottom-nav 上方 */
       width:35px;
       height:35px;
       border-radius:999px;
@@ -4038,10 +4040,23 @@ async function renderWeatherJMA(meta){
         </a>
       </div>`;
 
+    // lockBodyScroll();
+    // document.getElementById('modalOverlay').classList.add('active');
+    // document.getElementById('modalSheet').classList.add('active');
+    // showSheetSplash(item);
     lockBodyScroll();
-    document.getElementById('modalOverlay').classList.add('active');
-    document.getElementById('modalSheet').classList.add('active');
-    showSheetSplash(item);
+
+    const ov = document.getElementById('modalOverlay');
+    const sh = document.getElementById('modalSheet');
+
+    ov.classList.add('active');
+
+    // ✅ 延後一幀再讓 sheet 進場：減少 Safari「跳一下 / UI 彈出」的機率
+    requestAnimationFrame(() => {
+      sh.classList.add('active');
+      showSheetSplash(item);
+    });
+
 
 /*
     // === menu pill click + 喇叭 click：事件委派（只綁一次）===
@@ -4230,7 +4245,7 @@ async function renderWeatherJMA(meta){
   (function initModalDrag(){
     const sheet   = document.getElementById('modalSheet');
     const overlay = document.getElementById('modalOverlay');
-    const handle  = document.querySelector('.modal-header');  /* 或改成 .modal-drag-handle */
+    const handle  = document.querySelector('.modal-drag-handle');  /* 或改成 .modal-drag-handle */
 
     if(!sheet || !overlay || !handle) return;
 
@@ -4809,14 +4824,27 @@ async function renderWeatherJMA(meta){
 
   
 /*    ====== Desktop: wheel -> horizontal scroll for horizontal strips ====== */
+//   function enableWheelHorizontal(el){
+//     if(!el) return;
+//     el.addEventListener('wheel', (e)=>{
+// /*        只在滑鼠停在可水平滾動區塊時，把滾輪轉成水平移動 */
+//       if(Math.abs(e.deltaY) > Math.abs(e.deltaX)){
+//         e.preventDefault();
+//         el.scrollLeft += e.deltaY;
+//       }
+//     }, { passive:false });
+//   }
   function enableWheelHorizontal(el){
     if(!el) return;
+
     el.addEventListener('wheel', (e)=>{
-/*        只在滑鼠停在可水平滾動區塊時，把滾輪轉成水平移動 */
-      if(Math.abs(e.deltaY) > Math.abs(e.deltaX)){
-        e.preventDefault();
-        el.scrollLeft += e.deltaY;
-      }
+      // 只在「按住 Shift」且此區塊真的可以水平滾動時，才接管滾輪
+      const canHScroll = el.scrollWidth > el.clientWidth + 2;
+      if(!canHScroll) return;
+      if(!e.shiftKey) return;
+
+      e.preventDefault();
+      el.scrollLeft += e.deltaY;
     }, { passive:false });
   }
 
