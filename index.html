@@ -2500,13 +2500,14 @@
     renderUserTabs();
     renderChecklists();
     renderDateScroller();
-    enableWheelHorizontal(document.getElementById('dayScroller'));
     await selectDay(0);
     renderHotels();
     renderFlights();
     normalizeExpenses();
     renderExpenseUI();
     initToTopButton();
+    enableWheelHorizontal(document.getElementById('dayScroller'));
+    initModalDragToClose();
   });
 
   function initToTopButton(){
@@ -4382,7 +4383,7 @@ async function renderWeatherJMA(meta){
     }).join('');
   }
 
-/*    ====== 記帳（支援：參與者多選 / 行中 vs 預付） ====== */
+  /*    ====== 記帳（支援：參與者多選 / 行中 vs 預付） ====== */
   let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
   let curCurrency = 'JPY';  // 預設日幣
   const JPY_TWD_RATE = 0.21; // 您可以根據需求修改匯率
@@ -4401,7 +4402,7 @@ async function renderWeatherJMA(meta){
   }
     
 
-/*    兼容舊資料（沒有 participants/type 時補上） */
+  /*    兼容舊資料（沒有 participants/type 時補上） */
   function normalizeExpenses(){
     expenses = (Array.isArray(expenses) ? expenses : []).map(e => {
       const payer = (e?.payer || users[0] || 'L');
@@ -4848,6 +4849,22 @@ async function renderWeatherJMA(meta){
     }, { passive:false });
   }
 
+  function enableWheelHorizontal(el){
+    if(!el) return;
+
+    el.addEventListener('wheel', (e) => {
+      const canHScroll = el.scrollWidth > el.clientWidth + 2;
+      if(!canHScroll) return;
+
+      // ✅ 只有按住 Shift 才把滾輪改成左右
+      if(!e.shiftKey) return;
+
+      e.preventDefault();
+      el.scrollLeft += e.deltaY;
+    }, { passive:false });
+  }
+
+
 /*  utils */
   function escapeHtml(str){
     return String(str ?? '').replace(/[&<>"']/g, m => ({
@@ -5244,6 +5261,60 @@ async function renderWeatherJMA(meta){
       syncFromCloud();
     }
   });
+  function initModalDragToClose(){
+    const sheet = document.getElementById('modalSheet');
+    const overlay = document.getElementById('modalOverlay');
+    const handle = document.querySelector('.modal-drag-handle');
+    const scroller = document.getElementById('modalContent');
+    if(!sheet || !handle) return;
+
+    let startY = 0, curY = 0, dragging = false;
+
+    const onDown = (e) => {
+      // 只有按在 handle 才開始
+      dragging = true;
+      startY = (e.touches ? e.touches[0].clientY : e.clientY);
+      curY = 0;
+      sheet.style.transition = 'none';
+    };
+
+    const onMove = (e) => {
+      if(!dragging) return;
+      const y = (e.touches ? e.touches[0].clientY : e.clientY);
+      curY = Math.max(0, y - startY);
+
+      // 如果內容正在滾動且不是在頂端，就不要拖關閉
+      if(scroller && scroller.scrollTop > 0) return;
+
+      sheet.style.transform = `translateY(${curY}px)`;
+      e.preventDefault();
+    };
+
+    const onUp = () => {
+      if(!dragging) return;
+      dragging = false;
+      sheet.style.transition = '';
+
+      // ✅ 拉超過 120px 就關
+      if(curY > 120){
+        closeModal();
+      }else{
+        sheet.style.transform = '';
+      }
+    };
+
+    handle.addEventListener('touchstart', onDown, { passive:true });
+    window.addEventListener('touchmove', onMove, { passive:false });
+    window.addEventListener('touchend', onUp);
+
+    handle.addEventListener('mousedown', onDown);
+    window.addEventListener('mousemove', onMove, { passive:false });
+    window.addEventListener('mouseup', onUp);
+
+    // 點 overlay 也可關（你本來就有）
+    if(overlay) overlay.addEventListener('click', closeModal);
+  }
+
 
 </script>
 </body>
