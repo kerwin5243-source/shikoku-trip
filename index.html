@@ -4019,6 +4019,7 @@ async function renderWeatherJMA(meta){
 
 /* ✅ 修正後的 closeModal：確保背景 100% 同步回歸透明 */
 /* ✅ 修正後的 closeModal：消除背景閃爍 */
+/* ✅ 最終修正版：確保背景 100% 零延遲同步回歸透明 */
   function closeModal(){
     if(__closingModal) return;
     __closingModal = true;
@@ -4026,40 +4027,37 @@ async function renderWeatherJMA(meta){
     const overlay = document.getElementById('modalOverlay');
     const sheet   = document.getElementById('modalSheet');
 
-    /* 💡 BIOS 邏輯：立即重置所有位移與透明度暫存器，確保關閉動作一致 */
-    /* 立即強制恢復過渡動畫，並清除手動寫入的內聯樣式 */
-    sheet.style.transition = 'transform .25s cubic-bezier(0.16, 1, 0.3, 1)';
-    overlay.style.transition = 'opacity .25s ease';
+    /* 💡 BIOS 邏輯：設定明確的轉移時間，並直接將數值寫入暫存器 */
+    const duration = "0.28s";
+    const easing = "cubic-bezier(0.16, 1, 0.3, 1)";
     
-    /* 清除內聯樣式，使其回歸 CSS 定義的初始值 (0 狀態) */
-    sheet.style.transform = '';
-    overlay.style.opacity = '';
+    sheet.style.transition = `transform ${duration} ${easing}`;
+    overlay.style.transition = `opacity ${duration} ease`;
+    
+    /* 核心：將終點狀態明確寫死，不讓 CSS Class 介入 */
+    sheet.style.transform = 'translateX(-50%) translateY(120%)';
+    overlay.style.opacity = '0';
 
     hideSheetSplash();
-
-    /* 觸發類別切換 */
-    sheet.classList.remove('active');
-    overlay.classList.remove('active');
     
-    closeMenuCard();
+    /* 延後移除 Active 類別，僅作為狀態紀錄 */
+    setTimeout(() => {
+        sheet.classList.remove('active');
+        overlay.classList.remove('active');
+        closeMenuCard();
+    }, 10);
 
     const done = ()=>{
-      /* 清除所有臨時樣式暫存器，回歸乾淨狀態 */
+      /* 動畫結束後清空所有暫存，恢復到純淨的 CSS 狀態 */
       sheet.style.cssText = '';
       overlay.style.cssText = '';
       unlockBodyScroll();
       __closingModal = false;
     };
 
-    /* 監聽動畫結束訊號 */
-    sheet.addEventListener('transitionend', function _onEnd(e){
-      if(e.target !== sheet) return;
-      sheet.removeEventListener('transitionend', _onEnd);
-      done();
-    }, { once: true });
-
-    /* 保險機制 */
-    setTimeout(done, 300);
+    /* 使用 once: true 確保事件只觸發一次 */
+    sheet.addEventListener('transitionend', done, { once: true });
+    setTimeout(done, 350); 
   }
 
   function showUserDetail(userName) {
@@ -4141,6 +4139,7 @@ async function renderWeatherJMA(meta){
 /* ✅ 優化後的 initModalDrag：徹底解決內容區下拉晃動問題 */
 /* ✅ 優化後的 initModalDrag：徹底解決內容區下拉關閉失效與抖動 */
 /* ✅ 優化後的 initModalDrag：解決手機端下拉失效 */
+/* ✅ 最終修正版：全域鎖定解決手機下拉抖動 */
   (function initModalDrag(){
     const sheet   = document.getElementById('modalSheet');
     const overlay = document.getElementById('modalOverlay');
@@ -4149,88 +4148,79 @@ async function renderWeatherJMA(meta){
   
     if(!sheet || !overlay || !handle || !scrollArea) return;
   
-    let startY = 0, dy = 0;
-    let dragging = false, isFromContent = false, isPullingDown = false; 
+    let startY = 0, dy = 0, dragging = false;
   
     const onStart = (e) => {
       if(!sheet.classList.contains('active')) return;
-      isFromContent = scrollArea.contains(e.target);
-      
-      /* 💡 策略：若在內容區頂端，將 touch-action 暫時設為 none 封鎖原生引擎 */
-      if (isFromContent && scrollArea.scrollTop <= 2) {
-          scrollArea.style.touchAction = 'none';
-      } else {
-          scrollArea.style.touchAction = 'pan-y';
-      }
+
+      /* 💡 只有在接近頂端時才啟動下拉關閉中斷 */
+      if (scrollArea.scrollTop > 5 && e.target !== handle) return;
 
       dragging = true;
-      isPullingDown = false;
       startY = e.clientY;
       dy = 0;
+      
+      /* 關鍵：立即鎖定指針並禁止原生捲動 */
       sheet.setPointerCapture(e.pointerId);
+      sheet.style.touchAction = 'none';
+      scrollArea.style.touchAction = 'none';
     };
   
     const onMove = (e) => {
       if (!dragging) return;
   
-      const currentY = e.clientY;
-      const deltaY = currentY - startY;
-  
-      if (!isPullingDown && isFromContent) {
-          /* 判斷：在頂端且向下移動超過 5px，正式切換為「下拉關閉」模式 */
-          if (deltaY > 5 && scrollArea.scrollTop <= 0) {
-              isPullingDown = true;
-          } else if (deltaY < -5) {
-              /* 向上捲動，釋放控制權 */
-              dragging = false;
-              scrollArea.style.touchAction = 'pan-y';
-              sheet.releasePointerCapture(e.pointerId);
-              return;
-          }
+      const deltaY = e.clientY - startY;
+      
+      /* 判定是否真的要下拉 */
+      if (deltaY < 0) {
+          /* 使用者往上推，釋放控制權交還給捲動引擎 */
+          dragging = false;
+          sheet.style.touchAction = '';
+          scrollArea.style.touchAction = 'pan-y';
+          sheet.releasePointerCapture(e.pointerId);
+          return;
       }
-  
-      /* 一旦進入關閉模式 */
-      if (isPullingDown || !isFromContent) {
-          /* 核心修復：強制攔截原生事件並將捲動鎖死在頂端，防止抖動 */
-          if (e.cancelable) e.preventDefault(); 
-          if (isFromContent) scrollArea.scrollTop = 0; 
+
+      /* ✅ 強制攔截所有原生行為，防止抖動 */
+      if (e.cancelable) e.preventDefault(); 
+      scrollArea.scrollTop = 0; 
+      
+      dy = deltaY;
+      
+      requestAnimationFrame(() => {
+          sheet.style.transition = 'none';
+          overlay.style.transition = 'none';
+          sheet.style.transform = `translateX(-50%) translateY(${dy}px)`;
           
-          dy = Math.max(0, deltaY);
-          
-          requestAnimationFrame(() => {
-              sheet.style.transition = 'none';
-              overlay.style.transition = 'none';
-              sheet.style.transform = `translateX(-50%) translateY(${dy}px)`;
-              
-              /* 背景透明度線性遞減 */
-              const k = Math.max(0, 1 - dy / 450);
-              overlay.style.opacity = (0.38 * k).toFixed(3);
-          });
-      }
+          /* 背景隨位移線性變淡 */
+          const k = Math.max(0, 1 - dy / 450);
+          overlay.style.opacity = (0.38 * k).toFixed(3);
+      });
     };
   
     const onEnd = (e) => {
       if (!dragging) return;
       dragging = false;
-      isPullingDown = false;
       sheet.releasePointerCapture(e.pointerId);
-      scrollArea.style.touchAction = 'pan-y'; // 恢復標準觸控
+      
+      /* 恢復標準觸控暫存器 */
+      sheet.style.touchAction = '';
+      scrollArea.style.touchAction = 'pan-y';
   
       if (dy > 120) {
         closeModal();
       } else {
-        /* 回彈動作 */
+        /* 回彈程序 */
         sheet.style.transition = 'transform .25s cubic-bezier(0.16, 1, 0.3, 1)';
         overlay.style.transition = 'opacity .25s ease';
-        sheet.style.transform = '';
-        overlay.style.opacity = ''; 
+        sheet.style.transform = 'translateX(-50%) translateY(0)';
+        overlay.style.opacity = '0.38'; 
       }
       dy = 0;
     };
   
     handle.addEventListener('pointerdown', onStart);
     scrollArea.addEventListener('pointerdown', onStart);
-    /* 必須加上 passive: false 才能讓 preventDefault 生效 */
     sheet.addEventListener('pointermove', onMove, { passive: false });
     sheet.addEventListener('pointerup', onEnd);
     sheet.addEventListener('pointercancel', onEnd);
