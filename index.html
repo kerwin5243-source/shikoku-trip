@@ -89,7 +89,8 @@
       color:var(--ink);
       margin:0;
       padding-bottom:calc(90px + env(safe-area-inset-bottom));
-      overscroll-behavior-y:none;
+       /* ✅ 修正：改為 auto 或僅在行動端啟動，避免桌機捲動衝突 */
+      overscroll-behavior-y:auto;
     }
     body.body-no-scroll{ overflow:hidden; }
 
@@ -4837,15 +4838,21 @@ async function renderWeatherJMA(meta){
 //   }
   function enableWheelHorizontal(el){
     if(!el) return;
-
     el.addEventListener('wheel', (e)=>{
-      // 只在「按住 Shift」且此區塊真的可以水平滾動時，才接管滾輪
-      const canHScroll = el.scrollWidth > el.clientWidth + 2;
-      if(!canHScroll) return;
-      if(!e.shiftKey) return;
+      /* 偵測垂直滾輪意圖 */
+      if(Math.abs(e.deltaY) > Math.abs(e.deltaX)){
+        e.preventDefault();
+        el.scrollLeft += e.deltaY;
+        const canScrollLeft = el.scrollLeft > 0;
+        const canScrollRight = el.scrollLeft < (el.scrollWidth - el.clientWidth - 1);
 
-      e.preventDefault();
-      el.scrollLeft += e.deltaY;
+        /* 💡 BIOS 邏輯：只有在內部還有空間可以水平位移時，才攔截(PreventDefault)捲動中斷 */
+        if ((e.deltaY < 0 && canScrollLeft) || (e.deltaY > 0 && canScrollRight)) {
+          e.preventDefault();
+          el.scrollLeft += e.deltaY;
+        }
+        /* 否則：不執行 preventDefault，讓捲動事件冒泡給 body 處理 */
+      }
     }, { passive:false });
   }
 
