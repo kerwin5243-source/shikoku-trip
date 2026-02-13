@@ -4849,21 +4849,6 @@ async function renderWeatherJMA(meta){
     }, { passive:false });
   }
 
-  function enableWheelHorizontal(el){
-    if(!el) return;
-
-    el.addEventListener('wheel', (e) => {
-      const canHScroll = el.scrollWidth > el.clientWidth + 2;
-      if(!canHScroll) return;
-
-      // ✅ 只有按住 Shift 才把滾輪改成左右
-      if(!e.shiftKey) return;
-
-      e.preventDefault();
-      el.scrollLeft += e.deltaY;
-    }, { passive:false });
-  }
-
 
 /*  utils */
   function escapeHtml(str){
