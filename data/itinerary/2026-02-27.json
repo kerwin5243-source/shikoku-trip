@@ -93,7 +93,7 @@
         "detail": "拿到行李後待辦順序：\n1) 領取華航香川優惠\n2) 前往機場租車中心櫃檯\n3) 確認 ETC / 保險 / 車況後再出發",
         "addr": "",
         "mapcode": "",
-        "parking": "",
+        "parking": null,
         "hours": "",
         "price": "",
         "stay": "30 min",
