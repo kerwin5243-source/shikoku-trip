@@ -3734,6 +3734,7 @@ function buildOsmStaticThumb(center, zoom, points){
 
   let __routeMap = null;
 
+
   
 function renderRouteMiniMap(pathLatLngs, stopLatLngs, fallbackCenterStr, zoom){
   if(!window.L) return;
@@ -3802,6 +3803,34 @@ function renderRouteMiniMap(pathLatLngs, stopLatLngs, fallbackCenterStr, zoom){
   window.__routeMap = map;
 }
 
+// WMO weather_code -> FontAwesome icon（給 24H 天氣用）
+function wmoToFa(code, hour){
+  const night = (hour < 6 || hour >= 18);
+
+  // 0: Clear sky
+  if(code === 0) return night ? 'fa-moon' : 'fa-sun';
+
+  // 1,2,3: Mainly clear, partly cloudy, overcast
+  if(code === 1 || code === 2) return 'fa-cloud';   // 保守：用雲（避免不同版本 FA 沒有 cloud-sun/moon）
+  if(code === 3) return 'fa-cloud';
+
+  // 45,48: Fog
+  if(code === 45 || code === 48) return 'fa-smog';
+
+  // Drizzle / Rain
+  if([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code)) return 'fa-cloud-rain';
+
+  // Snow
+  if([71,73,75,77,85,86].includes(code)) return 'fa-snowflake';
+
+  // Thunderstorm
+  if([95,96,99].includes(code)) return 'fa-bolt';
+
+  return 'fa-cloud';
+}
+
+
+
 
 async function renderWeatherJMA(meta){
         const el = document.getElementById('weatherStrip');
@@ -3848,7 +3877,11 @@ async function renderWeatherJMA(meta){
             + `&timezone=Asia%2FTokyo`;
 
         try{
-            const data = await fetch(url).then(r=>r.json());
+            const res = await fetch(url, { cache: 'no-store' });
+            if(!res.ok){
+              throw new Error(`weather fetch failed: ${res.status} ${res.statusText}`);
+            }
+            const data = await res.json();
             const times = data?.hourly?.time || [];
             const temps = data?.hourly?.temperature_2m || [];
             const codes = data?.hourly?.weather_code || [];
@@ -3880,9 +3913,10 @@ async function renderWeatherJMA(meta){
             </div>
             `).join('');
         }catch(e){
-            el.innerHTML = `<div style="padding:10px; color:var(--ink2); font-weight:900;">
-            讀取天氣失敗（網路/CORS/服務暫時不可用）
-            </div>`;
+          console.error('weather error:', e);
+          el.innerHTML = `<div style="padding:10px; color:var(--ink2); font-weight:900;">
+          讀取天氣失敗（網路/CORS/服務暫時不可用）
+          </div>`;
         }
     }
 
