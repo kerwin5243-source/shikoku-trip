@@ -4080,9 +4080,10 @@ async function renderWeatherJMA(meta){
           <span class="meta-val">（此行程尚未填：到達/地址/停車/Mapcode）</span>
         </div>` : ''}
       </div>
-      ${reserveBlock}	 
+      ${reserveBlock}
+      <div class="detail">${escapeHtml(detailText)}</div>	 
       ${menuBlock}
-      <div class="detail">${escapeHtml(detailText)}</div>
+      
 
       ${avoidList}
       ${guideList}
