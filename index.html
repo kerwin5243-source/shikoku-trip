@@ -2058,6 +2058,16 @@
         <div id="weatherLoc" class="wx-city"></div>
         <div class="wx-label"><i class="fas fa-cloud-sun"></i> 24H 預報</div>
       </div>
+      <div class="wx-top">
+        <div id="weatherLoc" class="wx-city"></div>
+
+        <!-- ✅ 新增：像天氣App一句話 + 今日高低溫 -->
+        <div id="wxSummary" class="wx-summary"></div>
+        <div id="wxHiLo" class="wx-hilo"></div>
+
+        <!-- ✅ 新增：日出日落 -->
+        <div id="wxSun" class="wx-sun"></div>
+      </div>
       <div class="weather-strip" id="weatherStrip"></div>
       <div style="text-align:right; font-size:0.86rem; color:var(--ink2); font-weight:800;">
         今晚住宿：<strong id="stayHotelName" style="color:var(--primary);"></strong>
@@ -3187,9 +3197,9 @@
         renderDayHero(currentDayData, meta);
         await renderDayRouteCard(currentDayData);
         renderTimelineToolbar(meta);
-        renderWeatherMeta(meta);
         renderTimelineList(currentDayData);
         enableTimelineSortable();
+        renderWeatherMeta(meta);
         await renderWeatherJMA(meta);
     }
 
@@ -3803,6 +3813,18 @@ function renderRouteMiniMap(pathLatLngs, stopLatLngs, fallbackCenterStr, zoom){
 
   window.__routeMap = map;
 }
+function wmoToZh(code){
+  // 夠用版（你也可再細分）
+  if(code === 0) return '晴';
+  if([1,2,3].includes(code)) return '多雲';
+  if([45,48].includes(code)) return '有霧';
+  if([51,53,55,56,57].includes(code)) return '毛毛雨';
+  if([61,63,65,66,67].includes(code)) return '下雨';
+  if([71,73,75,77].includes(code)) return '下雪';
+  if([80,81,82].includes(code)) return '陣雨';
+  if([95,96,99].includes(code)) return '雷雨';
+  return '';
+}
 
 // WMO weather_code -> FontAwesome icon（給 24H 天氣用）
 function wmoToFa(code, hour){
@@ -3830,6 +3852,16 @@ function wmoToFa(code, hour){
   return 'fa-cloud';
 }
 
+function renderWeatherMeta(meta){
+  // 位置（loc）
+  const locEl = document.getElementById('weatherLoc');
+  if(locEl) locEl.textContent = meta?.loc || '';
+
+  // 今晚住宿（hotel_id -> hotels.json 對應 name）
+  const hotelNameEl = document.getElementById('stayHotelName');
+  const h = hotels.find(x => x.id === meta?.hotel_id);
+  if(hotelNameEl) hotelNameEl.textContent = h?.name || '';
+}
 
 
 
@@ -3874,6 +3906,7 @@ async function renderWeatherJMA(meta){
         const url =
             `https://api.open-meteo.com/v1/jma?latitude=${encodeURIComponent(ll.lat)}&longitude=${encodeURIComponent(ll.lon)}`
             + `&hourly=temperature_2m,weather_code`
+            + `&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset`
             + `&forecast_days=16`
             + `&timezone=Asia%2FTokyo`;
 
@@ -3886,6 +3919,29 @@ async function renderWeatherJMA(meta){
             const times = data?.hourly?.time || [];
             const temps = data?.hourly?.temperature_2m || [];
             const codes = data?.hourly?.weather_code || [];
+            // ✅ daily（對應當天）
+            const dTimes = data?.daily?.time || [];
+            const dIdx = dTimes.indexOf(iso);
+
+            const wxSummaryEl = document.getElementById('wxSummary');
+            const wxHiLoEl = document.getElementById('wxHiLo');
+            const wxSunEl = document.getElementById('wxSun');
+
+            if(dIdx !== -1){
+              const dCode = Number(data?.daily?.weather_code?.[dIdx] ?? 0);
+              const tMax = data?.daily?.temperature_2m_max?.[dIdx];
+              const tMin = data?.daily?.temperature_2m_min?.[dIdx];
+              const sunrise = data?.daily?.sunrise?.[dIdx]; // "2026-02-27T06:xx"
+              const sunset  = data?.daily?.sunset?.[dIdx];
+
+              const codeText = wmoToZh(dCode); // 下面會給你 mapping
+
+              if(wxSummaryEl) wxSummaryEl.textContent = codeText ? `今天${codeText}` : '';
+              if(wxHiLoEl && tMax != null && tMin != null) wxHiLoEl.textContent = `${Math.round(tMin)}° ~ ${Math.round(tMax)}°`;
+
+              const fmt = (s)=> (s && s.includes('T')) ? s.split('T')[1].slice(0,5) : '';
+              if(wxSunEl) wxSunEl.textContent = (sunrise && sunset) ? `日出 ${fmt(sunrise)}｜日落 ${fmt(sunset)}` : '';
+            }
 
             const rows = [];
             for(let h=1; h<=24; h++){
