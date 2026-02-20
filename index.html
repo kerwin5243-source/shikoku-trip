@@ -10,6 +10,9 @@
   <link rel="apple-touch-icon" sizes="152x152" href="/icon/apple-touch-icon-152.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/icon/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/icon/favicon-16.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;800;900&family=Noto+Serif+TC:wght@600;700;900&display=swap" rel="stylesheet">
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#F6F3EE" />
@@ -80,6 +83,9 @@
       --radius-S:14px;
 
       --shadow-soft:0 10px 26px rgba(0,0,0,.08);
+        /* ✅ 新增：字體（城巿/標題用 Serif，其餘用 Sans） */
+      --font-sans: "Noto Sans TC", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+      --font-serif: "Noto Serif TC", "Noto Sans TC", serif;
     }
     *, *::before, *::after { box-sizing: border-box; }
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -449,6 +455,33 @@
       -webkit-text-stroke: .4px rgba(0,0,0,.35);
       /* backdrop-filter: blur(6px); */     /* ❌ 取消毛玻璃 */
       /* -webkit-backdrop-filter: blur(6px); */
+    }
+
+    body{ font-family: var(--font-sans); }
+
+    .wx-city{
+      font-family: var(--font-serif);
+      font-weight: 900;
+      letter-spacing: .4px;
+    }
+
+    #wxSummary{
+      font-family: var(--font-sans);
+      font-weight: 900;
+      letter-spacing: .2px;
+      margin-top: 10px;
+    }
+
+    .wx-temp-inline{
+      margin-left: 10px;
+      font-weight: 800;
+      color: var(--ink2);
+    }
+
+    #wxSun{
+      margin-top: 8px;
+      font-weight: 800;
+      color: var(--ink2);
     }
 
 
@@ -1910,6 +1943,11 @@
     .menuPill{ cursor:pointer; }
     .menuPill:active{ transform:scale(.985); }
 
+  .wx-temp-inline{
+    margin-left:10px;
+    font-weight: 800;
+    color: rgba(0,0,0,.55); /* 跟你的 ink2 類似就行 */
+  }
 
 
 
@@ -3936,8 +3974,14 @@ async function renderWeatherJMA(meta){
 
               const codeText = wmoToZh(dCode); // 下面會給你 mapping
 
-              if(wxSummaryEl) wxSummaryEl.textContent = codeText ? `今天${codeText}` : '';
-              if(wxHiLoEl && tMax != null && tMin != null) wxHiLoEl.textContent = `${Math.round(tMin)}° ~ ${Math.round(tMax)}°`;
+              const minTxt = (tMin != null) ? `${Math.round(tMin)}°` : '';
+              const maxTxt = (tMax != null) ? `${Math.round(tMax)}°` : '';
+
+              if(wxSummaryEl){
+                const tempPart = (minTxt && maxTxt) ? `  溫度:${minTxt} ~ ${maxTxt}` : '';
+                wxSummaryEl.innerHTML = `今天${codeText}${tempPart}`;
+              }
+              if(wxHiLoEl) wxHiLoEl.textContent = ''; // ✅ 不用第二行就清空（或你乾脆刪掉 wxHiLo 那個DOM）
 
               const fmt = (s)=> (s && s.includes('T')) ? s.split('T')[1].slice(0,5) : '';
               if(wxSunEl) wxSunEl.textContent = (sunrise && sunset) ? `日出 ${fmt(sunrise)}｜日落 ${fmt(sunset)}` : '';
