@@ -1001,28 +1001,26 @@
     }
     /* ===== Sheet Splash (open modal show image for ~5s) ===== */
     /* ===== Sheet Splash (camera frame + pop) ===== */
-    .sheet-splash{
-      position:absolute;
-      inset:0;
-      z-index:2600;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:8px;
+  /* 明信片/拍立得效果 */
+  .splash-img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center;
 
-      /* 不要死灰：改成鏡頭遮光感 */
-      background:
-        radial-gradient(circle at 50% 40%,
-          rgba(0,0,0,.18) 0%,
-          rgba(0,0,0,.46) 55%,
-          rgba(0,0,0,.62) 100%);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+    /* ✅ 白色相紙邊 */
+    background:#fff;
+    padding:10px 10px 46px;          /* 底部留白較大 → 拍立得感 */
+    border-radius:16px;
+    border:1px solid rgba(0,0,0,.06);
+    box-shadow:0 18px 50px rgba(0,0,0,.28);
+    display:none;
+  }
 
-      opacity:0;
-      pointer-events:none;
-      transition:opacity .18s ease;
-    }
+  /* 讓圖片本身呈現在「相紙」內 */
+  .splash-img{
+    box-sizing:border-box;
+  }
 
 
 
@@ -1032,7 +1030,7 @@
       pointer-events:auto;          /* 出現時吃點擊，避免誤觸內容 */
     }
 
-    .sheet-splash img{
+    /* .sheet-splash img{
       width:100%;
       max-width:640px;
       max-height:72vh;
@@ -1040,7 +1038,7 @@
       border-radius:22px;
       border:1px solid rgba(255,255,255,.18);
       box-shadow:0 26px 80px rgba(0,0,0,.38);
-    }
+    } */
 
 
     
@@ -1116,18 +1114,6 @@
       grid-template-rows:1fr 1fr;
     }
 
-    /* 圖片本體 */
-    .splash-img{
-      width:100%;
-      height:100%;
-      aspect-ratio: 16 / 9;
-      object-fit:cover;
-      object-position: center;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.16);
-      box-shadow:0 18px 50px rgba(0,0,0,.25);
-      display:none; /* JS 會決定顯示哪張 */
-    }
 
     /* 兩張上下時，讓每張更像拍立得畫面 */
     .splash-grid.two .splash-img{
@@ -1161,6 +1147,20 @@
 
     /* splash 出現時，禁止底下內容互動（保險） */
     #modalSheet.splash-on #modalScroll{
+      pointer-events:none;
+    }
+
+    .splash-caption{
+      position:absolute;
+      left:22px;
+      right:22px;
+      bottom:18px;
+      font-family: var(--font-serif);
+      font-weight:900;
+      color:rgba(20,18,16,.78);
+      text-align:center;
+      letter-spacing:.08em;
+      font-size:.95rem;
       pointer-events:none;
     }
 
@@ -2224,12 +2224,13 @@
       <button class="modal-x" onclick="closeModal()" aria-label="close">×</button>
     </div>
     <div class="sheet-splash" id="sheetSplash" aria-hidden="true">
-      <div class="splash-frame" role="img" aria-label="spotlight">
+      <div class="splash-frame" id="sheetSplashFrame" role="img" aria-label="spotlight">
         <div class="shutter-flash" aria-hidden="true"></div>
         <div class="splash-grid one" id="sheetSplashGrid">
           <img class="splash-img" id="sheetSplashImg1" alt="" />
           <img class="splash-img" id="sheetSplashImg2" alt="" />
         </div>
+        <div class="splash-caption" id="sheetSplashCaption"></div>
       </div>
     </div>
     <div class="modal-scroll" id="modalScroll">
@@ -2358,12 +2359,35 @@
     img1.src = srcs[0];
     img1.style.display = 'block';
 
-    if(srcs[1]){
-      img2.src = srcs[1];
-      img2.style.display = 'block';
-    }
+    if(srcs[1]) img2.src = srcs[1]; // 先預載，但先不顯示
 
     ov.classList.add('active');
+    // ✅ caption：用景點 title（你也可改成 loc / date）
+    const cap = document.getElementById('sheetSplashCaption');
+    if(cap) cap.textContent = item?.title ? String(item.title).replace(/\n/g,' ') : '';
+
+    // ✅ 兩張圖：先顯示 1.8s → 淡入第2張 → 再 1.8s → 關閉
+    if(srcs.length >= 2){
+      img2.style.display = 'none';
+      img2.style.opacity = '0';
+
+      // 給一個淡入效果
+      img2.style.transition = 'opacity .28s ease';
+
+      setTimeout(()=>{
+        img2.style.display = 'block';
+        requestAnimationFrame(()=> img2.style.opacity = '1');
+        // 同時把第一張淡掉（可選）
+        img1.style.transition = 'opacity .28s ease';
+        img1.style.opacity = '0';
+      }, 1800);
+
+      // 總時間延長一點（兩張需要更久）
+      __sheetSplashTimer = setTimeout(()=> hideSheetSplash(), 4200);
+    }else{
+      // 單張：維持你原本 5 秒也可以，或縮短像快門感 3.2s
+      __sheetSplashTimer = setTimeout(()=> hideSheetSplash(), 3200);
+    }
     sheet.classList.add('splash-on');
 /*      ✅ shutter flash (120ms) */
     const frame = document.getElementById('sheetSplashFrame');
@@ -2378,8 +2402,6 @@
       if(__sheetSplashTimer) clearTimeout(__sheetSplashTimer);
       hideSheetSplash();
     };
-
-    __sheetSplashTimer = setTimeout(()=> hideSheetSplash(), 5000);
   }
 
 
@@ -3091,7 +3113,7 @@
       const timeVal = /^\d{2}:\d{2}$/.test(t) ? t : '';
       return `
         <div class="edit-row" onclick="event.stopPropagation()">
-          <input class="time-input" type="time" value="${escapeHtml(t)}" data-edit-time="1" data-idx="${i}" />
+          <input class="time-input" type="time" value="${escapeHtml(timeVal)}" data-edit-time="1" data-idx="${i}" />
           <button class="mini-btn danger" data-delete-idx="${i}"><i class="fas fa-trash"></i> 刪除</button>
         </div>`;
     }
