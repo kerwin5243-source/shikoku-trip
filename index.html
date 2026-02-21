@@ -627,6 +627,21 @@
       padding-top:6px;
       font-size:1rem;
     }
+
+    .tl-time{ position:relative; }
+    .time-photo-btn{
+      margin-top:8px;
+      width:28px; height:28px;
+      border-radius:999px;
+      border:1px solid rgba(233,225,214,.95);
+      background:#fff;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      color:#6F6A62;
+    }
+    .time-photo-btn:active{ transform:scale(.96); }
     
 
 
@@ -798,6 +813,26 @@
       color:var(--ink2);
       font-weight:700;
     }
+
+    .souvenir-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px 12px;
+    }
+    @media (min-width: 768px){
+      .souvenir-grid{ grid-template-columns: 1fr 1fr 1fr; }
+    }
+    .souvenir-item{ display:flex; align-items:center; gap:12px; }
+    .souvenir-avatar{
+      width:56px; height:56px;
+      border-radius:999px;
+      overflow:hidden;
+      border:4px solid rgba(61,110,169,.25); /* 你圖二那種圈圈感 */
+      background:#fff;
+      flex:0 0 auto;
+    }
+    .souvenir-avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .souvenir-name{ font-weight:900; color:var(--primary); line-height:1.2; }
 
 
 
@@ -1758,7 +1793,27 @@
       }
     }
 
-
+  .pill-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:.82rem;
+    font-weight:900;
+    margin-top:10px;
+    border:1px solid rgba(0,0,0,.08);
+  }
+  .pill-mapcode{
+    background:rgba(255,235,238,.92);
+    color:#B42318;
+    border-color:rgba(180,35,24,.15);
+  }
+  .pill-phone{
+    background:rgba(232,245,233,.92); /* 綠色淡底 */
+    color:#1B5E20;
+    border-color:rgba(27,94,32,.18);
+  }
 
 
     /* ===== Mobile layout guard ===== */
@@ -2235,6 +2290,14 @@
     </div>
   </div>
 
+  <!-- 伴手禮 -->
+  <div id="page-souvenir" class="page">
+    <div class="card">
+      <div class="section-title"><i class="fas fa-gift"></i> 伴手禮總覽</div>
+      <div id="souvenirBoard"></div>
+    </div>
+  </div>
+
   <!-- modal -->
   <div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
   <div class="modal-sheet" id="modalSheet" role="dialog" aria-modal="true">
@@ -2278,6 +2341,7 @@
   <nav class="bottom-nav">
     <div class="nav-item active" onclick="nav('itinerary', this)"><i class="fas fa-map-location-dot"></i> 行程</div>
     <div class="nav-item" onclick="nav('info', this)"><i class="fas fa-passport"></i> 資訊</div>
+    <div class="nav-item" onclick="nav('souvenir', this)"><i class="fas fa-gift"></i> 伴手禮</div>
     <div class="nav-item" onclick="nav('money', this)"><i class="fas fa-yen-sign"></i> 記帳</div>
     <div class="nav-item" onclick="nav('pre', this)"><i class="fas fa-list-check"></i> 行前</div>
   </nav>
@@ -2710,6 +2774,7 @@ function showSheetSplash(item){
       fetch("./data/flights.json").then(r=>r.json()),
       fetch("./data/hotels.json").then(r=>r.json()),
       fetch("./data/itinerary.index.json").then(r=>r.json()),
+      fetch("./data/souvenirs.json").then(r=>r.json()),
     ]);
 
     users = CONFIG?.members || ['KF','AL','RL','BL','CY'];
@@ -2777,6 +2842,8 @@ function showSheetSplash(item){
     initToTopButton();
     enableWheelHorizontal(document.getElementById('dayScroller'));
     initModalDragToClose();
+    await selectDay(0);
+    autoJumpToNextSpot();
   });
 
   function initToTopButton(){
@@ -3092,10 +3159,20 @@ function showSheetSplash(item){
     const icon = routeIcon(mode);
     const mins = r.minutes ? `${formatDuration(r.minutes)}` : (item.stay || '');
     const line2 = `${r.from || ''} → ${r.to || ''}`.trim();
+    const hasPhoto =
+      !!(item?.splash || item?.img || item?.cover || item?.image) ||
+      (Array.isArray(item?.menu) && item.menu.some(m => m?.img));
+
+    const photoBtn = hasPhoto
+      ? `<button class="time-photo-btn" data-photo-idx="${i}" title="看照片"><i class="fas fa-camera"></i></button>`
+      : '';
 
     return `
         <div class="timeline-item route-item">
-            <div class="tl-time">${escapeHtml(t)}</div>
+            <div class="tl-time">
+              <div class="tval">${escapeHtml(t)}</div>
+              ${photoBtn}
+            </div>
             <div class="route-spacer"></div>
 
             <div class="route-strip route-click"
@@ -3406,6 +3483,51 @@ function showSheetSplash(item){
 
       return `<div class="hotel-hero"><div class="hotel-track" data-hotel-track="${escapeHtml(h.id||'')}">${slides}</div></div>`;
     }
+
+function parseHHMMToMin(t){
+  const m = String(t||'').match(/(\d{1,2}):(\d{2})/);
+  if(!m) return null;
+  const hh = Number(m[1]), mm = Number(m[2]);
+  if(!Number.isFinite(hh) || !Number.isFinite(mm)) return null;
+  return hh*60+mm;
+}
+
+async function autoJumpToNextSpot(){
+  // 1) 找今天是哪一天（用 meta.file 的日期）
+  const today = new Date();
+  const y = today.getFullYear();
+  const mo = String(today.getMonth()+1).padStart(2,'0');
+  const d  = String(today.getDate()).padStart(2,'0');
+  const iso = `${y}-${mo}-${d}`;
+
+  const dayIdx = itineraryIndex.findIndex(m => String(m.file||'').includes(iso));
+  if(dayIdx < 0) return;
+
+  await selectDay(dayIdx);
+
+  // 2) 找下一個 item（以目前時間）
+  const nowMin = today.getHours()*60 + today.getMinutes();
+  const items = currentDayData?.items || [];
+  let targetIdx = -1;
+
+  for(let i=0;i<items.length;i++){
+    if(items[i]?.type === 'route') continue;
+    const t = parseHHMMToMin(items[i]?.time);
+    if(t != null && t >= nowMin){
+      targetIdx = i;
+      break;
+    }
+  }
+  if(targetIdx < 0) return;
+
+  // 3) scroll 到那個 item（不一定要 openModal）
+  const node = document.getElementById(`exp-item-${targetIdx}`);
+  if(node) node.scrollIntoView({ behavior:'smooth', block:'center' });
+
+  // 如果你想直接打開詳細：
+  // openModal(targetIdx);
+}
+    
 
     async function selectDay(idx) {
         currentDayIdx = idx;
@@ -4353,19 +4475,31 @@ async function renderWeatherJMA(meta){
 
     const detailText = item.detail || item.desc || '';
 
+    const linksArr = Array.isArray(item.links) ? item.links : [];
+    const linkBtnsHtml = linksArr.length
+      ? `<div class="link-grid">${
+          linksArr.map(l => {
+            const label = String(l?.label || l?.title || '連結');
+            const url = String(l?.url || '').trim();
+            if(!url) return '';
+            return `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(url)})'>${escapeHtml(label)}</button>`;
+          }).filter(Boolean).join('')
+        }</div>`
+      : '';
+
 /*      ✅ 支援 links 是「物件」或「陣列包一個物件」 */
-    const links = Array.isArray(item.links) ? (item.links[0] || {}) : (item.links || {});
+//     const links = Array.isArray(item.links) ? (item.links[0] || {}) : (item.links || {});
 
-/*      ✅ 用 JSON.stringify 避免引號/特殊字元把 onclick 撐爆 */
-    const linkBtns = [
-        links.official ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.official))})'>官網</button>` : '',
-        links.reserve  ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.reserve))})'>reserveseat</button>` : '',
-        links.menu     ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.menu))})'>meun</button>` : '',
-        links.cupon    ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.cupon))})'>cupon</button>` : '',
-        links.floormap      ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.floormap))})'>樓層地圖</button>` : '',
-    ].filter(Boolean).join('');
+// /*      ✅ 用 JSON.stringify 避免引號/特殊字元把 onclick 撐爆 */
+//     const linkBtns = [
+//         links.official ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.official))})'>官網</button>` : '',
+//         links.reserve  ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.reserve))})'>reserveseat</button>` : '',
+//         links.menu     ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.menu))})'>meun</button>` : '',
+//         links.cupon    ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.cupon))})'>cupon</button>` : '',
+//         links.floormap      ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.floormap))})'>樓層地圖</button>` : '',
+//     ].filter(Boolean).join('');
 
-    const linkBtnsHtml = linkBtns ? `<div class="link-grid">${linkBtns}</div>` : '';
+//     const linkBtnsHtml = linkBtns ? `<div class="link-grid">${linkBtns}</div>` : '';
 
 /*      ✅ 你要的欄位（eta/arrive/arrival 皆可） */
     const eta = item.eta || item.arrive || item.arrival || '';
@@ -4763,8 +4897,8 @@ async function renderWeatherJMA(meta){
             ${h.mapcode ? `
               <div style="display:inline-block;background:rgba(255,235,238,.92);color:#B42318;padding:6px 10px;border-radius:999px;font-size:.82rem;font-weight:900;margin-top:10px;border:1px solid rgba(180,35,24,.15);">
                 Mapcode: ${escapeHtml(h.mapcode)}
-              </div>
-            ` : ''}
+              </div>` : ''}
+            ${h.phone ? `<div class="pill-badge pill-phone"><i class="fas fa-phone"></i> ${escapeHtml(h.phone.trim())}</div>` : ''}
 
             <button class="btn btn-outline" style="margin-top:15px;"
               onclick="openUrl('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(h.name || '')}')">
@@ -4815,6 +4949,31 @@ async function renderWeatherJMA(meta){
         cur = (next >= realCount) ? 0 : next;
       }, 8000);
     });
+  }
+
+  function renderSouvenirs(){
+    const el = document.getElementById('souvenirBoard');
+    if(!el) return;
+    const groups = Array.isArray(SOUVENIRS) ? SOUVENIRS : [];
+
+    el.innerHTML = groups.map(g => {
+      const items = Array.isArray(g.items) ? g.items : [];
+      return `
+        <div class="card" style="padding:16px; margin-bottom:14px;">
+          <div style="font-weight:900; margin-bottom:10px;">${escapeHtml(g.region||'')}</div>
+          <div class="souvenir-grid">
+            ${items.map(it => `
+              <div class="souvenir-item">
+                <div class="souvenir-avatar">
+                  <img src="${escapeHtml(normalizeAssetUrl(it.img||''))}" alt="" loading="lazy" decoding="async">
+                </div>
+                <div class="souvenir-name">${escapeHtml(it.name||'')}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }).join('');
   }
 
   function renderFlights(){

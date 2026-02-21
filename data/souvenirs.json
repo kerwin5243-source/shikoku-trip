@@ -1,0 +1,10 @@
+[
+  { "region":"高松", "items":[
+    {"name":"Busan Bada Sand","img":"/photos/souvenir/busan1.jpg"},
+    {"name":"HBAF 杏仁果","img":"/photos/souvenir/busan2.jpg"}
+  ]},
+  { "region":"徳島", "items":[
+    {"name":"明月堂 博多通饅頭","img":"/photos/souvenir/fuku1.jpg"},
+    {"name":"福太郎 明太子仙貝","img":"/photos/souvenir/fuku2.jpg"}
+  ]}
+]
