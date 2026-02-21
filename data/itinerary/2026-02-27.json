@@ -156,9 +156,9 @@
         "price": "",
         "stay": "40–60 min",
         "menu": [
-          { "jp": "鍋焼うどん", "zh": "鍋燒烏龍麵", "rec": true, "img": "/photos/menu/kawata_nabe.png", "note": "招牌鐵鍋上桌，湯頭偏甘甜，雞肉很嫩。" },
-          { "jp": "牛たまうどん", "zh": "牛玉烏龍麵" },
-          { "jp": "おでん", "zh": "關東煮" }
+          { "jp": "鍋焼うどん", "zh": "鍋燒烏龍麵", "rec": true, "img": "/photos/menu/B022701.jpg", "note": "招牌鐵鍋上桌，湯頭偏甘甜，雞肉很嫩。" },
+          { "jp": "牛たまうどん", "zh": "牛玉烏龍麵", "rec": true, "img": "/photos/menu/B022702.jpg", "note": "" },
+          { "jp": "おでん", "zh": "關東煮", "rec": true, "img": "/photos/menu/B022703.jpg", "note": "" }
         ],
         "avoid": [],
         "guide": [
@@ -282,7 +282,7 @@
         "stay": "3 hr",
         "menu": [],
         "avoid": [
-          "⛩️階梯多：穿好走鞋、帶水。",
+          "階梯多：穿好走鞋、帶水。",
           "下午接近關門：先盡快上山，下山再慢慢逛。"
         ],
         "guide": [
@@ -327,7 +327,7 @@
         "time": "18:20",
         "title": "YAMADA Denki",
         "tag": "shop",
-        "desc": "大型家電量販。",
+        "desc": "大型家電量販",
         "detail": "",
         "addr": "〒761-8032 香川県高松市鶴市町724番地1",
         "mapcode": "60 571 466*01",
