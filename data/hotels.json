@@ -12,7 +12,9 @@
     "phone": " +81 87-813-7738",
     "address": "〒1077-1 Murojinmachi, Takamatsu, Kagawa 761-8062 日本",
     "booking": "Booking.com（雙臥室房屋 獨棟民宿 80㎡）",
-    "images": []
+    "images": [
+      "/photos/hotel/h1001.jpg","/photos/hotel/h1002.jpg","/photos/hotel/h1003.jpg","/photos/hotel/h1004.jpg","/photos/hotel/h1005.jpg","/photos/hotel/h1006.jpg","/photos/hotel/h1007.jpg"
+    ]
   },
   {
     "id": "H2",
@@ -27,7 +29,9 @@
     "phone": "+81 89-945-5911",
     "address": "〒1-1 Dogosagidanicho, Matsuyama, Ehime 790-0836 日本",
     "booking": "Booking.com（日式家庭房 標準雙床房）",
-    "images": []
+    "images": [
+      "/photos/hotel/h2005.jpg","/photos/hotel/h2001.jpg","/photos/hotel/h2002.jpg","/photos/hotel/h2003.jpg","/photos/hotel/h2004.jpg"
+    ]
   },
   {
     "id": "H3",
@@ -42,7 +46,9 @@
     "phone": "+81 50-3134-8095",
     "address": "〒9-15 Kutanda, Kochi, 781-0832 日本",
     "booking": "Booking.com（宴會套房/宴會雙床房）",
-    "images": []
+    "images": [
+      "/photos/hotel/h3001.jpg","/photos/hotel/h3002.jpg","/photos/hotel/h3003.jpg","/photos/hotel/h3004.jpg","/photos/hotel/h3005.jpg","/photos/hotel/h3006.jpg","/photos/hotel/h3007.jpg"
+    ]
   },
   {
     "id": "H4",
@@ -57,6 +63,8 @@
     "phone": "+81 87-758-8005",
     "address": "〒766-0001 Kagawa, Nakatado District, Kotohira, 川西713-1 日本",
     "booking": "",
-    "images": []
+    "images": [
+      "/photos/hotel/h4001.jpg","/photos/hotel/h4002.jpg","/photos/hotel/h4003.jpg","/photos/hotel/h4004.jpg","/photos/hotel/h4005.jpg","/photos/hotel/h4006.jpg","/photos/hotel/h4007.jpg"
+    ]
   }
 ]
