@@ -325,6 +325,52 @@
         box-shadow:0 10px 26px rgba(0,0,0,.08);
         background:rgba(255,255,255,.6);
     }
+    /* ===== Hotel slideshow (same behavior as DayHero) ===== */
+    .hotel-hero{
+      border-radius:24px;
+      overflow:hidden;
+      border:1px solid rgba(233,225,214,.9);
+      box-shadow:0 10px 26px rgba(0,0,0,.08);
+      background:rgba(255,255,255,.6);
+    }
+
+    .hotel-track{
+      display:flex;
+      overflow-x:auto;
+      scroll-snap-type:x mandatory;
+      scrollbar-width:none;
+    }
+    .hotel-track::-webkit-scrollbar{ display:none; }
+
+    .hotel-slide{
+      flex:0 0 100%;
+      aspect-ratio: 16 / 9;     /* ✅ 比你原本 180px 更大、更好看 */
+      scroll-snap-align:start;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hotel-slide img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    /* 右下角淡淡數字（可選） */
+    .hotel-badge{
+      position:absolute;
+      right:10px;
+      bottom:10px;
+      padding:5px 9px;
+      border-radius:999px;
+      background:rgba(0,0,0,.22);
+      color:#fff;
+      font-weight:900;
+      font-size:.78rem;
+      text-shadow:0 2px 10px rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.18);
+    }
 
     .hero-track{
         display:flex;
@@ -2097,7 +2143,7 @@
         <div class="wx-label"><i class="fas fa-cloud-sun"></i> 24H 預報</div>
       </div>
       <div class="wx-top">
-        <div id="weatherLoc" class="wx-city"></div>
+        <!-- <div id="weatherLoc" class="wx-city"></div> -->
 
         <!-- ✅ 新增：像天氣App一句話 + 今日高低溫 -->
         <div id="wxSummary" class="wx-summary"></div>
@@ -3042,6 +3088,7 @@
 /*       if (!__tlEditMode) return ''; */
 /*        ✅ 移除判斷式，讓編輯列永遠生成，改由 CSS 的 .edit-row { display: none; } 控制 */
       const t = normalizeTime(item.time);
+      const timeVal = /^\d{2}:\d{2}$/.test(t) ? t : '';
       return `
         <div class="edit-row" onclick="event.stopPropagation()">
           <input class="time-input" type="time" value="${escapeHtml(t)}" data-edit-time="1" data-idx="${i}" />
@@ -3182,6 +3229,23 @@
         // 若 next 到 clone，先預設回 0（scroll handler 也會保險修正）
         cur = (next >= photos.length) ? 0 : next;
       }, 12000);
+    }
+    function buildHotelSlideshow(h){
+      const imgsRaw = Array.isArray(h?.images) ? h.images : [];
+      const imgs = imgsRaw.map(normalizeAssetUrl).filter(Boolean);
+      if(!imgs.length) return '';
+
+      // ✅ 循環：最後多塞第一張，滑到最右再瞬間跳回
+      const loopImgs = imgs.length > 1 ? [...imgs, imgs[0]] : imgs;
+
+      const slides = loopImgs.map((src, idx)=>`
+        <div class="hotel-slide">
+          <img src="${escapeHtml(src)}" alt="hotel ${escapeHtml(h.name||'')} ${idx+1}" loading="lazy" decoding="async">
+          ${imgs.length > 1 ? `<div class="hotel-badge">${(idx % imgs.length)+1}/${imgs.length}</div>` : ``}
+        </div>
+      `).join('');
+
+      return `<div class="hotel-hero"><div class="hotel-track" data-hotel-track="${escapeHtml(h.id||'')}">${slides}</div></div>`;
     }
 
     async function selectDay(idx) {
@@ -3988,7 +4052,7 @@ async function renderWeatherJMA(meta){
             }
 
             const rows = [];
-            for(let h=6; h<=22; h++){
+            for(let hh=6; hh<=22; h++){
             // const hh = (h === 24) ? 0 : h;
             // const day = (h === 24) ? new Date(target.getTime() + 86400000) : target;
             const y = day.getFullYear();
@@ -4508,28 +4572,92 @@ async function renderWeatherJMA(meta){
     window.open(url, '_blank', 'noopener');
   }
 
+
 /*    ====== 住宿/航班/記帳（沿用你原本邏輯） ====== */
   function renderHotels() {
-    document.getElementById('hotelList').innerHTML = (HOTELS || []).map(h => {
+    const host = document.getElementById('hotelList');
+    if(!host) return;
+
+    host.innerHTML = (HOTELS || []).map(h => {
       const dateText = h.stay ? `${h.stay.from} - ${h.stay.to}` : '';
-      const img = (h.images && h.images[0]) ? h.images[0]
-        : "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=900";
+
+      // ✅ 用你剛做的輪播（沒有 images 才 fallback）
+      const slideshow = buildHotelSlideshow(h) || `
+        <img src="${escapeHtml("https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=900")}"
+            style="width:100%; aspect-ratio:16/9; object-fit:cover; display:block;">
+      `;
 
       return `
         <div class="card" style="padding:0; overflow:hidden;">
-          <img src="${escapeHtml(img)}" style="height:180px; width:100%; object-fit:cover; border-radius:20px; margin-bottom:0;">
+          ${slideshow}
           <div style="padding:20px;">
-            <h3 style="margin:0 0 6px; font-family:'Noto Serif TC',serif; font-weight:900;">${escapeHtml(h.name || '')}</h3>
-            <div style="color:var(--ink2); font-size:0.9rem; margin-bottom:10px; font-weight:800;">${escapeHtml(dateText)}</div>
+            <h3 style="margin:0 0 6px; font-family:var(--font-serif); font-weight:900;">
+              ${escapeHtml(h.name || '')}
+            </h3>
+
+            <div style="color:var(--ink2); font-size:0.9rem; margin-bottom:10px; font-weight:800;">
+              ${escapeHtml(dateText)}
+            </div>
+
             <div style="font-size:0.95rem; line-height:1.6; color:#444; font-weight:700;">
               ${escapeHtml(h.desc || '')}
             </div>
-            ${h.mapcode ? `<div style="display:inline-block;background:rgba(255,235,238,.92);color:#B42318;padding:6px 10px;border-radius:999px;font-size:.82rem;font-weight:900;margin-top:10px;border:1px solid rgba(180,35,24,.15);">Mapcode: ${escapeHtml(h.mapcode)}</div>` : ''}
-            <button class="btn btn-outline" style="margin-top:15px;" onclick="openUrl('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(h.name || '')}')">導航</button>
+
+            ${h.mapcode ? `
+              <div style="display:inline-block;background:rgba(255,235,238,.92);color:#B42318;padding:6px 10px;border-radius:999px;font-size:.82rem;font-weight:900;margin-top:10px;border:1px solid rgba(180,35,24,.15);">
+                Mapcode: ${escapeHtml(h.mapcode)}
+              </div>
+            ` : ''}
+
+            <button class="btn btn-outline" style="margin-top:15px;"
+              onclick="openUrl('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(h.name || '')}')">
+              導航
+            </button>
           </div>
         </div>
       `;
     }).join('');
+
+    // ✅ 這行很重要：渲染完才初始化輪播（自動播放/循環/滾輪）
+    initHotelSlideshows();
+  }
+
+  function initHotelSlideshows(){
+    // 清除舊 timer
+    window.__hotelTimers = window.__hotelTimers || {};
+    Object.values(window.__hotelTimers).forEach(t=>clearInterval(t));
+    window.__hotelTimers = {};
+
+    document.querySelectorAll('.hotel-track[data-hotel-track]').forEach(track=>{
+      const id = track.getAttribute('data-hotel-track') || '';
+      enableWheelHorizontal(track); // ✅ 桌機滾輪可左右滑（你站內已經有這個函式）
+
+      const slides = track.children.length;
+      if(slides <= 1) return;
+
+      const realCount = slides - 1; // 最後一張是 clone
+      let cur = 0;
+
+      // 使用者手滑到最後 clone → 瞬間跳回第 1 張
+      track.addEventListener('scroll', ()=>{
+        const w = track.clientWidth || 1;
+        const idx = Math.round(track.scrollLeft / w);
+        if(idx === realCount){
+          track.scrollTo({ left: 0, behavior: 'auto' });
+          cur = 0;
+        }else{
+          cur = Math.max(0, Math.min(idx, realCount-1));
+        }
+      });
+
+      // ✅ 自動播放（8 秒可改）
+      window.__hotelTimers[id] = setInterval(()=>{
+        const w = track.clientWidth || 1;
+        const next = cur + 1;
+        track.scrollTo({ left: next * w, behavior: 'smooth' });
+        cur = (next >= realCount) ? 0 : next;
+      }, 8000);
+    });
   }
 
   function renderFlights(){
