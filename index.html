@@ -344,7 +344,7 @@
 
     .hotel-slide{
       flex:0 0 100%;
-      aspect-ratio: 16 / 9;     /* ✅ 比你原本 180px 更大、更好看 */
+      aspect-ratio: 3 / 2;     /* ✅ 比你原本 180px 更大、更好看 */
       scroll-snap-align:start;
       position:relative;
       overflow:hidden;
@@ -4052,22 +4052,20 @@ async function renderWeatherJMA(meta){
             }
 
             const rows = [];
-            for(let hh=6; hh<=22; h++){
-            // const hh = (h === 24) ? 0 : h;
-            // const day = (h === 24) ? new Date(target.getTime() + 86400000) : target;
-            const y = day.getFullYear();
-            const mo = pad2(day.getMonth()+1);
-            const d = pad2(day.getDate());
-            const tKey = `${y}-${mo}-${d}T${pad2(hh)}:00`;
+            for(let hh = 6; hh <= 22; hh++){
+              const y  = target.getFullYear();
+              const mo = pad2(target.getMonth() + 1);
+              const d  = pad2(target.getDate());
+              const tKey = `${y}-${mo}-${d}T${pad2(hh)}:00`;
 
-            const idx = times.indexOf(tKey);
-            if(idx === -1){
-                rows.push({ time: pad2(h)+':00', icon:'fa-minus', temp:'—' });
+              const idx = times.indexOf(tKey);
+              if(idx === -1){
+                rows.push({ time: pad2(hh)+':00', icon:'fa-minus', temp:'—' });
                 continue;
-            }
-            const icon = wmoToFa(Number(codes[idx] ?? 0), hh);
-            const temp = temps[idx] != null ? Math.round(temps[idx]) + '°' : '—';
-            rows.push({ time: pad2(h)+':00', icon, temp });
+              }
+              const icon = wmoToFa(Number(codes[idx] ?? 0), hh);
+              const temp = temps[idx] != null ? Math.round(temps[idx]) + '°' : '—';
+              rows.push({ time: pad2(hh)+':00', icon, temp });
             }
 
             el.innerHTML = rows.map(r=>`
