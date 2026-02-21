@@ -182,7 +182,7 @@
         ],
         "links": [
           {
-            "title": "官方 FAQ / 預約",
+            "label": "官方預約",
             "url": "https://iya.gogo-adventure.com/faq/",
             "cat": "official"
           }

@@ -311,12 +311,12 @@
         ],
         "links": [
           {
-            "title": "官方：エンジェルロード 潮見表（2026/02）",
+            "label": "官方潮見表",
             "url": "https://www.shikokuferry.com/angel",
             "cat": "tide"
           },
           {
-            "title": "土庄町：潮見表 2026（PDF）",
+            "label": "土庄町：潮見表",
             "url": "https://www.town.tonosho.kagawa.jp/material/files/group/15/AJ2026.pdf",
             "cat": "tide"
           }
@@ -426,7 +426,7 @@
         ],
         "links": [
           {
-            "title": "Pokémon Center KAGAWA（官方）",
+            "label": "Pokémon官網",
             "url": "https://www.pokemon.co.jp/shop/en/pokecen/kagawa/",
             "cat": "official"
           }

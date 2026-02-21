@@ -293,7 +293,7 @@
           "[參道體驗]：\n  - 兩側有許多茶館、烏龍麵店、紀念品店。途中若體力不支，可租用竹杖，部分路段亦有傳統「轎子」服務。"
         ],
         "links": [
-          { "title": "金刀比羅宮參考文章", "url": "https://thegate12.com/tw/article/205" }
+          { "label": "參考文章", "url": "https://thegate12.com/tw/article/205" }
         ],
         "img": ""
       },
@@ -395,8 +395,8 @@
           "[雜貨]：\n (3F)： DAISO"
         ],
         "links": [
-            {"floormap": "https://tw.aeonmall.global/catalog/floormap/takamatsu/tw/index.html#page=1",
-             "coupon": "https://tw-img.vpon.com/img/campaigns/aeon/aeon_2025campaign_en/index.html"}
+            {"label":"floormap","url":"https://tw.aeonmall.global/catalog/floormap/takamatsu/tw/index.html#page=1"},
+            {"label":"coupon","url":"https://tw-img.vpon.com/img/campaigns/aeon/aeon_2025campaign_en/index.html"}
         ],
         "img": ""
       },
@@ -427,8 +427,8 @@
           "[3F｜長崎ちゃんぽん 十鉄]：\n ◈ ちゃんぽん：什錦湯麵\n ◈ 野菜たっぷりちゃんぽん：蔬菜加量什錦湯麵\n ◈ 皿うどん：長崎皿烏龍（脆麵/炒麵）"
         ],
         "links": [
-            {"floormap": "https://tw.aeonmall.global/catalog/floormap/takamatsu/tw/index.html#page=1",
-             "coupon": "https://tw-img.vpon.com/img/campaigns/aeon/aeon_2025campaign_en/index.html"}
+            {"label":"floormap","url":"https://tw.aeonmall.global/catalog/floormap/takamatsu/tw/index.html#page=1"},
+            {"label":"coupon","url":"https://tw-img.vpon.com/img/campaigns/aeon/aeon_2025campaign_en/index.html"}
         ],
         "img": ""
       },

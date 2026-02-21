@@ -82,12 +82,7 @@
         ],
         "links": [
           {
-            "title": "高知城資訊（營業時間/票價）",
-            "url": "https://shikoku-tourism.com/en/see-and-do/10061",
-            "cat": "official"
-          },
-          {
-            "title": "高知城介紹",
+            "label": "高知城介紹",
             "url": "https://shikoku-guide.com/en/information/kochicastle/",
             "cat": "official"
           }
