@@ -2507,9 +2507,9 @@
       fetch("./data/itinerary.index.json").then(r=>r.json()),
     ]);
 
-    users = CONFIG?.members || ['L','K','R','Y','J'];
-    curUser = users[0] || 'L';
-    curPayer = users[0] || 'L';
+    users = CONFIG?.members || ['Kerwin','Alan','Roy','Yan','CHIEH'];
+    curUser = users[0] || 'Kerwin';
+    curPayer = users[0] || 'Kerwin';
 
     checklistData = CHECKLISTS || { carry: [], check: [] };
     hotels = HOTELS || [];
@@ -3988,9 +3988,9 @@ async function renderWeatherJMA(meta){
             }
 
             const rows = [];
-            for(let h=1; h<=24; h++){
-            const hh = (h === 24) ? 0 : h;
-            const day = (h === 24) ? new Date(target.getTime() + 86400000) : target;
+            for(let h=6; h<=22; h++){
+            // const hh = (h === 24) ? 0 : h;
+            // const day = (h === 24) ? new Date(target.getTime() + 86400000) : target;
             const y = day.getFullYear();
             const mo = pad2(day.getMonth()+1);
             const d = pad2(day.getDate());
