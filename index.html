@@ -2767,7 +2767,7 @@ function showSheetSplash(item){
   }
 
   async function loadAllData(){ 
-    [CONFIG, CHECKLISTS, TODOS, FLIGHTS, HOTELS, ITINERARY] = await Promise.all([
+    [CONFIG, CHECKLISTS, TODOS, FLIGHTS, HOTELS, ITINERARY, SOUVENIRS] = await Promise.all([
       fetch("./data/config.json").then(r=>r.json()),
       fetch("./data/checklists.json").then(r=>r.json()),
       fetch("./data/todos.json").then(r=>r.json()),
