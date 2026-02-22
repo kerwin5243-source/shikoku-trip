@@ -1797,11 +1797,11 @@
     display:inline-flex;
     align-items:center;
     gap:8px;
-    padding:6px 10px;
+    padding:5px 8px;
     border-radius:999px;
-    font-size:.82rem;
+    font-size:.74rem;
     font-weight:900;
-    margin-top:10px;
+    margin-top:8px;
     border:1px solid rgba(0,0,0,.08);
   }
   .pill-mapcode{
@@ -2348,11 +2348,11 @@
 
 <script>
 /*    ====== Globals (JSON 驅動) ====== */
-  let CONFIG, CHECKLISTS, TODOS, FLIGHTS, HOTELS, ITINERARY;
+  let CONFIG, CHECKLISTS, TODOS, FLIGHTS, HOTELS, ITINERARY, SOUVENIRS;
 
   let users = [];
-  let curUser = 'L';
-  let curPayer = 'L';
+  let curUser = 'KF';
+  let curPayer = 'KF';
 
 /*    timeline (支援本機即時編輯：拖曳排序 / 改時間 / 刪除) */
 /*    ✅ 先宣告編輯模式狀態，避免 TDZ 造成行程渲染失敗 */
@@ -2839,6 +2839,7 @@ function showSheetSplash(item){
     renderFlights();
     normalizeExpenses();
     renderExpenseUI();
+    renderSouvenirs();
     initToTopButton();
     enableWheelHorizontal(document.getElementById('dayScroller'));
     initModalDragToClose();
@@ -4894,10 +4895,7 @@ async function renderWeatherJMA(meta){
               ${escapeHtml(h.desc || '')}
             </div>
 
-            ${h.mapcode ? `
-              <div style="display:inline-block;background:rgba(255,235,238,.92);color:#B42318;padding:6px 10px;border-radius:999px;font-size:.82rem;font-weight:900;margin-top:10px;border:1px solid rgba(180,35,24,.15);">
-                Mapcode: ${escapeHtml(h.mapcode)}
-              </div>` : ''}
+            ${h.mapcode ? `<div class="pill-badge pill-mapcode">Mapcode: ${escapeHtml(h.mapcode)}</div>` : ''}
             ${h.phone ? `<div class="pill-badge pill-phone"><i class="fas fa-phone"></i> ${escapeHtml(h.phone.trim())}</div>` : ''}
 
             <button class="btn btn-outline" style="margin-top:15px;"
