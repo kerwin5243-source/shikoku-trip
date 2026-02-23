@@ -4679,6 +4679,9 @@ async function renderWeatherJMA(meta){
 
   let __closingModal = false;
 
+/* ✅ 修正後的 closeModal：確保背景 100% 同步回歸透明 */
+/* ✅ 修正後的 closeModal：消除背景閃爍 */
+/* ✅ 最終修正版：確保背景 100% 零延遲同步回歸透明 */
   function closeModal(){
     if(__closingModal) return;
     __closingModal = true;
@@ -4686,39 +4689,37 @@ async function renderWeatherJMA(meta){
     const overlay = document.getElementById('modalOverlay');
     const sheet   = document.getElementById('modalSheet');
 
-    /*      ✅ 避免拖曳關閉時殘留 inline style 造成 transitionend 怪怪的 */
-    overlay.style.opacity = '';
-    sheet.style.transition = '';
-    sheet.style.transform  = '';
+    /* 💡 BIOS 邏輯：設定明確的轉移時間，並直接將數值寫入暫存器 */
+    const duration = "0.28s";
+    const easing = "cubic-bezier(0.16, 1, 0.3, 1)";
+    
+    sheet.style.transition = `transform ${duration} ${easing}`;
+    overlay.style.transition = `opacity ${duration} ease`;
+    
+    /* 核心：將終點狀態明確寫死，不讓 CSS Class 介入 */
+    sheet.style.transform = 'translateX(-50%) translateY(120%)';
+    overlay.style.opacity = '0';
+
     hideSheetSplash();
     
-
-    /*      先讓 sheet 開始下滑 */
-    sheet.classList.remove('active');
-    closeMenuCard();
-
-    /*      ✅ overlay 先淡出/先不擋視覺（你就不會覺得「多蓋一層灰」） */
-    overlay.classList.remove('active');
+    /* 延後移除 Active 類別，僅作為狀態紀錄 */
+    setTimeout(() => {
+        sheet.classList.remove('active');
+        overlay.classList.remove('active');
+        closeMenuCard();
+    }, 10);
 
     const done = ()=>{
+      /* 動畫結束後清空所有暫存，恢復到純淨的 CSS 狀態 */
+      sheet.style.cssText = '';
+      overlay.style.cssText = '';
       unlockBodyScroll();
       __closingModal = false;
     };
 
-    /*      ✅ 保險：transitionend 有時候會不觸發（或被重排打斷） */
-    const onEnd = (e)=>{
-      if(e.target !== sheet) return;
-      sheet.removeEventListener('transitionend', onEnd);
-      done();
-    };
-
-    sheet.addEventListener('transitionend', onEnd);
-
-    /*      fallback（比你的 .18s 稍長一點就好） */
-    setTimeout(()=>{
-      sheet.removeEventListener('transitionend', onEnd);
-      done();
-    }, 260);
+    /* 使用 once: true 確保事件只觸發一次 */
+    sheet.addEventListener('transitionend', done, { once: true });
+    setTimeout(done, 350); 
   }
 
 
