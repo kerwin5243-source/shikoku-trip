@@ -3400,17 +3400,6 @@ function renderGasStations(){
         </div>`;
     }
     
-/*
-    // 儲存異動
-//     function saveDayEdits() {
-//       const meta = itineraryIndex[currentDayIdx];
-//       const file = meta?.file;
-//       if (!file) return;
-//       const dataToSave = { items: (currentDayData?.items || []) };
-//       localStorage.setItem(`day_edits_${file}`, JSON.stringify(dataToSave));
-//       cloudPost("updateItinerary", { file: file, items: dataToSave });
-//     }
-*/
 
     function renderDayHero(dayData, meta){
       const el = document.getElementById('dayHero');
@@ -3595,6 +3584,62 @@ async function autoJumpToNextSpot(){
   // 如果你想直接打開詳細：
   // openModal(targetIdx);
 }
+
+//小行程 Modal」裡加一個 「移動到哪一天」 的下拉選單+按鈕
+
+function dayKey(meta){ return `day_edits_${meta.file}`; }
+
+async function loadDayItems(meta){
+  // 先看 localStorage edits
+  try{
+    const raw = localStorage.getItem(dayKey(meta));
+    if(raw){
+      const saved = JSON.parse(raw);
+      if(Array.isArray(saved?.items)) return saved.items;
+    }
+  }catch(e){}
+
+  // 沒有 edits → fetch 原始日檔
+  const data = await fetch(meta.file, { cache:'no-store' }).then(r=>r.json());
+  return Array.isArray(data?.items) ? data.items : [];
+}
+
+function saveDayItems(meta, items){
+  localStorage.setItem(dayKey(meta), JSON.stringify({ file: meta.file, items }));
+}
+
+async function moveItemToDay(fromDayIdx, itemIdx, toDayIdx){
+  if(toDayIdx === fromDayIdx) return;
+
+  const fromMeta = itineraryIndex[fromDayIdx];
+  const toMeta   = itineraryIndex[toDayIdx];
+  if(!fromMeta || !toMeta) return;
+
+  const fromItems = currentDayData?.items || [];
+  const item = fromItems[itemIdx];
+  if(!item) return;
+
+  // 1) 從來源移除
+  const newFrom = fromItems.slice();
+  newFrom.splice(itemIdx, 1);
+  saveDayItems(fromMeta, newFrom);
+
+  // 2) 讀目標 items
+  const toItems = await loadDayItems(toMeta);
+  const newTo = toItems.slice();
+
+  // 3) 插入（最簡單：push 到尾端）
+  newTo.push(item);
+  saveDayItems(toMeta, newTo);
+
+  // 4) 更新目前畫面（你留在原本那天）
+  currentDayData.items = newFrom;
+  renderTimelineList(currentDayData);
+  enableTimelineSortable?.();
+
+  // 若你希望搬移後自動跳到目標天：
+  // await selectDay(toDayIdx);
+}
     
 
     async function selectDay(idx) {
@@ -3677,40 +3722,37 @@ async function autoJumpToNextSpot(){
       return dayData;
     }
 
-/*
-//     function applyDayEdits(dayData, meta){
-//       try{
-//         const key = `day_edits_${meta?.file || ''}`;
-//         const saved = JSON.parse(localStorage.getItem(key) || 'null');
-//         if(saved && Array.isArray(saved.items)){
-//           return { ...dayData, items: saved.items };
-//         }
-//       }catch(e){}
-//       return dayData;
-//     }
+    async function loadDayData(dayIdx, meta){
+      // 1) 若已有 cache，直接用
+      if(dayCache?.[dayIdx]) return dayCache[dayIdx];
 
-//     function saveDayEdits() {
-//       try {
-//         const file = itineraryIndex[currentDayIdx]?.file;
-//         if (!file) return;
-//     
-//         const key = dayEditKey();
-//         const dataToSave = { items: (currentDayData?.items || []) };
-//         
-//         // 1. 本地備份
-//         localStorage.setItem(key, JSON.stringify(dataToSave));
-//     
-//         // 2. 雲端同步
-//         cloudPost("updateItinerary", {
-//           file: file,
-//           items: dataToSave // 包含完整的項目順序與時間
-//         });
-//         console.log(`Day ${currentDayIdx + 1} 行程異動已同步雲端`);
-//       } catch (e) {
-//         console.error("儲存失敗", e);
-//       }
-//     }
-*/
+      // 2) 否則讀檔（你原本 selectDay 用什麼載，就照它）
+      const file = meta?.file;
+      const res = await fetch(file, { cache:'no-store' });
+      const data = await res.json();
+
+      // 3) 套用 localStorage edits（若你本來就有 applyDayEdits 邏輯，就改呼叫它）
+      const key = `day_edits_${file}`;
+      try{
+        const raw = localStorage.getItem(key);
+        if(raw){
+          const patch = JSON.parse(raw);
+          if(Array.isArray(patch?.items)) data.items = patch.items;
+        }
+      }catch(e){}
+
+      dayCache[dayIdx] = data;
+      return data;
+    }
+
+    function saveDayEditsForDayIdx(dayIdx, dayData){
+      const file = itineraryIndex?.[dayIdx]?.file;
+      if(!file) return;
+      try{
+        localStorage.setItem(`day_edits_${file}`, JSON.stringify({ items: dayData.items }));
+      }catch(e){}
+      dayCache[dayIdx] = dayData;
+    }
 /*       ✅ 修正後的 saveDayEdits */
      function saveDayEdits() {
        try {
@@ -4474,13 +4516,26 @@ async function renderWeatherJMA(meta){
     });
   }
 
+  function modalGoto(delta){
+    const list = currentDayData?.items || [];
+    const cur  = Number(window.__activeModalIdx ?? -1);
+    if(cur < 0) return;
 
+    const nxt = cur + delta;
+    if(nxt < 0 || nxt >= list.length) return; // ✅ 第一筆/最後一筆擋住
+
+    // ✅ 直接重用 openModal：不用先 close
+    openModal(nxt);
+  }
 
 
 /*    ====== Modal：預計到達/地址/停車/Mapcode/介紹 + Google 導航 ====== */
   function openModal(itemIdx) {
-    const item = currentDayData?.items?.[itemIdx];
+    const idx = Number(itemIdx);
+    const item = currentDayData?.items?.[idx];
     if(!item) return;
+
+    window.__activeModalIdx  = idx;   // ✅ 新增：記住目前開的是哪一筆
     window.__activeModalItem = item;
 
 
@@ -4508,7 +4563,7 @@ async function renderWeatherJMA(meta){
             const zh = escapeHtml(m.zh || '');
             const isRec = m.rec === true || m.recommend === true;
 
-/*              ✅ 只讓推薦的項目可以點開（維持你原本邏輯） */
+          /*              ✅ 只讓推薦的項目可以點開（維持你原本邏輯） */
             const pillCls = `menu-row ${isRec ? 'menuPill' : ''}`;
 
             return `
@@ -4555,21 +4610,37 @@ async function renderWeatherJMA(meta){
         }</div>`
       : '';
 
-/*      ✅ 支援 links 是「物件」或「陣列包一個物件」 */
-//     const links = Array.isArray(item.links) ? (item.links[0] || {}) : (item.links || {});
+    /*      ✅ 支援 links 是「物件」或「陣列包一個物件」 */
+    //     const links = Array.isArray(item.links) ? (item.links[0] || {}) : (item.links || {});
 
-// /*      ✅ 用 JSON.stringify 避免引號/特殊字元把 onclick 撐爆 */
-//     const linkBtns = [
-//         links.official ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.official))})'>官網</button>` : '',
-//         links.reserve  ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.reserve))})'>reserveseat</button>` : '',
-//         links.menu     ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.menu))})'>meun</button>` : '',
-//         links.cupon    ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.cupon))})'>cupon</button>` : '',
-//         links.floormap      ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.floormap))})'>樓層地圖</button>` : '',
-//     ].filter(Boolean).join('');
+    // /*      ✅ 用 JSON.stringify 避免引號/特殊字元把 onclick 撐爆 */
+    //     const linkBtns = [
+    //         links.official ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.official))})'>官網</button>` : '',
+    //         links.reserve  ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.reserve))})'>reserveseat</button>` : '',
+    //         links.menu     ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.menu))})'>meun</button>` : '',
+    //         links.cupon    ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.cupon))})'>cupon</button>` : '',
+    //         links.floormap      ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.floormap))})'>樓層地圖</button>` : '',
+    //     ].filter(Boolean).join('');
 
-//     const linkBtnsHtml = linkBtns ? `<div class="link-grid">${linkBtns}</div>` : '';
+    //     const linkBtnsHtml = linkBtns ? `<div class="link-grid">${linkBtns}</div>` : '';
 
-/*      ✅ 你要的欄位（eta/arrive/arrival 皆可） */
+    /*      ✅ 你要的欄位（eta/arrive/arrival 皆可） */
+    //Modal 裡加 UI_行程跨天移動
+    const dayOptions = itineraryIndex.map((m, idx)=> {
+      const label = String(m.file||'').match(/\d{4}-\d{2}-\d{2}/)?.[0] || `Day ${idx+1}`;
+      return `<option value="${idx}" ${idx===currentDayIdx?'selected':''}>${escapeHtml(label)}</option>`;
+    }).join('');
+
+    const moveBlock = `
+      <div class="meta-row" style="margin-top:12px;">
+        <div style="font-weight:900; margin-bottom:6px;">移動行程到</div>
+        <div style="display:flex; gap:10px;">
+          <select id="moveDaySelect" class="input" style="flex:1;">${dayOptions}</select>
+          <button class="btn btn-outline" id="moveDayBtn">移動</button>
+        </div>
+      </div>
+    `;
+
     const eta = item.eta || item.arrive || item.arrival || '';
     const addr = item.addr || '';
     const parking = item.parking || '';
@@ -4646,6 +4717,7 @@ async function renderWeatherJMA(meta){
       ${avoidList}
       ${guideList}
       ${linkBtnsHtml}
+      ${moveBlock}
 
 
       
@@ -4657,76 +4729,98 @@ async function renderWeatherJMA(meta){
         </a>
       </div>`;
 
-    // lockBodyScroll();
-    // document.getElementById('modalOverlay').classList.add('active');
-    // document.getElementById('modalSheet').classList.add('active');
-    // showSheetSplash(item);
-    lockBodyScroll();
+      // lockBodyScroll();
+      // document.getElementById('modalOverlay').classList.add('active');
+      // document.getElementById('modalSheet').classList.add('active');
+      // showSheetSplash(item);
+      // ===== openModal 尾端：開啟 + 綁事件（建議整段用這段取代） =====
+      lockBodyScroll();
 
-    const ov = document.getElementById('modalOverlay');
-    const sh = document.getElementById('modalSheet');
+      // ✅ 跨天移動：按鈕綁定（每次 openModal 重新綁 OK）
+      const btn = document.getElementById('moveDayBtn');
+      if(btn){
+        btn.onclick = async () => {
+          const sel = document.getElementById('moveDaySelect');
+          const targetDayIdx = Number(sel?.value ?? currentDayIdx);
+          if(Number.isNaN(targetDayIdx) || targetDayIdx === currentDayIdx) return;
 
-    ov.classList.add('active');
+          const movingItem = currentDayData.items.splice(idx, 1)[0];
+          saveDayEdits();
+          renderTimelineList(currentDayData);
 
-    // ✅ 延後一幀再讓 sheet 進場：減少 Safari「跳一下 / UI 彈出」的機率
-    requestAnimationFrame(() => {
-      sh.classList.add('active');
-      showSheetSplash(item);
-    });
+          const targetMeta = itineraryIndex[targetDayIdx];
+          const targetData = await loadDayData(targetDayIdx, targetMeta);
 
+          targetData.items.push(movingItem);
+          targetData.items.sort((a,b)=>{
+            const ta = String(a.time||'').match(/(\d{1,2}):(\d{2})/);
+            const tb = String(b.time||'').match(/(\d{1,2}):(\d{2})/);
+            const ma = ta ? (Number(ta[1])*60+Number(ta[2])) : 99999;
+            const mb = tb ? (Number(tb[1])*60+Number(tb[2])) : 99999;
+            return ma-mb;
+          });
 
-/*
-    // === menu pill click + 喇叭 click：事件委派（只綁一次）===
-    // document.getElementById('modalSheet')?.addEventListener('click', (e) => {
-    //   const speakBtn = e.target.closest?.('.menuSpeak');
-    //   if(speakBtn){
-    //     e.stopPropagation();
-    //     const text = speakBtn.getAttribute('data-speak') || '';
-    //     speakJapanese(text);
-    //     return;
-    //   }
+          saveDayEditsForDayIdx(targetDayIdx, targetData);
 
-    //   const pill = e.target.closest?.('.menuPill');
-    //   if(!pill) return;
+          await selectDay(targetDayIdx);
+          const newIdx = targetData.items.findIndex(x=>x===movingItem);
+          openModal(newIdx === -1 ? 0 : newIdx);
+        };
+      }
 
-    //   const isRec = pill.getAttribute('data-rec') === '1';
-    //   if(!isRec) return; // 不是推薦就不開卡
+      const ov = document.getElementById('modalOverlay');
+      const sh = document.getElementById('modalSheet');
 
-    //   const idx = Number(pill.getAttribute('data-menu-idx'));
-    //   const m = window.__activeModalItem?.menu?.[idx];
-    //   if(m) openMenuCard(m);
-    // });
-*/
+      // ✅ 記住是否已開啟（一定要在 add active 前算）
+      const alreadyOpen = ov.classList.contains('active') && sh.classList.contains('active');
 
+      ov.classList.add('active');
+
+      requestAnimationFrame(() => {
+        sh.classList.add('active');
+        // 你想每次切換也有明信片效果：保留
+        showSheetSplash(item);
+      });
+
+      // ✅ Modal 內左右滑（只綁一次，避免越綁越多次）
+      if(!window.__modalSwipeBound){
+        window.__modalSwipeBound = true;
+
+        const splash = document.getElementById('sheetSplash');
+        const scrollArea = document.getElementById('modalScroll');
+
+        let sx = 0, sy = 0, tracking = false;
+
+        sh.addEventListener('pointerdown', (e) => {
+          if(!sh.classList.contains('active')) return;
+          if(splash?.classList.contains('active')) return;
+          if(scrollArea && scrollArea.scrollTop > 8) return;
+
+          tracking = true;
+          sx = e.clientX; sy = e.clientY;
+        }, { passive: true });
+
+        sh.addEventListener('pointerup', (e) => {
+          if(!tracking) return;
+          tracking = false;
+
+          const dx = e.clientX - sx;
+          const dy = e.clientY - sy;
+
+          if(Math.abs(dx) < 60) return;
+          if(Math.abs(dx) < Math.abs(dy) * 1.2) return;
+
+          if(dx < 0) modalGoto(+1);
+          else       modalGoto(-1);
+        }, { passive: true });
+
+        sh.addEventListener('pointercancel', () => { tracking = false; }, { passive: true });
+      }
   }
 
-/*
-  // function openRouteMap(ev, idx){
-  //   ev?.stopPropagation?.();
 
-  //   const item = currentDayData?.items?.[idx];
-  //   if(!item) return;
 
-  //   const r = item.route || {};
-  //   const from = r.from || '';
-  //   const to   = r.to || '';
-  //   if(!to) return;
 
-  //   const mode = (r.mode || 'drive').toLowerCase();
-  //   const travelmode =
-  //     mode === 'walk'  ? 'walking' :
-  //     mode === 'train' ? 'transit' :
-  //     mode === 'ship'  ? 'transit' :
-  //     mode === 'plane' ? 'transit' :
-  //     'driving';
-
-  //   window.open(
-  //     `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(from)}&destination=${encodeURIComponent(to)}&travelmode=${travelmode}`,
-  //     '_blank',
-  //     'noopener'
-  //   );
-  // }
-*/
   function openRouteMap(ev, idx){
     ev?.stopPropagation?.();
     const item = currentDayData?.items?.[idx];
@@ -4734,8 +4828,8 @@ async function renderWeatherJMA(meta){
 
     const r = item.route;
     const tm = travelModeForRoute(r.mode);
-/*     window.open(`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(r.from||'')}&destination=${encodeURIComponent(r.to||'')}&travelmode=${tm}`,
-	    '_blank', 'noopener'); */
+    /*     window.open(`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(r.from||'')}&destination=${encodeURIComponent(r.to||'')}&travelmode=${tm}`,
+          '_blank', 'noopener'); */
     window.open(`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(r.from||'')}&destination=${encodeURIComponent(r.to||'')}&travelmode=${tm}`, '_blank', 'noopener');
   }
 
