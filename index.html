@@ -1208,6 +1208,8 @@
     #modalSheet.splash-on #modalScroll{
       pointer-events:none;
     }
+    #modalSheet.swap-left  { transition: transform .14s ease, opacity .14s ease; transform: translateX(calc(-50% - 18px)) translateY(0); opacity:.88; }
+    #modalSheet.swap-right { transition: transform .14s ease, opacity .14s ease; transform: translateX(calc(-50% + 18px)) translateY(0); opacity:.88; }
 
     .splash-caption{
       position:absolute;
@@ -2371,7 +2373,7 @@
 
 <script>
 /*    ====== Globals (JSON 驅動) ====== */
-  let CONFIG, CHECKLISTS, TODOS, FLIGHTS, HOTELS, GAS, ITINERARY, SOUVENIRS;
+  let CONFIG, CHECKLISTS, TODOS, FLIGHTS, HOTELS, ITINERARY, SOUVENIRS, GAS_STATIONS;
 
   let users = [];
   let curUser = 'KF';
@@ -2910,6 +2912,7 @@ function renderGasStations(){
     initToTopButton();
     enableWheelHorizontal(document.getElementById('dayScroller'));
     initModalDragToClose();
+    initModalSwipe();
     await selectDay(0);
     autoJumpToNextSpot();
   });
@@ -2960,6 +2963,27 @@ function renderGasStations(){
 
     openDirections(from, to, mode);
    });
+
+   function modalGoto(step, opt={}){
+    const items = currentDayData?.items || [];
+    const cur = Number(window.__activeModalIdx ?? 0);
+    const next = cur + step;
+
+    if(next < 0 || next >= items.length) return;
+
+    const sh = document.getElementById('modalSheet');
+    if(opt.animate && sh){
+      const cls = step > 0 ? 'swap-left' : 'swap-right';
+      sh.classList.add(cls);
+      setTimeout(()=>{
+        sh.classList.remove(cls);
+        openModal(next, { keepOpen:true, skipSplash: !!opt.skipSplash });
+      }, 140);
+      return;
+    }
+
+    openModal(next, { keepOpen:true, skipSplash: !!opt.skipSplash });
+  }
 
 
 
@@ -4717,7 +4741,6 @@ async function renderWeatherJMA(meta){
       ${avoidList}
       ${guideList}
       ${linkBtnsHtml}
-      ${moveBlock}
 
 
       
@@ -4818,7 +4841,42 @@ async function renderWeatherJMA(meta){
       }
   }
 
+  function initModalSwipe(){
+    const sh = document.getElementById('modalSheet');
+    const splash = document.getElementById('sheetSplash');
+    const scrollArea = document.getElementById('modalScroll');
+    if(!sh) return;
 
+    let sx=0, sy=0, tracking=false;
+
+    sh.addEventListener('pointerdown', (e)=>{
+      if(!sh.classList.contains('active')) return;
+      if(splash?.classList.contains('active')) return;
+
+      // ✅ 只有「從 header / sticky 區開始」才判定左右滑（不用一定回到最上）
+      const fromHeader = !!e.target.closest('.modal-header, #modalSticky, .sheet-head, .modal-title, .sheet-time');
+      if(!fromHeader) return;
+
+      tracking = true;
+      sx = e.clientX; sy = e.clientY;
+    }, {passive:true});
+
+    sh.addEventListener('pointerup', (e)=>{
+      if(!tracking) return;
+      tracking = false;
+
+      const dx = e.clientX - sx;
+      const dy = e.clientY - sy;
+
+      if(Math.abs(dx) < 60) return;
+      if(Math.abs(dx) < Math.abs(dy) * 1.2) return;
+
+      // ✅ 加一個小動畫讓切換「看起來更順」
+      modalGoto(dx < 0 ? +1 : -1, { animate:true, skipSplash:true });
+    }, {passive:true});
+
+    sh.addEventListener('pointercancel', ()=>{ tracking=false; }, {passive:true});
+  }
 
 
   function openRouteMap(ev, idx){
