@@ -886,6 +886,8 @@
       padding:4px 0 2px;
       background:#FAF7F2;
       border-bottom:1px solid rgba(233,225,214,.75);
+      z-index: 2700;       /* 必須高於 .sheet-splash 的 2600 */
+      touch-action: none;  /* 禁止瀏覽器嘗試捲動，強制讓 JS 接手拖曳 */						 
     }
 
     /* 拖曳條保持置中 */
@@ -925,6 +927,9 @@
       background:#FAF7F2;           /* ✅ 防止透出看到背後 */
       -webkit-overflow-scrolling:touch;
       overscroll-behavior:contain;
+      /* 💡 關鍵：允許垂直捲動，但當我們攔截事件時，瀏覽器應停止其原生行為 */
+      overscroll-behavior-y: none; 
+      touch-action: pan-y; 
     }
 
 
@@ -4791,75 +4796,101 @@ async function renderWeatherJMA(meta){
 
 
 
+
 /*    ===== Modal drag to close ===== */
+/* ✅ 修正後的 initModalDrag：增加對內容捲動狀態的感知 */
+/* ✅ 優化後的 initModalDrag：徹底解決內容區下拉晃動問題 */
+/* ✅ 優化後的 initModalDrag：徹底解決內容區下拉關閉失效與抖動 */
+/* ✅ 優化後的 initModalDrag：解決手機端下拉失效 */
+/* ✅ 最終修正版：全域鎖定解決手機下拉抖動 */
   (function initModalDrag(){
     const sheet   = document.getElementById('modalSheet');
     const overlay = document.getElementById('modalOverlay');
-    const handle  = document.querySelector('.modal-drag-handle');  /* 或改成 .modal-drag-handle */
-
-    if(!sheet || !overlay || !handle) return;
-
-    let startY = 0;
-    let dy = 0;
-    let dragging = false;
-
-    function setTranslate(y){
-      sheet.style.transform = `translateX(-50%) translateY(${y}px)`;
-      sheet.style.transition = 'none';
-/*        讓遮罩跟著變淡（可選） */
-      const k = Math.max(0, 1 - y / 280);
-      overlay.style.opacity = (0.38 * k).toFixed(3);
-    }
-
-    function reset(){
-      sheet.style.transition = '';
-      sheet.style.transform = '';        /* 交回給 .active 的 transform */
-      overlay.style.opacity = '';        /* 交回給 CSS */
-    }
-
-    
-
-    handle.addEventListener('pointerdown', (e)=>{
+    const handle  = document.querySelector('.modal-header');
+    const scrollArea = document.getElementById('modalScroll');
+  
+    if(!sheet || !overlay || !handle || !scrollArea) return;
+  
+    let startY = 0, dy = 0, dragging = false;
+  
+    const onStart = (e) => {
       if(!sheet.classList.contains('active')) return;
+
+      /* 💡 只有在接近頂端時才啟動下拉關閉中斷 */
+      if (scrollArea.scrollTop > 5 && e.target !== handle) return;								 
       dragging = true;
       startY = e.clientY;
       dy = 0;
-      sheet.setPointerCapture?.(e.pointerId);
-    });
-
-    handle.addEventListener('pointermove', (e)=>{
-      if(!dragging) return;
-      dy = Math.max(0, e.clientY - startY);  /* 只允許往下拖 */
-      setTranslate(dy);
-    });
-
-    handle.addEventListener('pointerup', (e)=>{
-      if(!dragging) return;
-      dragging = false;
-      sheet.releasePointerCapture?.(e.pointerId);
-
-/*        拖超過門檻就關掉，否則彈回 */
-      if(dy > 120){
-        reset();
-        closeModal();
-      }else{
-/*          彈回原位 */
-        sheet.style.transition = 'transform .18s cubic-bezier(.16,1,.3,1)';
-        sheet.style.transform  = 'translateX(-50%) translateY(0)';
-        overlay.style.opacity  = '0.38';
-        setTimeout(reset, 200);
+      
+      /* 關鍵：立即鎖定指針並禁止原生捲動 */
+      sheet.setPointerCapture(e.pointerId);
+      sheet.style.touchAction = 'none';
+      scrollArea.style.touchAction = 'none';
+    };
+  
+    const onMove = (e) => {
+      if (!dragging) return;
+  
+      const deltaY = e.clientY - startY;
+      
+      /* 判定是否真的要下拉 */
+      if (deltaY < 0) {
+          /* 使用者往上推，釋放控制權交還給捲動引擎 */
+          dragging = false;
+          sheet.style.touchAction = '';
+          scrollArea.style.touchAction = 'pan-y';
+          sheet.releasePointerCapture(e.pointerId);
+          return;
       }
-    });
 
-    handle.addEventListener('pointercancel', ()=>{
-      if(!dragging) return;
+      /* ✅ 強制攔截所有原生行為，防止抖動 */
+      if (e.cancelable) e.preventDefault(); 
+      scrollArea.scrollTop = 0; 
+      
+      dy = deltaY;
+      
+      requestAnimationFrame(() => {
+          sheet.style.transition = 'none';
+          overlay.style.transition = 'none';
+          sheet.style.transform = `translateX(-50%) translateY(${dy}px)`;
+          
+          /* 背景隨位移線性變淡 */
+          const k = Math.max(0, 1 - dy / 450);
+          overlay.style.opacity = (0.38 * k).toFixed(3);
+      });
+    };
+  
+    const onEnd = (e) => {
+      if (!dragging) return;
       dragging = false;
-      reset();
-    });
+      sheet.releasePointerCapture(e.pointerId);
+      
+      /* 恢復標準觸控暫存器 */
+      sheet.style.touchAction = '';
+      scrollArea.style.touchAction = 'pan-y';
+  
+      if (dy > 120) {
+				
+        closeModal();
+      } else {
+        /* 回彈程序 */
+        sheet.style.transition = 'transform .25s cubic-bezier(0.16, 1, 0.3, 1)';
+        overlay.style.transition = 'opacity .25s ease';
+        sheet.style.transform = 'translateX(-50%) translateY(0)';
+        overlay.style.opacity = '0.38'; 
+							   
+      }
+      dy = 0;
+    };
+  
+    handle.addEventListener('pointerdown', onStart);
+    scrollArea.addEventListener('pointerdown', onStart);
+					   
+			  
+    sheet.addEventListener('pointermove', onMove, { passive: false });
+    sheet.addEventListener('pointerup', onEnd);
+    sheet.addEventListener('pointercancel', onEnd);
   })();
-
-
-
   function openUrl(url){
     window.open(url, '_blank', 'noopener');
   }
@@ -5377,6 +5408,10 @@ async function renderWeatherJMA(meta){
       editingTs = null; // 重置
       const btn = document.querySelector('#page-money .btn');
       if(btn) btn.innerText = "加入紀錄";
+      /* ✅ 儲存後將全域狀態恢復為預設，避免影響下一筆 */
+      curCurrency = 'JPY'; 
+      curPayer = users[0] || 'KF';
+      curParticipants = new Set(users);																			   		   
     } 
     else {
       // 新增模式
