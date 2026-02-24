@@ -1039,51 +1039,11 @@
       line-height:1;
       gap:6px;  
     }
-    /* ===== Sheet Splash (open modal show image for ~5s) ===== */
+    /* ===== Sheet Splash (open modal show image for ~5s) =====
     /* ===== Sheet Splash (camera frame + pop) ===== */
-  /* 明信片/拍立得效果 */
-  .splash-img{
-    width:100%;
-    height:100%;
-    object-fit: contain;  
-    object-position:center;
-    box-sizing:border-box;
+    /* ===== Sheet Splash: Camera Preview (REPLACE WHOLE BLOCK) ===== */
 
-    /* ✅ 白色相紙邊 */
-    background: rgba(0,0,0,.12);  /* 避免留白太突兀 */
-    padding:10px 10px 46px;          /* 底部留白較大 → 拍立得感 */
-    border-radius:16px;
-    border:1px solid rgba(0,0,0,.06);
-    box-shadow:0 18px 50px rgba(0,0,0,.28);
-    display:none;
-  }
-  /* ✅ 用同一張圖做「模糊滿版背景」 */
-  #sheetSplashFrame{
-    --splash-bg: none;
-  }
-
-  #sheetSplashFrame::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    border-radius:22px;
-    background-image: var(--splash-bg);
-    background-size: cover;
-    background-position: center;
-    filter: blur(18px);
-    transform: scale(1.08);
-    opacity: .55;
-    z-index: 0;
-  }
-
-  /* 讓圖片與 caption 壓在背景上 */
-  #sheetSplashFrame .splash-grid,
-  #sheetSplashFrame .splash-caption{
-    position: relative;
-    z-index: 1;
-  }
-
-
+  /* Overlay：一層暗色 + blur */
   .sheet-splash{
     position:fixed;
     inset:0;
@@ -1093,132 +1053,145 @@
     justify-content:center;
     padding:14px;
 
-    /* ✅ 這三個是關鍵：平常要完全隱形、不吃點擊、不占視覺 */
     opacity:0;
-    pointer-events:none;
     visibility:hidden;
+    pointer-events:none;
     transition: opacity .16s ease, visibility .16s ease;
 
-    /* ✅ 你想要的相機/明信片氛圍背景（可調深淺） */
-    background: rgba(0,0,0,.35);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: rgba(0,0,0,.38);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
-
   .sheet-splash.active{
     opacity:1;
-    pointer-events:auto;
     visibility:visible;
+    pointer-events:auto;
   }
 
-    /* .sheet-splash img{
-      width:100%;
-      max-width:640px;
-      max-height:72vh;
-      object-fit:cover;
-      border-radius:22px;
-      border:1px solid rgba(255,255,255,.18);
-      box-shadow:0 26px 80px rgba(0,0,0,.38);
-    } */
+  /* 相機預覽框（大、乾淨） */
+  .splash-frame{
+    position:relative;
+    width: min(96vw, 980px);
+    max-height: min(86vh, 860px);
+    border-radius: 22px;
+    overflow:hidden;
+    background: rgba(255,255,255,.06);
 
+    /* 只留一層陰影 */
+    box-shadow: 0 30px 110px rgba(0,0,0,.38);
+  }
 
-    
-    /* 取景框本體 */
-    .splash-frame{
-      width: min(94vw, 920px);
-      max-height: min(78vh, 720px);
-      border-radius: 22px;
-      overflow:hidden;
+  /* 移除你之前的「同圖模糊滿版背景」 */
+  #sheetSplashFrame::before{ display:none !important; }
 
-      /* ✅ 只留一層陰影，不要再疊 border */
-      box-shadow: 0 28px 90px rgba(0,0,0,.35);
-      background: transparent; /* 不要再加一層底 */
-      position: relative
-    }
+  /* 取景框內線（很淡，避免厚重） */
+  .splash-frame::after{
+    content:"";
+    position:absolute;
+    inset:12px;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,.14);
+    pointer-events:none;
+    z-index:3;
+  }
 
-    /* pop 動畫 */
-    @keyframes splashPop{
-      0%   { transform: translateY(18px) scale(.94); opacity:0; }
-      60%  { transform: translateY(-2px) scale(1.01); opacity:1; }
-      100% { transform: translateY(0) scale(1); opacity:1; }
-    }
+  /* 快門閃 */
+  .splash-frame .shutter-flash{
+    position:absolute;
+    inset:0;
+    border-radius:22px;
+    background:rgba(255,255,255,.92);
+    opacity:0;
+    pointer-events:none;
+    z-index:4;
+  }
+  .splash-frame.flash .shutter-flash{
+    animation: shutterFlash 120ms ease-out 1;
+  }
+  @keyframes shutterFlash{
+    0%   { opacity:0; }
+    15%  { opacity:1; }
+    100% { opacity:0; }
+  }
 
-    /* 取景框四角（相機框） */
-    .splash-frame::before,
-    .splash-frame::after{
-      content:"";
-      position:absolute;
-      inset:12px;
-      border-radius:16px;
-      pointer-events:none;
-    }
-    .splash-frame::before{
-      /* 四角框線：用背景畫四個 L 角 */
-      background:
-        linear-gradient(#fff,#fff) left top/22px 2px no-repeat,
-        linear-gradient(#fff,#fff) left top/2px 22px no-repeat,
+  /* Grid → 橫向滑動（單張也用同一套） */
+  .splash-grid{
+    position:relative;
+    z-index:2;
+    display:flex;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    scrollbar-width:none;
+    height:100%;
+  }
+  .splash-grid::-webkit-scrollbar{ display:none; }
 
-        linear-gradient(#fff,#fff) right top/22px 2px no-repeat,
-        linear-gradient(#fff,#fff) right top/2px 22px no-repeat,
+  /* 圖片：相機預覽，完整顯示（contain） */
+  .splash-img{
+    flex:0 0 100%;
+    scroll-snap-align:start;
 
-        linear-gradient(#fff,#fff) left bottom/22px 2px no-repeat,
-        linear-gradient(#fff,#fff) left bottom/2px 22px no-repeat,
+    width:100%;
+    height:100%;
+    display:block;
 
-        linear-gradient(#fff,#fff) right bottom/22px 2px no-repeat,
-        linear-gradient(#fff,#fff) right bottom/2px 22px no-repeat;
-      opacity:.55;
-    }
-    .splash-frame::after{
-      border:1px solid rgba(255,255,255,.18);
-      opacity:.8;
-    }
+    object-fit: contain;
+    object-position:center;
 
-    /* 兩張以上 → 橫向滑，圖片會大很多 */
-    .splash-grid{
-      display:flex;
-      overflow-x:auto;
-      scroll-snap-type:x mandatory;
-      scrollbar-width:none;
-    }
-    .splash-grid::-webkit-scrollbar{ display:none; }
+    /* 相機預覽的黑邊（避免留白突兀） */
+    background: rgba(0,0,0,.10);
 
-    .splash-grid .splash-img{
-      flex:0 0 100%;
-      scroll-snap-align:start;
-      width:100%;
-      height:100%;
-      object-fit:contain;          /* ✅ 想完整展示就用 contain */
-      background:#fff;             /* 明信片白底 */
-      padding:12px 12px 44px;      /* 下方留白做拍立得 */
-      border-radius:0;             /* ✅ 不要再自己圓角，避免疊框感 */
-      box-shadow:none;             /* ✅ 不要再自己陰影 */
-      border:none;                 /* ✅ 不要再自己 border */
-      display:block;
-    }
+    /* ✅ 不要白邊/陰影/圓角，避免疊層 */
+    padding:0;
+    border:0;
+    border-radius:0;
+    box-shadow:none;
+  }
 
-        /* ===== Shutter flash (120ms) ===== */
-    .splash-frame{
-      position:relative; /* 確保 flash 疊在框上 */
-    }
+  /* Caption：下方置中（小字，不搶畫面） */
+  .splash-caption{
+    position:absolute;
+    left:18px;
+    right:18px;
+    bottom:14px;
+    z-index:5;
 
-    .splash-frame .shutter-flash{
-      position:absolute;
-      inset:0;
-      border-radius:22px;
-      background:rgba(255,255,255,.92);
-      opacity:0;
-      pointer-events:none;
-    }
+    font-family: var(--font-serif);
+    font-weight:900;
+    font-size:.92rem;
+    letter-spacing:.06em;
+    text-align:center;
 
-    .splash-frame.flash .shutter-flash{
-      animation: shutterFlash 120ms ease-out 1;
-    }
+    color: rgba(255,255,255,.92);
+    text-shadow: 0 8px 24px rgba(0,0,0,.55);
+    pointer-events:none;
+  }
 
-    @keyframes shutterFlash{
-      0%   { opacity:0; }
-      15%  { opacity:1; }
-      100% { opacity:0; }
-    }
+  /* 右下角計數器（1/2） */
+  .splash-counter{
+    position:absolute;
+    right:12px;
+    bottom:12px;
+    z-index:5;
+
+    padding:6px 10px;
+    border-radius:999px;
+    background:rgba(0,0,0,.28);
+    color:#fff;
+    font-weight:900;
+    font-size:.82rem;
+    border:1px solid rgba(255,255,255,.18);
+    pointer-events:none;
+  }
+
+  /* 讓 modal 內容在 splash 期間淡出（你原本有就保留，這裡給更安全版本） */
+  #modalSheet.splash-on #modalScroll{
+    opacity:0;
+    transition: opacity .18s ease;
+  }
+  #modalSheet:not(.splash-on) #modalScroll{
+    opacity:1;
+  }
 
 
     /* splash 出現時，禁止底下內容互動（保險） */
@@ -1245,7 +1218,7 @@
       letter-spacing:.08em;
       font-size:.95rem;
       pointer-events:none;
-    }
+    } */
 
 
 
@@ -2507,6 +2480,21 @@ function showSheetSplash(item){
   ov.classList.add('active');
   ov.setAttribute('aria-hidden','false');
   sheet.classList.add('splash-on');
+  const counter = document.getElementById('sheetSplashCounter');
+
+  if(counter){
+    counter.textContent = (srcs.length > 1) ? `1/${srcs.length}` : '';
+  }
+
+  if(grid && counter && srcs.length > 1){
+    // 先移除舊監聽（避免重複）
+    grid.onscroll = null;
+    grid.onscroll = () => {
+      const w = grid.clientWidth || 1;
+      const i = Math.round(grid.scrollLeft / w);
+      counter.textContent = `${Math.min(i+1, srcs.length)}/${srcs.length}`;
+    };
+  }
 
   // ✅ 快門閃一下
   const frame = document.getElementById('sheetSplashFrame');
