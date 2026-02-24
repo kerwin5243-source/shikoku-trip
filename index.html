@@ -1045,8 +1045,9 @@
   .splash-img{
     width:100%;
     height:100%;
-    object-fit:cover;
+    object-fit: contain;  
     object-position:center;
+    box-sizing:border-box;
 
     /* ✅ 白色相紙邊 */
     background:#fff;
@@ -1056,11 +1057,33 @@
     box-shadow:0 18px 50px rgba(0,0,0,.28);
     display:none;
   }
-
-  /* 讓圖片本身呈現在「相紙」內 */
-  .splash-img{
-    box-sizing:border-box;
+  /* ✅ 用同一張圖做「模糊滿版背景」 */
+  #sheetSplashFrame{
+    --splash-bg: none;
   }
+
+  #sheetSplashFrame::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:22px;
+    background-image: var(--splash-bg);
+    background-size: cover;
+    background-position: center;
+    filter: blur(18px);
+    transform: scale(1.08);
+    opacity: .55;
+    z-index: 0;
+  }
+
+  /* 讓圖片與 caption 壓在背景上 */
+  #sheetSplashFrame .splash-grid,
+  #sheetSplashFrame .splash-caption{
+    position: relative;
+    z-index: 1;
+  }
+
+
   .sheet-splash{
     position:fixed;
     inset:0;
@@ -1205,8 +1228,13 @@
 
 
     /* splash 出現時，禁止底下內容互動（保險） */
+/* ✅ splash 期間：把內容先藏起來，等 splash 結束再顯示 */
     #modalSheet.splash-on #modalScroll{
-      pointer-events:none;
+      opacity:0;
+      transition: opacity .18s ease;
+    }
+    #modalSheet:not(.splash-on) #modalScroll{
+      opacity:1;
     }
     #modalSheet.swap-left  { transition: transform .14s ease, opacity .14s ease; transform: translateX(calc(-50% - 18px)) translateY(0); opacity:.88; }
     #modalSheet.swap-right { transition: transform .14s ease, opacity .14s ease; transform: translateX(calc(-50% + 18px)) translateY(0); opacity:.88; }
@@ -2432,6 +2460,8 @@ function hideSheetSplash(){
   ov.classList.remove('active');
   ov.setAttribute('aria-hidden','true');
   sheet.classList.remove('splash-on');
+  const frame = document.getElementById('sheetSplashFrame');
+  if(frame) frame.style.setProperty('--splash-bg', 'none');
 
   // ✅ reset（避免下一次 opacity 還是 0）
   [img1, img2].forEach(img=>{
@@ -2486,10 +2516,7 @@ function showSheetSplash(item){
 
   // ✅ 快門閃一下
   const frame = document.getElementById('sheetSplashFrame');
-  if(frame){
-    frame.classList.remove('flash');
-    requestAnimationFrame(()=> frame.classList.add('flash'));
-  }
+  if(frame) frame.style.setProperty('--splash-bg', `url("${srcs[0]}")`);
 
   // ✅ 點一下提前跳過
   ov.onclick = () => {
