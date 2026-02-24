@@ -469,7 +469,8 @@
         "hours": "入住 16:00–22:00 / 退房 11:00",
         "reservations": [
           { "label": "booking.com No.", "value": "6297.508.902" },
-          { "label": "PIN 碼", "value": "0054" }
+          { "label": "PIN 碼", "value": "0054" },
+          { "label": "民宿密碼", "value": "700616" }
         ],
         "price": "¥121,666",
         "stay": "3 Days",
