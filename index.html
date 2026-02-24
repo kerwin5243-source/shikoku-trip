@@ -2272,6 +2272,7 @@
 
     <div class="section-title" style="margin-top:8px;"><i class="fas fa-hotel"></i> 住宿資訊</div>
     <div id="hotelList"></div>
+    <div class="section-title" style="margin-top:8px;"><i class="fas fa-gas-pump"></i> 加油站資訊</div>
     <div id="gasBoard"></div>
   </div>
 
@@ -4888,15 +4889,33 @@ async function renderWeatherJMA(meta){
   //     }
   // }
 
+  function ensureModalContent(){
+    let content = document.getElementById('modalContent');
+    if(content) return content;
 
-  function openModal(itemIdx, opt={}){
+    const sheet = document.getElementById('modalSheet');
+    if(!sheet) return null;
+
+    // 如果 modalContent 不見了：補回來
+    content = document.createElement('div');
+    content.className = 'modal-scroll';
+    content.id = 'modalContent';
+    sheet.appendChild(content);
+    return content;
+  }
+
+  function openModal(itemIdx, opt={}){ 
     const idx = Number(itemIdx);
     const item = currentDayData?.items?.[idx];
     if(!item) return;
 
     window.__activeModalIdx = idx;
 
-    const content = document.getElementById('modalContent');
+    const content = ensureModalContent();
+    if(!content){
+      console.warn('[openModal] modalContent not found');
+      return;
+    }
 
     const mapcode = item.mapcode ? `<span class="pill"><i class="fas fa-location-dot"></i> Mapcode：${escapeHtml(item.mapcode)}</span>` : '';
     const hours = item.hours ? `<span class="pill"><i class="fas fa-clock"></i> ${escapeHtml(item.hours)}</span>` : '';
@@ -5317,22 +5336,22 @@ async function renderWeatherJMA(meta){
     });
   }
 
-  function renderGasStations(data) {
-    const container = document.getElementById("gas-container");
-    container.innerHTML = "";
+  // function renderGasStations(data) {
+  //   const container = document.getElementById("gas-container");
+  //   container.innerHTML = "";
 
-    data.forEach(station => {
-      const div = document.createElement("div");
-      div.className = "info-card";
-      div.innerHTML = `
-        <h3>${station.name}</h3>
-        <p>${station.address}</p>
-        <a href="${station.map}" target="_blank">Google Map</a>
-        <p>${station.note}</p>
-      `;
-      container.appendChild(div);
-    });
-  }
+  //   data.forEach(station => {
+  //     const div = document.createElement("div");
+  //     div.className = "info-card";
+  //     div.innerHTML = `
+  //       <h3>${station.name}</h3>
+  //       <p>${station.address}</p>
+  //       <a href="${station.map}" target="_blank">Google Map</a>
+  //       <p>${station.note}</p>
+  //     `;
+  //     container.appendChild(div);
+  //   });
+  // }
 
   function renderSouvenirs(){
     const el = document.getElementById('souvenirBoard');
@@ -6035,33 +6054,33 @@ async function renderWeatherJMA(meta){
       let isLongPress = false;
       let startPos = { x: 0, y: 0 };
   
-/*        攔截系統選單中斷 */
+      /*        攔截系統選單中斷 */
       el.oncontextmenu = (e) => {
         if (!__tlEditMode) e.preventDefault(); 
       };
   
-/*
-//       const start = (e) => {
-//         if (__tlEditMode) return; 
-//         
-//         isLongPress = false;
-//         startPos = { x: e.clientX, y: e.clientY };
-//         
-//         // 啟動 700ms 定時器
-//         pressTimer = setTimeout(() => {
-//           isLongPress = true;
-//           triggerEditMode(el);
-//         }, 700); 
-//       };
-*/
-/*      ✅ 修改：將原始事件 e 傳入 triggerEditMode */
+    /*
+    //       const start = (e) => {
+    //         if (__tlEditMode) return; 
+    //         
+    //         isLongPress = false;
+    //         startPos = { x: e.clientX, y: e.clientY };
+    //         
+    //         // 啟動 700ms 定時器
+    //         pressTimer = setTimeout(() => {
+    //           isLongPress = true;
+    //           triggerEditMode(el);
+    //         }, 700); 
+    //       };
+    */
+    /*      ✅ 修改：將原始事件 e 傳入 triggerEditMode */
     const start = (e) => {
       if (__tlEditMode) return; 
       
       isLongPress = false;
       startPos = { x: e.clientX, y: e.clientY };
       
-/*        啟動 700ms 定時器 */
+      /*        啟動 700ms 定時器 */
       pressTimer = setTimeout(() => {
         isLongPress = true;
         triggerEditMode(el, e);  /* 👈 這裡多傳入 e */
