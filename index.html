@@ -4602,385 +4602,385 @@ async function renderWeatherJMA(meta){
 
 
 /*    ====== Modal：預計到達/地址/停車/Mapcode/介紹 + Google 導航 ====== */
-  // function openModal(itemIdx) {
-  //   const idx = Number(itemIdx);
-  //   const item = currentDayData?.items?.[idx];
-  //   if(!item) return;
-
-  //   window.__activeModalIdx  = idx;   // ✅ 新增：記住目前開的是哪一筆
-  //   window.__activeModalItem = item;
-
-
-  //   const hours = item.hours ? `<span class="pill"><i class="fas fa-clock"></i> ${escapeHtml(item.hours)}</span>` : '';
-  //   const price = item.price ? `<span class="pill"><i class="fas fa-ticket"></i> ${escapeHtml(item.price)}</span>` : '';
-  //   const stay  = item.stay  ? `<span class="pill"><i class="fas fa-hourglass-half"></i> ${escapeHtml(item.stay)}</span>` : '';
-
-  //   const guideList = (item.guide || []).length
-  //     ? `<div class="block"><h4><i class="fas fa-headset"></i> 特色介紹</h4><ul class="bullet">${item.guide.map(x=>`<li>${escapeHtml(x).replace(/\n/g,'<br>').replace(/^\[(.+?)\]：/,'<strong>[$1]：</strong>')}</li>`).join('')}</ul></div>`
-  //     : '';
-
-  //   const avoidList = (item.avoid || []).length
-  //     ? `<div class="block"><h4><i class="fas fa-triangle-exclamation"></i> 注意事項</h4><ul class="bullet">${item.avoid.map(x=>`<li>${escapeHtml(x).replace(/\n/g,'<br>').replace(/^\[(.+?)\]：/,'<strong>[$1]：</strong>')}</li>`).join('')}</ul></div>`
-  //     : '';
-
-  //   const menuBlock = (item.menu || []).length ? `
-  //     <div class="menu-box">
-  //       <div class="menu-box-head">
-  //         <i class="fas fa-thumbs-up"></i> 必吃美食
-  //       </div>
-  //       <div class="menu-table">
-  //         ${(item.menu || []).map((m, idx) => {
-  //           const jpRaw = (m.jp || '');
-  //           const jp = escapeHtml(jpRaw);
-  //           const zh = escapeHtml(m.zh || '');
-  //           const isRec = m.rec === true || m.recommend === true;
-
-  //         /*              ✅ 只讓推薦的項目可以點開（維持你原本邏輯） */
-  //           const pillCls = `menu-row ${isRec ? 'menuPill' : ''}`;
-
-  //           return `
-  //             <div class="${pillCls}" data-menu-idx="${idx}" data-rec="${isRec ? '1':'0'}">
-  //               <div class="menu-jp">
-  //                 <button class="menuSpeak" type="button" data-speak="${escapeHtml(m.speak || jpRaw)}" aria-label="speak">
-  //                   <i class="fas fa-volume-up"></i>
-  //                 </button>
-  //                 <span>${jp}</span>
-  //               </div>
-  //               <div class="menu-zh">${zh}</div>
-  //             </div>
-  //           `;
-  //         }).join('')}
-  //       </div>
-  //     </div>
-  //   ` : '';
-
-
-  //   const reserveBlock = (item.reservations || []).length
-  //     ? `<div class="block">
-  //           <h4><i class="fas fa-receipt"></i> 預約資訊</h4>
-  //           ${(item.reservations||[]).map(r=>`
-  //               <div class="meta-row" style="padding:6px 0; border-bottom:1px dashed rgba(233,225,214,.85);">
-  //               <span class="meta-ico"><i class="fas fa-hashtag"></i></span>
-  //               <span class="meta-val"><b>${escapeHtml(r.label||'')}</b>：${escapeHtml(r.value||'')}</span>
-  //               <button class="mini-btn" onclick="copyText('${escapeHtml(r.value||'')}')">複製</button>
-  //               </div>
-  //           `).join('')}
-  //       </div>`
-  //   : '';							
-
-  //   const detailText = item.detail || item.desc || '';
-
-  //   const linksArr = Array.isArray(item.links) ? item.links : [];
-  //   const linkBtnsHtml = linksArr.length
-  //     ? `<div class="link-grid">${
-  //         linksArr.map(l => {
-  //           const label = String(l?.label || l?.title || '連結');
-  //           const url = String(l?.url || '').trim();
-  //           if(!url) return '';
-  //           return `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(url)})'>${escapeHtml(label)}</button>`;
-  //         }).filter(Boolean).join('')
-  //       }</div>`
-  //     : '';
-
-  //   /*      ✅ 支援 links 是「物件」或「陣列包一個物件」 */
-  //   //     const links = Array.isArray(item.links) ? (item.links[0] || {}) : (item.links || {});
-
-  //   // /*      ✅ 用 JSON.stringify 避免引號/特殊字元把 onclick 撐爆 */
-  //   //     const linkBtns = [
-  //   //         links.official ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.official))})'>官網</button>` : '',
-  //   //         links.reserve  ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.reserve))})'>reserveseat</button>` : '',
-  //   //         links.menu     ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.menu))})'>meun</button>` : '',
-  //   //         links.cupon    ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.cupon))})'>cupon</button>` : '',
-  //   //         links.floormap      ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.floormap))})'>樓層地圖</button>` : '',
-  //   //     ].filter(Boolean).join('');
-
-  //   //     const linkBtnsHtml = linkBtns ? `<div class="link-grid">${linkBtns}</div>` : '';
-
-  //   /*      ✅ 你要的欄位（eta/arrive/arrival 皆可） */
-  //   //Modal 裡加 UI_行程跨天移動
-  //   const dayOptions = itineraryIndex.map((m, idx)=> {
-  //     const label = String(m.file||'').match(/\d{4}-\d{2}-\d{2}/)?.[0] || `Day ${idx+1}`;
-  //     return `<option value="${idx}" ${idx===currentDayIdx?'selected':''}>${escapeHtml(label)}</option>`;
-  //   }).join('');
-
-  //   const moveBlock = `
-  //     <div class="meta-row" style="margin-top:12px;">
-  //       <div style="font-weight:900; margin-bottom:6px;">移動行程到</div>
-  //       <div style="display:flex; gap:10px;">
-  //         <select id="moveDaySelect" class="input" style="flex:1;">${dayOptions}</select>
-  //         <button class="btn btn-outline" id="moveDayBtn">移動</button>
-  //       </div>
-  //     </div>
-  //   `;
-
-  //   const eta = item.eta || item.arrive || item.arrival || '';
-  //   const addr = item.addr || '';
-  //   const parking = item.parking || '';
-  //   const mapcode = item.mapcode || '';
-
-  //   const navUrl = buildGoogleDirUrlForItem(item);
-
-  //   const sticky = document.getElementById('modalSticky');
-  //   const body   = document.getElementById('modalBody');
-
-  //   sticky.innerHTML = `
-  //       <div class="modal-sticky-wrap ${tagClass(item.tag)}">
-  //           <div class="sheet-head">
-  //               <div class="tag-chip ${tagClass(item.tag)}">
-  //                   <div class="sheet-tag ${tagClass(item.tag)}">
-  //                     ${escapeHtml((item.tag||'').toUpperCase())}
-  //                     ${((item.tag||'').toLowerCase()==='takagi') ? getTagIconHtml('takagi', itemIdx) : ''}
-  //                   </div>
-  //               </div>
-  //           <div class="sheet-time"><i class="fa-regular fa-clock" style="color:#8B8175;"></i>${escapeHtml(item.time || '—')}</div>
-  //           </div>
-
-  //           <div class="modal-title">${escapeHtml(item.title || '')}</div>
-
-  //           <div class="pill-row">
-  //           ${hours}${price}${stay}
-  //           </div>
-  //       </div>
-  //   `;
-
-
-
-  //   body.innerHTML = `
-  //     <div class="meta-box">
-  //       ${eta ? `
-  //       <div class="meta-row">
-  //         <span class="meta-ico"><i class="fa-regular fa-clock"></i></span>
-  //         <span class="meta-val">預計到達：${escapeHtml(eta)}</span>
-  //         <button class="mini-btn" onclick="copyText('${escapeHtml(eta)}')">複製</button>
-  //       </div>` : ''}
-
-  //       ${addr ? `
-  //       <div class="meta-row">
-  //         <span class="meta-ico"><i class="fas fa-location-dot"></i></span>
-  //         <span class="meta-val">${escapeHtml(addr)}</span>
-  //         <button class="mini-btn" onclick="copyText('${escapeHtml(addr)}')">複製</button>
-  //       </div>` : ''}
-
-  //       ${parking ? `
-  //       <div class="meta-row">
-  //         <span class="meta-ico"><i class="fas fa-square-parking"></i></span>
-  //         <span class="meta-val">${escapeHtml(parking)}</span>
-  //         <button class="mini-btn" onclick="copyText('${escapeHtml(parking)}')">複製</button>
-  //       </div>` : ''}
-
-  //       ${mapcode ? `
-  //       <div class="meta-row">
-  //         <span class="meta-ico">🗾</span>
-  //         <span class="meta-val">Mapcode：${escapeHtml(mapcode)}</span>
-  //         <button class="mini-btn" onclick="copyText('${escapeHtml(mapcode)}')">複製</button>
-  //       </div>` : ''}
-
-  //       ${(!eta && !addr && !parking && !mapcode) ? `
-  //       <div class="meta-row">
-  //         <span class="meta-ico">ℹ️</span>
-  //         <span class="meta-val">（此行程尚未填：到達/地址/停車/Mapcode）</span>
-  //       </div>` : ''}
-  //     </div>
-  //     ${reserveBlock}
-  //     <div class="detail">${escapeHtml(detailText)}</div>	 
-  //     ${menuBlock}
-      
-
-  //     ${avoidList}
-  //     ${guideList}
-  //     ${linkBtnsHtml}
-
-
-      
-
-
-  //     <div class="sheet-actions">
-  //       <a class="btn-primary" href="${navUrl}" target="_blank" rel="noopener">
-  //         <i class="fas fa-location-arrow"></i> 開啟 Google Maps 導航
-  //       </a>
-  //     </div>`;
-
-  //     // lockBodyScroll();
-  //     // document.getElementById('modalOverlay').classList.add('active');
-  //     // document.getElementById('modalSheet').classList.add('active');
-  //     // showSheetSplash(item);
-  //     // ===== openModal 尾端：開啟 + 綁事件（建議整段用這段取代） =====
-  //     lockBodyScroll();
-
-  //     // ✅ 跨天移動：按鈕綁定（每次 openModal 重新綁 OK）
-  //     const btn = document.getElementById('moveDayBtn');
-  //     if(btn){
-  //       btn.onclick = async () => {
-  //         const sel = document.getElementById('moveDaySelect');
-  //         const targetDayIdx = Number(sel?.value ?? currentDayIdx);
-  //         if(Number.isNaN(targetDayIdx) || targetDayIdx === currentDayIdx) return;
-
-  //         const movingItem = currentDayData.items.splice(idx, 1)[0];
-  //         saveDayEdits();
-  //         renderTimelineList(currentDayData);
-
-  //         const targetMeta = itineraryIndex[targetDayIdx];
-  //         const targetData = await loadDayData(targetDayIdx, targetMeta);
-
-  //         targetData.items.push(movingItem);
-  //         targetData.items.sort((a,b)=>{
-  //           const ta = String(a.time||'').match(/(\d{1,2}):(\d{2})/);
-  //           const tb = String(b.time||'').match(/(\d{1,2}):(\d{2})/);
-  //           const ma = ta ? (Number(ta[1])*60+Number(ta[2])) : 99999;
-  //           const mb = tb ? (Number(tb[1])*60+Number(tb[2])) : 99999;
-  //           return ma-mb;
-  //         });
-
-  //         saveDayEditsForDayIdx(targetDayIdx, targetData);
-
-  //         await selectDay(targetDayIdx);
-  //         const newIdx = targetData.items.findIndex(x=>x===movingItem);
-  //         openModal(newIdx === -1 ? 0 : newIdx);
-  //       };
-  //     }
-
-  //     const ov = document.getElementById('modalOverlay');
-  //     const sh = document.getElementById('modalSheet');
-
-  //     // ✅ 記住是否已開啟（一定要在 add active 前算）
-  //     const alreadyOpen = ov.classList.contains('active') && sh.classList.contains('active');
-
-  //     ov.classList.add('active');
-
-  //     requestAnimationFrame(() => {
-  //       sh.classList.add('active');
-  //       // 你想每次切換也有明信片效果：保留
-  //       showSheetSplash(item);
-  //     });
-
-  //     // ✅ Modal 內左右滑（只綁一次，避免越綁越多次）
-  //     if(!window.__modalSwipeBound){
-  //       window.__modalSwipeBound = true;
-
-  //       const splash = document.getElementById('sheetSplash');
-  //       const scrollArea = document.getElementById('modalScroll');
-
-  //       let sx = 0, sy = 0, tracking = false;
-
-  //       sh.addEventListener('pointerdown', (e) => {
-  //         if(!sh.classList.contains('active')) return;
-  //         if(splash?.classList.contains('active')) return;
-  //         if(scrollArea && scrollArea.scrollTop > 8) return;
-
-  //         tracking = true;
-  //         sx = e.clientX; sy = e.clientY;
-  //       }, { passive: true });
-
-  //       sh.addEventListener('pointerup', (e) => {
-  //         if(!tracking) return;
-  //         tracking = false;
-
-  //         const dx = e.clientX - sx;
-  //         const dy = e.clientY - sy;
-
-  //         if(Math.abs(dx) < 60) return;
-  //         if(Math.abs(dx) < Math.abs(dy) * 1.2) return;
-
-  //         if(dx < 0) modalGoto(+1);
-  //         else       modalGoto(-1);
-  //       }, { passive: true });
-
-  //       sh.addEventListener('pointercancel', () => { tracking = false; }, { passive: true });
-  //     }
-  // }
-
-  function ensureModalContent(){
-    let content = document.getElementById('modalContent');
-    if(content) return content;
-
-    const sheet = document.getElementById('modalSheet');
-    if(!sheet) return null;
-
-    // 如果 modalContent 不見了：補回來
-    content = document.createElement('div');
-    content.className = 'modal-scroll';
-    content.id = 'modalContent';
-    sheet.appendChild(content);
-    return content;
-  }
-
-  function openModal(itemIdx, opt={}){ 
+  function openModal(itemIdx) {
     const idx = Number(itemIdx);
     const item = currentDayData?.items?.[idx];
     if(!item) return;
 
-    window.__activeModalIdx = idx;
+    window.__activeModalIdx  = idx;   // ✅ 新增：記住目前開的是哪一筆
+    window.__activeModalItem = item;
 
-    const content = ensureModalContent();
-    if(!content){
-      console.warn('[openModal] modalContent not found');
-      return;
-    }
 
-    const mapcode = item.mapcode ? `<span class="pill"><i class="fas fa-location-dot"></i> Mapcode：${escapeHtml(item.mapcode)}</span>` : '';
     const hours = item.hours ? `<span class="pill"><i class="fas fa-clock"></i> ${escapeHtml(item.hours)}</span>` : '';
     const price = item.price ? `<span class="pill"><i class="fas fa-ticket"></i> ${escapeHtml(item.price)}</span>` : '';
+    const stay  = item.stay  ? `<span class="pill"><i class="fas fa-hourglass-half"></i> ${escapeHtml(item.stay)}</span>` : '';
 
     const guideList = (item.guide || []).length
-      ? `<div class="block"><h4><i class="fas fa-headset"></i> 導遊介紹</h4><ul class="bullet">${item.guide.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul></div>`
+      ? `<div class="block"><h4><i class="fas fa-headset"></i> 特色介紹</h4><ul class="bullet">${item.guide.map(x=>`<li>${escapeHtml(x).replace(/\n/g,'<br>').replace(/^\[(.+?)\]：/,'<strong>[$1]：</strong>')}</li>`).join('')}</ul></div>`
       : '';
 
     const avoidList = (item.avoid || []).length
-      ? `<div class="block"><h4><i class="fas fa-triangle-exclamation"></i> 避雷指南</h4><ul class="bullet">${item.avoid.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul></div>`
+      ? `<div class="block"><h4><i class="fas fa-triangle-exclamation"></i> 注意事項</h4><ul class="bullet">${item.avoid.map(x=>`<li>${escapeHtml(x).replace(/\n/g,'<br>').replace(/^\[(.+?)\]：/,'<strong>[$1]：</strong>')}</li>`).join('')}</ul></div>`
       : '';
 
-    const menuBlock = (item.menu || []).length
-      ? `<div class="menu-recommend">
-          <div style="font-weight:800; margin-bottom:10px; color:#F57C00;"><i class="fas fa-thumbs-up"></i> 必吃菜單（中日對照）</div>
-          ${(item.menu||[]).map(m=>`
-            <div class="menu-item">
-              <span class="jp-text">${escapeHtml(m.jp || '')}</span>
-              <span style="font-size:.9rem; color:#666;">${escapeHtml(m.zh || '')}</span>
-            </div>`).join('')}
+    const menuBlock = (item.menu || []).length ? `
+      <div class="menu-box">
+        <div class="menu-box-head">
+          <i class="fas fa-thumbs-up"></i> 必吃美食
+        </div>
+        <div class="menu-table">
+          ${(item.menu || []).map((m, idx) => {
+            const jpRaw = (m.jp || '');
+            const jp = escapeHtml(jpRaw);
+            const zh = escapeHtml(m.zh || '');
+            const isRec = m.rec === true || m.recommend === true;
+
+          /*              ✅ 只讓推薦的項目可以點開（維持你原本邏輯） */
+            const pillCls = `menu-row ${isRec ? 'menuPill' : ''}`;
+
+            return `
+              <div class="${pillCls}" data-menu-idx="${idx}" data-rec="${isRec ? '1':'0'}">
+                <div class="menu-jp">
+                  <button class="menuSpeak" type="button" data-speak="${escapeHtml(m.speak || jpRaw)}" aria-label="speak">
+                    <i class="fas fa-volume-up"></i>
+                  </button>
+                  <span>${jp}</span>
+                </div>
+                <div class="menu-zh">${zh}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    ` : '';
+
+
+    const reserveBlock = (item.reservations || []).length
+      ? `<div class="block">
+            <h4><i class="fas fa-receipt"></i> 預約資訊</h4>
+            ${(item.reservations||[]).map(r=>`
+                <div class="meta-row" style="padding:6px 0; border-bottom:1px dashed rgba(233,225,214,.85);">
+                <span class="meta-ico"><i class="fas fa-hashtag"></i></span>
+                <span class="meta-val"><b>${escapeHtml(r.label||'')}</b>：${escapeHtml(r.value||'')}</span>
+                <button class="mini-btn" onclick="copyText('${escapeHtml(r.value||'')}')">複製</button>
+                </div>
+            `).join('')}
         </div>`
-      : '';
+    : '';							
 
     const detailText = item.detail || item.desc || '';
 
-    content.innerHTML = `
-      ${item.img ? `<img src="${escapeHtml(item.img)}" class="modal-img">` : ''}
-      <div class="modal-subtitle">${escapeHtml(item.time || '')} • ${(item.tag||'').toUpperCase()}</div>
-      <div class="modal-title">${escapeHtml(item.title || '')}</div>
+    const linksArr = Array.isArray(item.links) ? item.links : [];
+    const linkBtnsHtml = linksArr.length
+      ? `<div class="link-grid">${
+          linksArr.map(l => {
+            const label = String(l?.label || l?.title || '連結');
+            const url = String(l?.url || '').trim();
+            if(!url) return '';
+            return `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(url)})'>${escapeHtml(label)}</button>`;
+          }).filter(Boolean).join('')
+        }</div>`
+      : '';
 
-      <div style="margin:8px 0 6px;">
-        ${mapcode}${hours}${price}
-      </div>
+    /*      ✅ 支援 links 是「物件」或「陣列包一個物件」 */
+    //     const links = Array.isArray(item.links) ? (item.links[0] || {}) : (item.links || {});
 
-      <p style="line-height:1.7; color:#444; margin:10px 0 0;">${escapeHtml(detailText)}</p>
+    // /*      ✅ 用 JSON.stringify 避免引號/特殊字元把 onclick 撐爆 */
+    //     const linkBtns = [
+    //         links.official ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.official))})'>官網</button>` : '',
+    //         links.reserve  ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.reserve))})'>reserveseat</button>` : '',
+    //         links.menu     ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.menu))})'>meun</button>` : '',
+    //         links.cupon    ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.cupon))})'>cupon</button>` : '',
+    //         links.floormap      ? `<button class="btn btn-outline" onclick='openUrl(${JSON.stringify(String(links.floormap))})'>樓層地圖</button>` : '',
+    //     ].filter(Boolean).join('');
 
-      ${menuBlock}
-      ${avoidList}
-      ${guideList}
+    //     const linkBtnsHtml = linkBtns ? `<div class="link-grid">${linkBtns}</div>` : '';
 
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
-        <button class="btn btn-outline" onclick="copyText('${escapeHtml(item.title || '')}')">複製名稱</button>
-        ${item.mapcode
-          ? `<button class="btn" onclick="copyText('${escapeHtml(item.mapcode)}')">複製 Mapcode</button>`
-          : `<button class="btn" onclick="openMap('${escapeHtml(item.title || '')}')">Google 導航</button>`}
+    /*      ✅ 你要的欄位（eta/arrive/arrival 皆可） */
+    //Modal 裡加 UI_行程跨天移動
+    const dayOptions = itineraryIndex.map((m, idx)=> {
+      const label = String(m.file||'').match(/\d{4}-\d{2}-\d{2}/)?.[0] || `Day ${idx+1}`;
+      return `<option value="${idx}" ${idx===currentDayIdx?'selected':''}>${escapeHtml(label)}</option>`;
+    }).join('');
+
+    const moveBlock = `
+      <div class="meta-row" style="margin-top:12px;">
+        <div style="font-weight:900; margin-bottom:6px;">移動行程到</div>
+        <div style="display:flex; gap:10px;">
+          <select id="moveDaySelect" class="input" style="flex:1;">${dayOptions}</select>
+          <button class="btn btn-outline" id="moveDayBtn">移動</button>
+        </div>
       </div>
     `;
 
-    // keepOpen：左右切換時不重跑開啟動畫（更順）
-    const ov = document.getElementById('modalOverlay');
-    const sh = document.getElementById('modalSheet');
+    const eta = item.eta || item.arrive || item.arrival || '';
+    const addr = item.addr || '';
+    const parking = item.parking || '';
+    const mapcode = item.mapcode || '';
 
-    if(!opt.keepOpen){
-      document.body.classList.add('body-no-scroll');
+    const navUrl = buildGoogleDirUrlForItem(item);
+
+    const sticky = document.getElementById('modalSticky');
+    const body   = document.getElementById('modalBody');
+
+    sticky.innerHTML = `
+        <div class="modal-sticky-wrap ${tagClass(item.tag)}">
+            <div class="sheet-head">
+                <div class="tag-chip ${tagClass(item.tag)}">
+                    <div class="sheet-tag ${tagClass(item.tag)}">
+                      ${escapeHtml((item.tag||'').toUpperCase())}
+                      ${((item.tag||'').toLowerCase()==='takagi') ? getTagIconHtml('takagi', itemIdx) : ''}
+                    </div>
+                </div>
+            <div class="sheet-time"><i class="fa-regular fa-clock" style="color:#8B8175;"></i>${escapeHtml(item.time || '—')}</div>
+            </div>
+
+            <div class="modal-title">${escapeHtml(item.title || '')}</div>
+
+            <div class="pill-row">
+            ${hours}${price}${stay}
+            </div>
+        </div>
+    `;
+
+
+
+    body.innerHTML = `
+      <div class="meta-box">
+        ${eta ? `
+        <div class="meta-row">
+          <span class="meta-ico"><i class="fa-regular fa-clock"></i></span>
+          <span class="meta-val">預計到達：${escapeHtml(eta)}</span>
+          <button class="mini-btn" onclick="copyText('${escapeHtml(eta)}')">複製</button>
+        </div>` : ''}
+
+        ${addr ? `
+        <div class="meta-row">
+          <span class="meta-ico"><i class="fas fa-location-dot"></i></span>
+          <span class="meta-val">${escapeHtml(addr)}</span>
+          <button class="mini-btn" onclick="copyText('${escapeHtml(addr)}')">複製</button>
+        </div>` : ''}
+
+        ${parking ? `
+        <div class="meta-row">
+          <span class="meta-ico"><i class="fas fa-square-parking"></i></span>
+          <span class="meta-val">${escapeHtml(parking)}</span>
+          <button class="mini-btn" onclick="copyText('${escapeHtml(parking)}')">複製</button>
+        </div>` : ''}
+
+        ${mapcode ? `
+        <div class="meta-row">
+          <span class="meta-ico">🗾</span>
+          <span class="meta-val">Mapcode：${escapeHtml(mapcode)}</span>
+          <button class="mini-btn" onclick="copyText('${escapeHtml(mapcode)}')">複製</button>
+        </div>` : ''}
+
+        ${(!eta && !addr && !parking && !mapcode) ? `
+        <div class="meta-row">
+          <span class="meta-ico">ℹ️</span>
+          <span class="meta-val">（此行程尚未填：到達/地址/停車/Mapcode）</span>
+        </div>` : ''}
+      </div>
+      ${reserveBlock}
+      <div class="detail">${escapeHtml(detailText)}</div>	 
+      ${menuBlock}
+      
+
+      ${avoidList}
+      ${guideList}
+      ${linkBtnsHtml}
+
+
+      
+
+
+      <div class="sheet-actions">
+        <a class="btn-primary" href="${navUrl}" target="_blank" rel="noopener">
+          <i class="fas fa-location-arrow"></i> 開啟 Google Maps 導航
+        </a>
+      </div>`;
+
+      // lockBodyScroll();
+      // document.getElementById('modalOverlay').classList.add('active');
+      // document.getElementById('modalSheet').classList.add('active');
+      // showSheetSplash(item);
+      // ===== openModal 尾端：開啟 + 綁事件（建議整段用這段取代） =====
+      lockBodyScroll();
+
+      // ✅ 跨天移動：按鈕綁定（每次 openModal 重新綁 OK）
+      const btn = document.getElementById('moveDayBtn');
+      if(btn){
+        btn.onclick = async () => {
+          const sel = document.getElementById('moveDaySelect');
+          const targetDayIdx = Number(sel?.value ?? currentDayIdx);
+          if(Number.isNaN(targetDayIdx) || targetDayIdx === currentDayIdx) return;
+
+          const movingItem = currentDayData.items.splice(idx, 1)[0];
+          saveDayEdits();
+          renderTimelineList(currentDayData);
+
+          const targetMeta = itineraryIndex[targetDayIdx];
+          const targetData = await loadDayData(targetDayIdx, targetMeta);
+
+          targetData.items.push(movingItem);
+          targetData.items.sort((a,b)=>{
+            const ta = String(a.time||'').match(/(\d{1,2}):(\d{2})/);
+            const tb = String(b.time||'').match(/(\d{1,2}):(\d{2})/);
+            const ma = ta ? (Number(ta[1])*60+Number(ta[2])) : 99999;
+            const mb = tb ? (Number(tb[1])*60+Number(tb[2])) : 99999;
+            return ma-mb;
+          });
+
+          saveDayEditsForDayIdx(targetDayIdx, targetData);
+
+          await selectDay(targetDayIdx);
+          const newIdx = targetData.items.findIndex(x=>x===movingItem);
+          openModal(newIdx === -1 ? 0 : newIdx);
+        };
+      }
+
+      const ov = document.getElementById('modalOverlay');
+      const sh = document.getElementById('modalSheet');
+
+      // ✅ 記住是否已開啟（一定要在 add active 前算）
+      const alreadyOpen = ov.classList.contains('active') && sh.classList.contains('active');
+
       ov.classList.add('active');
-      sh.classList.add('active');
-    }
 
-    // 小動畫：切換時讓內容淡一下
-    if(opt.keepOpen && !opt.skipAnim){
-      content.classList.remove('fade-swap');
-      requestAnimationFrame(()=> content.classList.add('fade-swap'));
-    }
+      requestAnimationFrame(() => {
+        sh.classList.add('active');
+        // 你想每次切換也有明信片效果：保留
+        showSheetSplash(item);
+      });
+
+      // ✅ Modal 內左右滑（只綁一次，避免越綁越多次）
+      if(!window.__modalSwipeBound){
+        window.__modalSwipeBound = true;
+
+        const splash = document.getElementById('sheetSplash');
+        const scrollArea = document.getElementById('modalScroll');
+
+        let sx = 0, sy = 0, tracking = false;
+
+        sh.addEventListener('pointerdown', (e) => {
+          if(!sh.classList.contains('active')) return;
+          if(splash?.classList.contains('active')) return;
+          if(scrollArea && scrollArea.scrollTop > 8) return;
+
+          tracking = true;
+          sx = e.clientX; sy = e.clientY;
+        }, { passive: true });
+
+        sh.addEventListener('pointerup', (e) => {
+          if(!tracking) return;
+          tracking = false;
+
+          const dx = e.clientX - sx;
+          const dy = e.clientY - sy;
+
+          if(Math.abs(dx) < 60) return;
+          if(Math.abs(dx) < Math.abs(dy) * 1.2) return;
+
+          if(dx < 0) modalGoto(+1);
+          else       modalGoto(-1);
+        }, { passive: true });
+
+        sh.addEventListener('pointercancel', () => { tracking = false; }, { passive: true });
+      }
   }
+
+  // function ensureModalContent(){
+  //   let content = document.getElementById('modalContent');
+  //   if(content) return content;
+
+  //   const sheet = document.getElementById('modalSheet');
+  //   if(!sheet) return null;
+
+  //   // 如果 modalContent 不見了：補回來
+  //   content = document.createElement('div');
+  //   content.className = 'modal-scroll';
+  //   content.id = 'modalContent';
+  //   sheet.appendChild(content);
+  //   return content;
+  // }
+
+  // function openModal(itemIdx, opt={}){ 
+  //   const idx = Number(itemIdx);
+  //   const item = currentDayData?.items?.[idx];
+  //   if(!item) return;
+
+  //   window.__activeModalIdx = idx;
+
+  //   const content = ensureModalContent();
+  //   if(!content){
+  //     console.warn('[openModal] modalContent not found');
+  //     return;
+  //   }
+
+  //   const mapcode = item.mapcode ? `<span class="pill"><i class="fas fa-location-dot"></i> Mapcode：${escapeHtml(item.mapcode)}</span>` : '';
+  //   const hours = item.hours ? `<span class="pill"><i class="fas fa-clock"></i> ${escapeHtml(item.hours)}</span>` : '';
+  //   const price = item.price ? `<span class="pill"><i class="fas fa-ticket"></i> ${escapeHtml(item.price)}</span>` : '';
+
+  //   const guideList = (item.guide || []).length
+  //     ? `<div class="block"><h4><i class="fas fa-headset"></i> 導遊介紹</h4><ul class="bullet">${item.guide.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul></div>`
+  //     : '';
+
+  //   const avoidList = (item.avoid || []).length
+  //     ? `<div class="block"><h4><i class="fas fa-triangle-exclamation"></i> 避雷指南</h4><ul class="bullet">${item.avoid.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul></div>`
+  //     : '';
+
+  //   const menuBlock = (item.menu || []).length
+  //     ? `<div class="menu-recommend">
+  //         <div style="font-weight:800; margin-bottom:10px; color:#F57C00;"><i class="fas fa-thumbs-up"></i> 必吃菜單（中日對照）</div>
+  //         ${(item.menu||[]).map(m=>`
+  //           <div class="menu-item">
+  //             <span class="jp-text">${escapeHtml(m.jp || '')}</span>
+  //             <span style="font-size:.9rem; color:#666;">${escapeHtml(m.zh || '')}</span>
+  //           </div>`).join('')}
+  //       </div>`
+  //     : '';
+
+  //   const detailText = item.detail || item.desc || '';
+
+  //   content.innerHTML = `
+  //     ${item.img ? `<img src="${escapeHtml(item.img)}" class="modal-img">` : ''}
+  //     <div class="modal-subtitle">${escapeHtml(item.time || '')} • ${(item.tag||'').toUpperCase()}</div>
+  //     <div class="modal-title">${escapeHtml(item.title || '')}</div>
+
+  //     <div style="margin:8px 0 6px;">
+  //       ${mapcode}${hours}${price}
+  //     </div>
+
+  //     <p style="line-height:1.7; color:#444; margin:10px 0 0;">${escapeHtml(detailText)}</p>
+
+  //     ${menuBlock}
+  //     ${avoidList}
+  //     ${guideList}
+
+  //     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+  //       <button class="btn btn-outline" onclick="copyText('${escapeHtml(item.title || '')}')">複製名稱</button>
+  //       ${item.mapcode
+  //         ? `<button class="btn" onclick="copyText('${escapeHtml(item.mapcode)}')">複製 Mapcode</button>`
+  //         : `<button class="btn" onclick="openMap('${escapeHtml(item.title || '')}')">Google 導航</button>`}
+  //     </div>
+  //   `;
+
+  //   // keepOpen：左右切換時不重跑開啟動畫（更順）
+  //   const ov = document.getElementById('modalOverlay');
+  //   const sh = document.getElementById('modalSheet');
+
+  //   if(!opt.keepOpen){
+  //     document.body.classList.add('body-no-scroll');
+  //     ov.classList.add('active');
+  //     sh.classList.add('active');
+  //   }
+
+  //   // 小動畫：切換時讓內容淡一下
+  //   if(opt.keepOpen && !opt.skipAnim){
+  //     content.classList.remove('fade-swap');
+  //     requestAnimationFrame(()=> content.classList.add('fade-swap'));
+  //   }
+  // }
 
   function initModalSwipe(){
     const sh = document.getElementById('modalSheet');
