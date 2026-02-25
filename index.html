@@ -2859,6 +2859,18 @@ function renderGasStations(){
         localStorage.setItem('expenses', JSON.stringify(expenses));
         if (typeof renderExpenseUI === 'function') renderExpenseUI(); 
       }
+      /* 4-1b. ✅ 同步收付款 payments */
+      if (cloudData.payments) {
+        payments = cloudData.payments;
+
+        // 建議：套用你已有的 normalizePayments（避免資料髒掉）
+        if (typeof normalizePayments === 'function') normalizePayments();
+
+        localStorage.setItem('payments', JSON.stringify(payments));
+
+        // 讓 UI 立即刷新（結算會把 payments 抵扣進去）
+        if (typeof renderExpenseUI === 'function') renderExpenseUI();
+      }
   
 /*        4-2. 同步 Checkbox 與 全員待辦 (GLOBAL) */
       if (cloudData.checklists) {
@@ -5027,98 +5039,6 @@ async function renderWeatherJMA(meta){
       }
   }
 
-  // function ensureModalContent(){
-  //   let content = document.getElementById('modalContent');
-  //   if(content) return content;
-
-  //   const sheet = document.getElementById('modalSheet');
-  //   if(!sheet) return null;
-
-  //   // 如果 modalContent 不見了：補回來
-  //   content = document.createElement('div');
-  //   content.className = 'modal-scroll';
-  //   content.id = 'modalContent';
-  //   sheet.appendChild(content);
-  //   return content;
-  // }
-
-  // function openModal(itemIdx, opt={}){ 
-  //   const idx = Number(itemIdx);
-  //   const item = currentDayData?.items?.[idx];
-  //   if(!item) return;
-
-  //   window.__activeModalIdx = idx;
-
-  //   const content = ensureModalContent();
-  //   if(!content){
-  //     console.warn('[openModal] modalContent not found');
-  //     return;
-  //   }
-
-  //   const mapcode = item.mapcode ? `<span class="pill"><i class="fas fa-location-dot"></i> Mapcode：${escapeHtml(item.mapcode)}</span>` : '';
-  //   const hours = item.hours ? `<span class="pill"><i class="fas fa-clock"></i> ${escapeHtml(item.hours)}</span>` : '';
-  //   const price = item.price ? `<span class="pill"><i class="fas fa-ticket"></i> ${escapeHtml(item.price)}</span>` : '';
-
-  //   const guideList = (item.guide || []).length
-  //     ? `<div class="block"><h4><i class="fas fa-headset"></i> 導遊介紹</h4><ul class="bullet">${item.guide.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul></div>`
-  //     : '';
-
-  //   const avoidList = (item.avoid || []).length
-  //     ? `<div class="block"><h4><i class="fas fa-triangle-exclamation"></i> 避雷指南</h4><ul class="bullet">${item.avoid.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul></div>`
-  //     : '';
-
-  //   const menuBlock = (item.menu || []).length
-  //     ? `<div class="menu-recommend">
-  //         <div style="font-weight:800; margin-bottom:10px; color:#F57C00;"><i class="fas fa-thumbs-up"></i> 必吃菜單（中日對照）</div>
-  //         ${(item.menu||[]).map(m=>`
-  //           <div class="menu-item">
-  //             <span class="jp-text">${escapeHtml(m.jp || '')}</span>
-  //             <span style="font-size:.9rem; color:#666;">${escapeHtml(m.zh || '')}</span>
-  //           </div>`).join('')}
-  //       </div>`
-  //     : '';
-
-  //   const detailText = item.detail || item.desc || '';
-
-  //   content.innerHTML = `
-  //     ${item.img ? `<img src="${escapeHtml(item.img)}" class="modal-img">` : ''}
-  //     <div class="modal-subtitle">${escapeHtml(item.time || '')} • ${(item.tag||'').toUpperCase()}</div>
-  //     <div class="modal-title">${escapeHtml(item.title || '')}</div>
-
-  //     <div style="margin:8px 0 6px;">
-  //       ${mapcode}${hours}${price}
-  //     </div>
-
-  //     <p style="line-height:1.7; color:#444; margin:10px 0 0;">${escapeHtml(detailText)}</p>
-
-  //     ${menuBlock}
-  //     ${avoidList}
-  //     ${guideList}
-
-  //     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
-  //       <button class="btn btn-outline" onclick="copyText('${escapeHtml(item.title || '')}')">複製名稱</button>
-  //       ${item.mapcode
-  //         ? `<button class="btn" onclick="copyText('${escapeHtml(item.mapcode)}')">複製 Mapcode</button>`
-  //         : `<button class="btn" onclick="openMap('${escapeHtml(item.title || '')}')">Google 導航</button>`}
-  //     </div>
-  //   `;
-
-  //   // keepOpen：左右切換時不重跑開啟動畫（更順）
-  //   const ov = document.getElementById('modalOverlay');
-  //   const sh = document.getElementById('modalSheet');
-
-  //   if(!opt.keepOpen){
-  //     document.body.classList.add('body-no-scroll');
-  //     ov.classList.add('active');
-  //     sh.classList.add('active');
-  //   }
-
-  //   // 小動畫：切換時讓內容淡一下
-  //   if(opt.keepOpen && !opt.skipAnim){
-  //     content.classList.remove('fade-swap');
-  //     requestAnimationFrame(()=> content.classList.add('fade-swap'));
-  //   }
-  // }
 
   function initModalSwipe(){
     const sh = document.getElementById('modalSheet');
@@ -5888,205 +5808,6 @@ async function renderWeatherJMA(meta){
 
 
 
-  //舊的記帳
-  // function renderExpenseUI() {
-  //   /* 1. 初始化參與者：預設全選 */
-  //   if (curParticipants.size === 0) {
-  //     users.forEach(u => curParticipants.add(u));
-  //   }
-
-  //   /* 2. 付款人切換 (Payer Tabs) */
-  //   const payerSwitchEl = document.getElementById('payerSwitch');
-  //   if (payerSwitchEl) {
-  //     payerSwitchEl.innerHTML = users.map(u =>
-  //       `<div class="user-tab ${u === curPayer ? 'active' : ''}" onclick="curPayer='${u}'; renderExpenseUI();">${escapeHtml(u)}</div>`
-  //     ).join('');
-  //   }
-
-  //   if(addMode === 'payment'){
-  //     const sel = document.getElementById('payTo');
-  //     if(sel){
-  //       sel.innerHTML = users
-  //         .filter(u=>u !== curPayer)
-  //         .map(u=>`<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`)
-  //         .join('');
-  //     }
-  //   }
-
-  //   /* 3. 類型切換 (Type Segmented) */
-  //   const typeEl = document.getElementById('expTypeSwitch');
-  //   if (typeEl) {
-  //     typeEl.querySelectorAll('.seg-btn').forEach(btn => {
-  //       const t = btn.getAttribute('data-type');
-  //       btn.classList.toggle('active', t === curExpenseType);
-  //     });
-  //   }
-  //   // ✅ 新增/收付款 模式切換 UI
-  //   const modeEl = document.getElementById('addModeSwitch');
-  //   if(modeEl){
-  //     modeEl.querySelectorAll('.seg-btn').forEach(btn=>{
-  //       const m = btn.getAttribute('data-mode');
-  //       btn.classList.toggle('active', m === addMode);
-  //     });
-  //   }
-
-  //   // ✅ payment mode：顯示 payToRow、隱藏「類型」「分攤成員」
-  //   const payToRow = document.getElementById('payToRow');
-  //   if(payToRow) payToRow.style.display = (addMode === 'payment') ? 'block' : 'none';
-
-  //   if(typeEl) typeEl.style.display = (addMode === 'payment') ? 'none' : '';
-  //   if(partEl) partEl.style.display = (addMode === 'payment') ? 'none' : '';
-
-  //   /* 4. 參與者選擇 (Participants Chips) */
-  //   const partEl = document.getElementById('partSwitch');
-  //   if (partEl) {
-  //     partEl.innerHTML = users.map(u => {
-  //       const on = curParticipants.has(u);
-  //       return `<span class="chip ${on ? 'on' : 'off'}" onclick="toggleParticipant('${escapeHtml(u)}')">
-  //         <i class="fas ${on ? 'fa-user-check' : 'fa-user'}" style="opacity:${on ? 0.55 : 0.35};"></i>${escapeHtml(u)}
-  //       </span>`;
-  //     }).join('');
-  //   }
-
-  //   /* 5. 計算總額、小記與個人結算 */
-  //   let balJPY = {}, balTWD = {};
-  //   let sumTripJPY = 0, sumPrepaidJPY = 0;
-  //   let sumTripTWD = 0, sumPrepaidTWD = 0;
-    
-  //   users.forEach(u => { balJPY[u] = 0; balTWD[u] = 0; });
-
-  //   expenses.forEach(e => {
-  //     const parts = e.participants && e.participants.length ? e.participants : users;
-  //     const share = e.cost / parts.length;
-  //     const isTWD = (e.currency === 'TWD');
-
-  //     // 分幣別統計小記
-  //     if (isTWD) {
-  //       if (e.type === 'prepaid') sumPrepaidTWD += e.cost;
-  //       else sumTripTWD += e.cost;
-  //     } else {
-  //       if (e.type === 'prepaid') sumPrepaidJPY += e.cost;
-  //       else sumTripJPY += e.cost;
-  //     }
-
-  //     // 個人結算邏輯
-  //     const targetBal = isTWD ? balTWD : balJPY;
-  //     if (users.includes(e.payer)) targetBal[e.payer] += e.cost;
-  //     parts.forEach(u => {
-  //       if (users.includes(u)) targetBal[u] -= share;
-  //     });
-  //   });
-
-    
-  //   // ✅ 抵扣收付款：from 付給 to，from 欠款減少（bal 增加），to 應收減少（bal 減少）
-  //   payments.forEach(p=>{
-  //     const a = Number(p.amount||0);
-  //     if(!a) return;
-
-  //     if(p.currency === 'TWD'){
-  //       if(balTWD[p.from] == null || balTWD[p.to] == null) return;
-  //       balTWD[p.from] += a;
-  //       balTWD[p.to]   -= a;
-  //     }else{
-  //       if(balJPY[p.from] == null || balJPY[p.to] == null) return;
-  //       balJPY[p.from] += a;
-  //       balJPY[p.to]   -= a;
-  //     }
-  //   });
-
-  //   /* 6. 渲染詳細紀錄清單 */
-  //   const listEl = document.getElementById('expenseList');
-  //   if (listEl) {
-  //     listEl.innerHTML = expenses
-  //       .slice()
-  //       .sort((a, b) => (b.ts || 0) - (a.ts || 0))
-  //       .map((e) => {
-  //         const parts = Array.isArray(e.participants) && e.participants.length ? e.participants : users;
-  //         const typeLabel = e.type === 'prepaid' ? '預付' : '行中';
-  //         const typeCls = e.type === 'prepaid' ? 'prepaid' : 'trip';
-  //         const symbol = e.currency === 'TWD' ? '$' : '¥';
-  //         const altSymbol = e.currency === 'TWD' ? '¥' : '$';
-  //         const altCost = e.currency === 'TWD' ? Math.round(e.cost / JPY_TWD_RATE) : Math.round(e.cost * JPY_TWD_RATE);
-          
-  //         return `
-  //           <div style="display:flex; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid rgba(233,225,214,.8);">
-  //             <div style="min-width:0;">
-  //               <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-  //                 <div style="font-weight:900;">${escapeHtml(e.name)}</div>
-  //                 <span class="exp-badge ${typeCls}">${typeLabel}</span>
-  //               </div>
-  //               <div style="font-size:0.8rem; color:var(--ink2); font-weight:800; margin-top:4px;">
-  //                 ${escapeHtml(e.payer)} 付款 · 分攤：${escapeHtml(parts.join('、'))}
-  //               </div>
-  //             </div>
-  //             <div style="text-align:right; flex:0 0 auto;">
-  //               <div style="font-weight:900;">${symbol}${e.cost}</div>
-  //               <div style="font-size:0.75rem; color:#999; font-weight:700;">(${altSymbol}${altCost})</div>
-  //               <div style="font-size:0.8rem; margin-top:4px;">
-  //                 <span style="color:var(--accent); cursor:pointer; font-weight:900; margin-right:8px;" onclick="startEdit(${e.ts})">編輯</span>
-  //                 <span style="color:#B42318; cursor:pointer; font-weight:900;" onclick="delExpByTs(${e.ts})">刪除</span>
-  //               </div>
-  //             </div>
-  //           </div>`;
-  //       }).join('');
-  //   }
-
-  //   /* 7. 渲染結算清單 (Debt List) */
-  //   const debtEl = document.getElementById('debtList');
-  //   if (debtEl) {
-  //     debtEl.innerHTML = users.map(u => `
-  //       <div style="padding:10px 0; border-bottom:1px solid #EEE; cursor:pointer;" onclick="showUserDetail('${u}')">
-  //         <div style="font-weight:900; color:var(--primary);">👤 ${u} (點擊明細)</div>
-  //         <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
-  //           <span style="color:${balJPY[u] >= 0 ? '#2F8F5B' : '#B42318'}">日幣：${balJPY[u] >= 0 ? '收' : '付'} ¥${Math.abs(Math.round(balJPY[u]))}</span>
-  //           <span style="color:${balTWD[u] >= 0 ? '#2F8F5B' : '#B42318'}">台幣：${balTWD[u] >= 0 ? '收' : '付'} $${Math.abs(Math.round(balTWD[u]))}</span>
-  //         </div>
-  //       </div>`).join('');
-
-      
-  //     debtEl.innerHTML = users.map(u => {
-  //       const jpyRounded = Math.round(balJPY[u]);
-  //       const twdRounded = Math.round(balTWD[u]);
-        
-  //       // 💡 只有在金額不為 0 時才顯示該幣別
-  //       const jpyHtml = jpyRounded !== 0 ? `<span style="color:${jpyRounded > 0 ? '#2F8F5B' : '#B42318'}">日幣：${jpyRounded > 0 ? '收' : '付'} ¥${Math.abs(jpyRounded)}</span>` : '';
-  //       const twdHtml = twdRounded !== 0 ? `<span style="color:${twdRounded > 0 ? '#2F8F5B' : '#B42318'}">台幣：${twdRounded > 0 ? '收' : '付'} $${Math.abs(twdRounded)}</span>` : '';
-
-  //       return `
-  //       <div style="padding:10px 0; border-bottom:1px solid #EEE; cursor:pointer;" onclick="showUserDetail('${u}')">
-  //         <div style="font-weight:900; color:var(--primary);">👤 ${u} (點擊明細)</div>
-  //         <div style="display:flex; justify-content:space-between; font-size:0.9rem; gap:10px;">
-  //           ${jpyHtml || '<span style="color:#999">日幣：已清</span>'}
-  //           ${twdHtml || '<span style="color:#999">台幣：已清</span>'}
-  //         </div>
-  //       </div>`;
-  //     }).join('');
-  //   }
-
-  //   /* 8. 渲染小記 (Summary) - 增加換算總額 */
-  //   const sumEl = document.getElementById('expenseSummary');
-  //   if (sumEl) {
-  //           // ✅ 計算換算後的總台幣支出
-  //     const grandTotalTWD = (sumTripTWD + sumPrepaidTWD) + (sumTripJPY + sumPrepaidJPY) * JPY_TWD_RATE;
-  //     sumEl.innerHTML = `
-  //       <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(233,225,214,.5); font-weight:900;">
-  //         <span>行中支出</span>
-  //         <div style="text-align:right;"><div>¥${Math.round(sumTripJPY)}</div><div style="font-size:0.8rem; color:#888;">$${Math.round(sumTripTWD)}</div></div>
-  //       </div>
-  //       <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(233,225,214,.5); font-weight:900;">
-  //         <span>預付費用</span>
-  //         <div style="text-align:right;"><div>¥${Math.round(sumPrepaidJPY)}</div><div style="font-size:0.8rem; color:#888;">$${Math.round(sumPrepaidTWD)}</div></div>
-  //       </div>
-  //       <div style="display:flex; justify-content:space-between; padding:8px 0; font-weight:900; color:var(--accent);">
-  //         <span>預估總支出 (換算台幣)</span>
-  //         <div style="text-align:right; font-size:1.2rem;">$${Math.round(grandTotalTWD)}</div>
-  //       </div>
-  //     `;
-  //   }
-  //   renderPaymentsUI();
-  //   normalizePayments();
-  // }
-
   function renderPaymentList(){
     const el = document.getElementById('paymentList');
     if(!el) return;
@@ -6275,6 +5996,7 @@ function addExpenseFromForm(){
   }
 
   localStorage.setItem('expenses', JSON.stringify(expenses));
+  cloudPost("addExpense", item);
 
   // 清空輸入
   document.getElementById('exName').value = '';
@@ -6302,6 +6024,7 @@ function addPaymentFromForm(){
 
   payments.push(p);
   localStorage.setItem('payments', JSON.stringify(payments));
+  cloudPost("addPayment", p);
 
   // 清空輸入（收付款不一定需要 name，可留空）
   document.getElementById('exName').value = '';
@@ -6310,91 +6033,6 @@ function addPaymentFromForm(){
   renderExpenseUI();
 }
 
-// function addRecord(){
-//   if(addMode === 'payment') addPaymentFromForm();
-//   else addExpense();
-// }
-
-// function addExpense() {
-//   const name = document.getElementById('exName').value.trim();
-//   const cost = Number(document.getElementById('exCost').value);
-
-//   if(!name || !Number.isFinite(cost) || cost<=0) return alert('請輸入正確項目與金額');
-
-//   // ✅ 收付款模式
-//   if(addMode === 'payment'){
-//     const to = document.getElementById('payTo')?.value;
-//     if(!to) return alert('請選擇收款人');
-
-//     const payData = {
-//       from: curPayer,
-//       to,
-//       amount: Math.round(cost),
-//       currency: curCurrency,
-//       ts: Date.now()
-//     };
-//     payments.push(payData);
-//     localStorage.setItem('payments', JSON.stringify(payments));
-
-//     document.getElementById('exName').value = '';
-//     document.getElementById('exCost').value = '';
-//     renderExpenseUI();
-//     return;
-//   }
-
-//   // ✅ 下面才走你原本的「新增支出」流程（participants/type/editingTs 那套）
-// }
-
-
-//   可用舊的
-//   function addExpense() {
-//     const name = document.getElementById('exName').value.trim();
-//     const cost = Number(document.getElementById('exCost').value);
-//     const participants = Array.from(curParticipants);
-    
-//     if(!name || !Number.isFinite(cost) || cost<=0) return alert('請輸入正確項目與金額');
-//     if(participants.length<=0) return alert('請至少選一位分攤成員');
-  
-// /*      建立資料物件 */
-//     const expData = {
-//       name,
-//       cost: Math.round(cost),
-//       payer: curPayer,
-//       participants,
-//       type: curExpenseType,
-//       currency: curCurrency, // 💡 紀錄這筆錢是日幣還是台幣
-//       ts: editingTs || Date.now() // 💡 如果是編輯，延用舊的時間戳記
-//     };
-//     if (editingTs) {
-//       // 編輯模式：取代舊資料
-//       const idx = expenses.findIndex(e => e.ts === editingTs);
-//       if(idx !== -1) expenses[idx] = expData;
-//       editingTs = null; // 重置
-//       const btn = document.querySelector('#page-money .btn');
-//       if(btn) btn.innerText = "加入紀錄";
-//       /* ✅ 儲存後將全域狀態恢復為預設，避免影響下一筆 */
-//       curCurrency = 'JPY'; 
-//       curPayer = users[0] || 'KF';
-//       curParticipants = new Set(users);																			   		   
-//     } 
-//     else {
-//       // 新增模式
-//       expenses.push(expData);
-//     }
-  
-//     /*      1. 先更新本地 UI (讓使用者感覺反應很快) */
-//     localStorage.setItem('expenses', JSON.stringify(expenses));
-//     document.getElementById('exName').value = '';
-//     document.getElementById('exCost').value = '';
-//     renderExpenseUI();
-  
-//     /*      2. 傳送到雲端 */
-//     cloudPost("addExpense", expData);
-//     // 清空輸入框
-//     document.getElementById('exName').value = '';
-//     document.getElementById('exCost').value = '';
-
-//   }
 
   /* 💡 新增：啟動編輯模式的 Function */
   function startEdit(ts) {
