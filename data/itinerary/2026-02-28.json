@@ -83,7 +83,7 @@
         "desc": "先補給/取車後出發。",
         "detail": "下船前：\n🔸 先上洗手間🧻、買飲料\n🔸 確認今日主要行程：重岩 / 海水浴場 / 神社 / 橄欖公園 / 天使之路",
         "addr": "",
-        "mapcode": "",
+        "mapcode": "364 846 155*40",
         "parking": "",
         "hours": "",
         "price": "",
@@ -388,10 +388,9 @@
         ],
         "stay": "40–60 min",
         "menu": [
-          {"jp": "ぶりかま", "zh": "鹽烤鰤魚下巴", "rec": true, "img": "/photos/day2/022812.png" },
-          {"jp": "刺身（さしみ）", "zh": "生魚片拼盤","rec": true, "img": "/photos/day2/022814.jpg" },
-          {"jp": "エビフライ", "zh": "炸蝦","rec": true, "img": "/photos/day2/022815.jpg" },
-          {"jp": "カキフライ", "zh": "炸牡蠣","rec": true, "img": "/photos/day2/022811.png" }
+          {"jp": "ぶりかま", "zh": "鹽烤鰤魚下巴", "rec": true, "img": "/photos/menu/022821.png" },
+          {"jp": "刺身（さしみ）", "zh": "生魚片拼盤","rec": true, "img": "/photos/menu/022822.jpg" },
+          {"jp": "カキフライ", "zh": "炸牡蠣","rec": true, "img": "/photos/menu/022823.png" }
         ],
         "avoid": [],
         "guide": [
@@ -449,11 +448,11 @@
         "price": "¥1500–¥3500",
         "stay": "40–60 min",
         "menu": [
-          { "jp": "飲めるサーモン", "zh": "招牌「喝得到的鮭魚」軍艦（口感滑嫩）", "rec": true, "img": "", "price": "286" },
-          { "jp": "中とろ・塩うに・いくら・キャビアの超ごほうび巻き（1貫）", "zh": "中腹＋鹽海膽＋鮭魚卵＋魚子醬「超犒賞卷」", "rec": true, "img": "", "price": "429" },
-          { "jp": "3種飲めるセット", "zh": "三種「飲める」組合（一次吃到招牌系列）", "rec": true, "img": "", "price": "957" },
-          { "jp": "杉玉ポテトサラダ", "zh": "杉玉馬鈴薯沙拉（招牌、很適合配酒）", "rec": true, "img": "", "price": "" },
-          { "jp": "プレミアム寿司食べ比べ5貫", "zh": "高級壽司5貫拼盤（想吃更滿足選這套）", "rec": true, "img": "", "price": "1529" }
+          { "jp": "飲めるサーモン", "zh": "「喝得到的鮭魚」（口感滑嫩）", "rec": true, "img": "/photos/menu/022831.png", "price": "286" },
+          { "jp": "超ごほうび巻き", "zh": "中腹＋鹽海膽＋鮭魚卵＋魚子醬「超犒賞卷」", "rec": true, "img": "/photos/menu/022832.png", "price": "429" },
+          { "jp": "3種飲めるセット", "zh": "三種組合（招牌系列）", "rec": true, "img": "/photos/menu/022833.png", "price": "957" },
+          { "jp": "プレミアム寿司食べ比べ5貫", "zh": "高級壽司5貫拼盤", "rec": true, "img": "/photos/menu/022834.png", "price": "1529" },
+          { "jp": "船盛", "zh": "船盛", "rec": true, "img": "/photos/menu/022835.png", "price": "" }
         ],
         "avoid": [
           "20:30 入店仍OK，但飲料L.O. 22:30、料理L.O. 22:00；想慢慢喝建議不要太晚到。",
