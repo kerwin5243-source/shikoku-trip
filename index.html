@@ -6172,15 +6172,15 @@ function renderMySummary(my){
 
   el.innerHTML = `
     <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee;">
-      <span>我（${escapeHtml(curPayer)}）行中支出（分攤後）</span>
+      <span>${escapeHtml(curPayer)} 行中支出</span>
       <b>¥${tripJPY} / $${tripTWD}</b>
     </div>
     <div style="display:flex; justify-content:space-between; padding:8px 0;">
-      <span>我（${escapeHtml(curPayer)}）預付費用（分攤後）</span>
+      <span>${escapeHtml(curPayer)} 預付費用</span>
       <b>¥${preJPY} / $${preTWD}</b>
     </div>
     <div style="margin-top:10px; color:var(--text-sec); font-size:.85rem;">
-      ※ 此區為「分攤後」個人小記；切換付款人 tab 會更新
+      ※ 切換付款人 tab 會更新
     </div>
   `;
 }
@@ -6194,40 +6194,111 @@ function delPaymentByTs(ts){
   renderExpenseUI();
 }
 
+
 function addRecord(){
   if(addMode === 'payment') addPaymentFromForm();
-  else addExpense();
+  else addExpenseFromForm();
 }
 
-function addExpense() {
-  const name = document.getElementById('exName').value.trim();
-  const cost = Number(document.getElementById('exCost').value);
+/* ===== 新增支出（expense）===== */
+function addExpenseFromForm(){
+  const name = document.getElementById('exName')?.value.trim();
+  const cost = Number(document.getElementById('exCost')?.value);
 
-  if(!name || !Number.isFinite(cost) || cost<=0) return alert('請輸入正確項目與金額');
+  if(!name || !Number.isFinite(cost) || cost <= 0) return alert('請輸入正確項目與金額');
 
-  // ✅ 收付款模式
-  if(addMode === 'payment'){
-    const to = document.getElementById('payTo')?.value;
-    if(!to) return alert('請選擇收款人');
+  const participants = Array.from(curParticipants);
+  if(!participants.length) return alert('請至少選一位分攤成員');
 
-    const payData = {
-      from: curPayer,
-      to,
-      amount: Math.round(cost),
-      currency: curCurrency,
-      ts: Date.now()
-    };
-    payments.push(payData);
-    localStorage.setItem('payments', JSON.stringify(payments));
+  const ts = editingTs || Date.now();
+  const item = {
+    name,
+    cost: Math.round(cost),
+    payer: curPayer,
+    participants,
+    type: curExpenseType,   // 'trip' | 'prepaid'
+    currency: curCurrency,  // 'JPY' | 'TWD'
+    ts
+  };
 
-    document.getElementById('exName').value = '';
-    document.getElementById('exCost').value = '';
-    renderExpenseUI();
-    return;
+  if(editingTs){
+    const i = expenses.findIndex(e => Number(e.ts) === Number(editingTs));
+    if(i !== -1) expenses[i] = item;
+    editingTs = null;
+  }else{
+    expenses.push(item);
   }
 
-  // ✅ 下面才走你原本的「新增支出」流程（participants/type/editingTs 那套）
+  localStorage.setItem('expenses', JSON.stringify(expenses));
+
+  // 清空輸入
+  document.getElementById('exName').value = '';
+  document.getElementById('exCost').value = '';
+
+  renderExpenseUI();
 }
+
+/* ===== 新增收付款（payment）===== */
+function addPaymentFromForm(){
+  const amount = Number(document.getElementById('exCost')?.value);
+  if(!Number.isFinite(amount) || amount <= 0) return alert('請輸入正確金額');
+
+  const to = document.getElementById('payTo')?.value;
+  if(!to) return alert('請選擇收款人');
+  if(to === curPayer) return alert('收款人不能是自己');
+
+  const p = {
+    from: curPayer,
+    to,
+    amount: Math.round(amount),
+    currency: curCurrency,  // 'JPY' | 'TWD'
+    ts: Date.now()
+  };
+
+  payments.push(p);
+  localStorage.setItem('payments', JSON.stringify(payments));
+
+  // 清空輸入（收付款不一定需要 name，可留空）
+  document.getElementById('exName').value = '';
+  document.getElementById('exCost').value = '';
+
+  renderExpenseUI();
+}
+
+// function addRecord(){
+//   if(addMode === 'payment') addPaymentFromForm();
+//   else addExpense();
+// }
+
+// function addExpense() {
+//   const name = document.getElementById('exName').value.trim();
+//   const cost = Number(document.getElementById('exCost').value);
+
+//   if(!name || !Number.isFinite(cost) || cost<=0) return alert('請輸入正確項目與金額');
+
+//   // ✅ 收付款模式
+//   if(addMode === 'payment'){
+//     const to = document.getElementById('payTo')?.value;
+//     if(!to) return alert('請選擇收款人');
+
+//     const payData = {
+//       from: curPayer,
+//       to,
+//       amount: Math.round(cost),
+//       currency: curCurrency,
+//       ts: Date.now()
+//     };
+//     payments.push(payData);
+//     localStorage.setItem('payments', JSON.stringify(payments));
+
+//     document.getElementById('exName').value = '';
+//     document.getElementById('exCost').value = '';
+//     renderExpenseUI();
+//     return;
+//   }
+
+//   // ✅ 下面才走你原本的「新增支出」流程（participants/type/editingTs 那套）
+// }
 
 
 //   可用舊的
