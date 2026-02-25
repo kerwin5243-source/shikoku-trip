@@ -1721,6 +1721,47 @@
     }
     .stay-pill i{ color:#8E8E93; }
 
+    /* addModeSwitch：非選中不要灰底 */
+  #addModeSwitch{
+    background: transparent !important;
+    border: 0 !important;
+    padding: 0 !important;
+    gap:10px;
+  }
+  #addModeSwitch .seg-btn{
+    background: rgba(255,255,255,.72);
+    border:1px solid rgba(233,225,214,.95);
+    border-radius:14px;
+    font-weight:900;
+    color: var(--primary);
+    height:42px;
+  }
+  #addModeSwitch .seg-btn.active{
+    background: rgba(43,39,35,.92);
+    color:#fff;
+    border-color: rgba(43,39,35,.92);
+  }
+  .payto-select{
+    width:100%;
+    height:48px;
+    padding:0 14px;
+    border-radius:16px;
+    border:1px solid rgba(233,225,214,.95);
+    background:rgba(255,255,255,.92);
+    font-weight:900;
+    color:var(--primary);
+    box-shadow:0 10px 26px rgba(0,0,0,.06);
+    appearance:none;
+    -webkit-appearance:none;
+    background-image:
+      linear-gradient(45deg, transparent 50%, rgba(43,39,35,.65) 50%),
+      linear-gradient(135deg, rgba(43,39,35,.65) 50%, transparent 50%);
+    background-position:
+      calc(100% - 18px) 20px,
+      calc(100% - 12px) 20px;
+    background-size:6px 6px, 6px 6px;
+    background-repeat:no-repeat;
+  }
 
 
 
@@ -2288,7 +2329,7 @@
 
       <!-- 輸入：項目 / 金額（兩種模式共用） -->
       <div style="display:flex; gap:10px; margin-bottom:15px;">
-        <input type="text" id="exName" placeholder="項目 / 備註（例：晚餐、Kerwin→Alan）"
+        <input type="text" id="exName" placeholder="項目 / 備註（例：晚餐）"
           style="padding:12px; border:1px solid rgba(233,225,214,.9); border-radius:14px; flex:1; background:rgba(255,255,255,.8);">
         <input type="number" id="exCost" placeholder="金額"
           style="padding:12px; border:1px solid rgba(233,225,214,.9); border-radius:14px; width:110px; background:rgba(255,255,255,.8);">
@@ -2300,7 +2341,7 @@
       <!-- 收款人（to）：只在收付款模式顯示 -->
       <div id="payToRow" style="display:none; margin-top:10px; margin-bottom:12px;">
         <div style="font-weight:900; margin:6px 0;">收款人</div>
-        <select id="payTo" style="width:100%; padding:12px; border:1px solid rgba(233,225,214,.9); border-radius:14px; background:rgba(255,255,255,.8);"></select>
+        <select id="payTo" class="payto-select"></select>
       </div>
 
       <!-- ===== 以下一整段：只在新增支出模式顯示 ===== -->
@@ -6171,16 +6212,20 @@ function renderMySummary(my){
   const preTWD  = Math.round(my?.prepaidTWD || 0);
 
   el.innerHTML = `
-    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee;">
-      <span>${escapeHtml(curPayer)} 行中支出</span>
-      <b>¥${tripJPY} / $${tripTWD}</b>
+    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(233,225,214,.5); font-weight:900;">
+      <span>${escapeHtml(curPayer)} 行中分攤</span>
+      <div style="text-align:right;">
+        <div>¥${tripJPY}</div>
+        <div style="font-size:0.8rem; color:#888;">$${tripTWD}</div>
+      </div>
     </div>
-    <div style="display:flex; justify-content:space-between; padding:8px 0;">
-      <span>${escapeHtml(curPayer)} 預付費用</span>
-      <b>¥${preJPY} / $${preTWD}</b>
-    </div>
-    <div style="margin-top:10px; color:var(--text-sec); font-size:.85rem;">
-      ※ 切換付款人 tab 會更新
+
+    <div style="display:flex; justify-content:space-between; padding:8px 0; font-weight:900;">
+      <span>${escapeHtml(curPayer)} 預付分攤</span>
+      <div style="text-align:right;">
+        <div>¥${preJPY}</div>
+        <div style="font-size:0.8rem; color:#888;">$${preTWD}</div>
+      </div>
     </div>
   `;
 }
