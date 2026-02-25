@@ -2275,6 +2275,10 @@
   <div id="page-money" class="page">
     <div class="card">
       <div class="section-title">新增支出</div>
+      <div class="card">
+        <div class="section-title">個人小記</div>
+        <div id="mySummary"></div>
+      </div>
       <div class="seg" id="currencySwitch" style="margin-bottom: 12px;">
         <div class="seg-btn active" data-curr="JPY" onclick="setCurrency('JPY')">日幣 (¥)</div>
         <div class="seg-btn" data-curr="TWD" onclick="setCurrency('TWD')">台幣 ($)</div>
@@ -2306,6 +2310,24 @@
     <div class="card">
       <div class="section-title">結算 (負數代表欠款)</div>
       <div id="debtList"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">收付款</div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+        <select id="payFrom" style="padding:12px; border:1px solid #ddd; border-radius:12px; flex:1;"></select>
+        <select id="payTo" style="padding:12px; border:1px solid #ddd; border-radius:12px; flex:1;"></select>
+        <input id="payAmt" type="number" placeholder="金額"
+              style="padding:12px; border:1px solid #ddd; border-radius:12px; width:110px;">
+        <select id="payCurr" style="padding:12px; border:1px solid #ddd; border-radius:12px; width:110px;">
+          <option value="JPY">JPY</option>
+          <option value="TWD">TWD</option>
+        </select>
+      </div>
+
+      <button class="btn btn-outline" onclick="addPayment()">新增收付款</button>
+
+      <div id="payList" style="margin-top:12px;"></div>
     </div>
 
     <div class="card">
@@ -5433,6 +5455,10 @@ async function renderWeatherJMA(meta){
 
   /*    ====== 記帳（支援：參與者多選 / 行中 vs 預付） ====== */
   let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+  let payments = JSON.parse(localStorage.getItem('payments')) || [];
+  function savePayments(){
+    localStorage.setItem('payments', JSON.stringify(payments));
+  }
   let curCurrency = 'JPY';  // 預設日幣
   const JPY_TWD_RATE = 0.21; // 您可以根據需求修改匯率
   let editingTs = null;      // 追蹤是否正在編輯
@@ -5552,6 +5578,23 @@ async function renderWeatherJMA(meta){
       });
     });
 
+    
+    // ✅ 抵扣收付款：from 付給 to，from 欠款減少（bal 增加），to 應收減少（bal 減少）
+    payments.forEach(p=>{
+      const a = Number(p.amount||0);
+      if(!a) return;
+
+      if(p.currency === 'TWD'){
+        if(balTWD[p.from] == null || balTWD[p.to] == null) return;
+        balTWD[p.from] += a;
+        balTWD[p.to]   -= a;
+      }else{
+        if(balJPY[p.from] == null || balJPY[p.to] == null) return;
+        balJPY[p.from] += a;
+        balJPY[p.to]   -= a;
+      }
+    });
+
     /* 6. 渲染詳細紀錄清單 */
     const listEl = document.getElementById('expenseList');
     if (listEl) {
@@ -5641,7 +5684,44 @@ async function renderWeatherJMA(meta){
         </div>
       `;
     }
+    renderPaymentsUI();
+    renderMySummary();
   }
+
+  function renderMySummary(){
+  const el = document.getElementById('mySummary');
+  if(!el) return;
+
+  const mine = expenses.filter(e => e.payer === curPayer);
+  const totalPaid = mine.reduce((s,e)=> s + Number(e.cost||0), 0);
+
+  // 我在收付款中：我付出去多少 / 我收到多少（JPY）
+  const paidOut = payments
+    .filter(p => p.currency==='JPY' && p.from === curPayer)
+    .reduce((s,p)=> s + Number(p.amount||0), 0);
+
+  const received = payments
+    .filter(p => p.currency==='JPY' && p.to === curPayer)
+    .reduce((s,p)=> s + Number(p.amount||0), 0);
+
+  el.innerHTML = `
+    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee;">
+      <span>我（${escapeHtml(curPayer)}）本次付款總額</span>
+      <b>¥${Math.round(totalPaid)}</b>
+    </div>
+    <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee;">
+      <span>我付給別人（已結清）</span>
+      <b>¥${Math.round(paidOut)}</b>
+    </div>
+    <div style="display:flex; justify-content:space-between; padding:8px 0;">
+      <span>別人付給我（已收款）</span>
+      <b>¥${Math.round(received)}</b>
+    </div>
+    <div style="margin-top:10px; color:var(--text-sec); font-size:.85rem;">
+      ※ 此區只顯示「${escapeHtml(curPayer)}」個人資料（切換付款人 tab 會更新）
+    </div>
+  `;
+}
 
   // function renderExpenseUI() {
   //   /*      初始化 participants：預設全選 */
@@ -5764,6 +5844,59 @@ async function renderWeatherJMA(meta){
   //     `;
   //   }
   // }
+
+  function renderPaymentsUI(){
+  const from = document.getElementById('payFrom');
+  const to   = document.getElementById('payTo');
+  const list = document.getElementById('payList');
+  if(!from || !to || !list) return;
+
+  // 下拉選單：用 users
+  from.innerHTML = users.map(u=>`<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`).join('');
+  to.innerHTML   = users.map(u=>`<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`).join('');
+
+  // 預設選 curPayer 當 from，較符合「我付給誰」
+  from.value = curPayer;
+
+  if(!payments.length){
+    list.innerHTML = `<div style="color:var(--text-sec);">尚無收付款紀錄</div>`;
+    return;
+  }
+
+  list.innerHTML = payments.map((p,i)=>`
+    <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #eee;">
+      <div>
+        <div style="font-weight:800;">${escapeHtml(p.from)} → ${escapeHtml(p.to)}</div>
+        <div style="font-size:.85rem; color:var(--text-sec);">${escapeHtml(p.currency)} ${escapeHtml(String(p.amount))}</div>
+      </div>
+      <div style="color:red; cursor:pointer; font-size:.85rem;" onclick="delPayment(${i})">刪除</div>
+    </div>
+  `).join('');
+}
+
+function addPayment(){
+  const from = document.getElementById('payFrom')?.value;
+  const to   = document.getElementById('payTo')?.value;
+  const amt  = Number(document.getElementById('payAmt')?.value || 0);
+  const curr = document.getElementById('payCurr')?.value || 'JPY';
+
+  if(!from || !to) return alert('請選擇付款人/收款人');
+  if(from === to) return alert('付款人與收款人不能相同');
+  if(!Number.isFinite(amt) || amt <= 0) return alert('請輸入金額');
+
+  payments.push({ from, to, amount: Math.round(amt), currency: curr, ts: Date.now() });
+  savePayments();
+
+  document.getElementById('payAmt').value = '';
+  renderExpenseUI(); // 會一起重算結算 + 重新 renderPaymentsUI
+}
+
+function delPayment(i){
+  if(!confirm('刪除這筆收付款？')) return;
+  payments.splice(i,1);
+  savePayments();
+  renderExpenseUI();
+}
 
   function addExpense() {
     const name = document.getElementById('exName').value.trim();
