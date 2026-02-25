@@ -2853,24 +2853,45 @@ function renderGasStations(){
 */
       const cloudData = JSON.parse(text);
 
-/*        4-1. 同步帳本資料 */
-      if (cloudData.expenses) {
-        expenses = cloudData.expenses; 
+      // ===== 4-1. 同步帳本資料（避免雲端空資料覆蓋本機） =====
+      const readLS = (k, fallback) => {
+        try { return JSON.parse(localStorage.getItem(k) || ''); }
+        catch(e){ return fallback; }
+      };
+
+      const lsExpenses  = Array.isArray(readLS('expenses', [])) ? readLS('expenses', []) : [];
+      const lsPayments  = Array.isArray(readLS('payments', [])) ? readLS('payments', []) : [];
+
+      const cloudExpenses = Array.isArray(cloudData.expenses) ? cloudData.expenses : null;
+      const cloudPayments = Array.isArray(cloudData.payments) ? cloudData.payments : null;
+
+      // ✅ 規則：
+      // 1) 雲端有資料（length>0）→ 以雲端為準
+      // 2) 雲端沒資料（null 或 []）→ 保留本機（如果本機有）
+      // 3) 只有在「本機也沒有」時，才允許用雲端空值覆蓋（等於初始化）
+      if (cloudExpenses && cloudExpenses.length > 0) {
+        expenses = cloudExpenses;
         localStorage.setItem('expenses', JSON.stringify(expenses));
-        if (typeof renderExpenseUI === 'function') renderExpenseUI(); 
+      } else if (lsExpenses.length > 0) {
+        expenses = lsExpenses;
+      } else if (cloudExpenses) {
+        // 本機也空，雲端也空 → 初始化
+        expenses = cloudExpenses;
+        localStorage.setItem('expenses', JSON.stringify(expenses));
       }
-      /* 4-1b. ✅ 同步收付款 payments */
-      if (cloudData.payments) {
-        payments = cloudData.payments;
 
-        // 建議：套用你已有的 normalizePayments（避免資料髒掉）
-        if (typeof normalizePayments === 'function') normalizePayments();
-
+      if (cloudPayments && cloudPayments.length > 0) {
+        payments = cloudPayments;
         localStorage.setItem('payments', JSON.stringify(payments));
-
-        // 讓 UI 立即刷新（結算會把 payments 抵扣進去）
-        if (typeof renderExpenseUI === 'function') renderExpenseUI();
+      } else if (lsPayments.length > 0) {
+        payments = lsPayments;
+      } else if (cloudPayments) {
+        payments = cloudPayments;
+        localStorage.setItem('payments', JSON.stringify(payments));
       }
+
+      // 重新渲染
+      if (typeof renderExpenseUI === 'function') renderExpenseUI();
   
 /*        4-2. 同步 Checkbox 與 全員待辦 (GLOBAL) */
       if (cloudData.checklists) {
