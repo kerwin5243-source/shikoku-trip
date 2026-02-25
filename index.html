@@ -5978,6 +5978,7 @@ function delPaymentByTs(ts){
   if(!confirm('確定要刪除這筆收付款紀錄？')) return;
   payments = payments.filter(p => Number(p.ts) !== t);
   localStorage.setItem('payments', JSON.stringify(payments));
+  cloudPost("deletePayment", { ts: t });
   renderExpenseUI();
 }
 
