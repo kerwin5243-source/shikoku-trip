@@ -5636,6 +5636,9 @@ async function renderWeatherJMA(meta){
     });
   }
 
+  const expenseOnly = document.getElementById('expenseOnlyBlock');
+  if(expenseOnly) expenseOnly.style.display = (addMode === 'payment') ? 'none' : '';
+
   /* 4) participants：payment mode 隱藏 */
   const partEl = document.getElementById('partSwitch');
   if (partEl) {
@@ -5836,6 +5839,7 @@ async function renderWeatherJMA(meta){
 
   /* ====== 渲染：個人小記（分攤後） ====== */
   renderMySummary(my);
+  renderPaymentList();
 }
 
 
@@ -6042,6 +6046,34 @@ async function renderWeatherJMA(meta){
   //   normalizePayments();
   // }
 
+  function renderPaymentList(){
+    const el = document.getElementById('paymentList');
+    if(!el) return;
+
+    if(!payments.length){
+      el.innerHTML = `<div style="color:var(--ink2); font-weight:800;">尚無收付款紀錄</div>`;
+      return;
+    }
+
+    el.innerHTML = payments.slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).map(p=>{
+      const symbol = p.currency === 'TWD' ? '$' : '¥';
+      return `
+        <div style="display:flex; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid rgba(233,225,214,.7);">
+          <div style="min-width:0;">
+            <div style="font-weight:900;">${escapeHtml(p.from)} → ${escapeHtml(p.to)}</div>
+            <div style="font-size:.82rem; color:var(--ink2); font-weight:800;">收付款</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:900;">${symbol}${Math.round(p.amount||0)}</div>
+            <div style="font-size:.8rem; margin-top:4px;">
+              <span style="color:#B42318; cursor:pointer; font-weight:900;" onclick="delPaymentByTs(${p.ts})">刪除</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
   function renderMySummary(){
   const el = document.getElementById('mySummary');
   if(!el) return;
@@ -6160,6 +6192,11 @@ function delPaymentByTs(ts){
   payments = payments.filter(p => Number(p.ts) !== t);
   localStorage.setItem('payments', JSON.stringify(payments));
   renderExpenseUI();
+}
+
+function addRecord(){
+  if(addMode === 'payment') addPaymentFromForm();
+  else addExpense();
 }
 
 function addExpense() {
