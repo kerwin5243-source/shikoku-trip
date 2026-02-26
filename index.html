@@ -7208,6 +7208,14 @@ function closeShopImage() {
   }, 300); // 等待淡出動畫結束再隱藏
 }
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('✅ 離線核心 (Service Worker) 註冊成功！'))
+      .catch(err => console.log('❌ 離線核心註冊失敗：', err));
+  });
+}
+
 
 </script>
 </body>
