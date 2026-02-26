@@ -2504,6 +2504,10 @@
       <div class="section-title"><i class="fas fa-gift"></i> 伴手禮總覽</div>
       <div id="souvenirBoard"></div>
     </div>
+    <div id="imgViewerOverlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:99999; display:none; justify-content:center; align-items:center; opacity:0; transition:opacity 0.3s;" onclick="closeShopImage()">
+      <img id="imgViewerPic" src="" style="max-width:90%; max-height:85%; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.5);">
+      <div style="position:absolute; top:20px; right:25px; color:#fff; font-size:2.5rem; font-weight:100; cursor:pointer;">&times;</div>
+    </div>
   </div>
 
   <!-- modal -->
@@ -6920,17 +6924,30 @@ function renderShoppingList() {
     const isDone = item.bought ? 'checked' : '';
     const titleCls = item.bought ? 'shop-title done' : 'shop-title';
     
-    // 如果有照片顯示照片，沒有則顯示相機 Icon 提示上傳
-    const imgHtml = item.img 
-      ? `<img src="${escapeHtml(item.img)}" alt="pic">`
-      : `<i class="fas fa-camera"></i>`;
+    // 💡 核心修改：判斷有沒有照片，給予不同的點擊行為
+    let imgBoxContent = '';
+    if (item.img) {
+      // 有照片：點擊照片放大，右下角放一個小按鈕用來換照片
+      imgBoxContent = `
+        <img src="${escapeHtml(item.img)}" alt="pic" style="width:100%; height:100%; object-fit:cover;" onclick="openShopImage('${escapeHtml(item.img)}')">
+        <label style="position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.6); color:#fff; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; cursor:pointer;">
+          <i class="fas fa-pen" style="font-size:10px;"></i>
+          <input type="file" accept="image/*" onchange="uploadShopImg(event, ${idx})" style="display:none;">
+        </label>
+      `;
+    } else {
+      // 沒照片：整個框框都是上傳按鈕
+      imgBoxContent = `
+        <i class="fas fa-camera" style="color:var(--ink2); font-size:1.2rem;"></i>
+        <input type="file" accept="image/*" onchange="uploadShopImg(event, ${idx})" style="position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;">
+      `;
+    }
 
     return `
       <div class="shop-item">
         <input type="checkbox" class="shop-chk" ${isDone} onchange="toggleShopItem(${idx})">
         <div class="shop-img-box">
-          ${imgHtml}
-          <input type="file" class="shop-img-upload" accept="image/*" onchange="uploadShopImg(event, ${idx})">
+          ${imgBoxContent}
         </div>
         <div class="shop-info">
           <div class="${titleCls}">${escapeHtml(item.name)}</div>
@@ -7038,6 +7055,31 @@ function uploadShopImg(event, idx) {
     img.src = e.target.result;
   };
   reader.readAsDataURL(file);
+}
+
+// ✅ 新增：打開全螢幕照片
+function openShopImage(src) {
+  const overlay = document.getElementById('imgViewerOverlay');
+  const img = document.getElementById('imgViewerPic');
+  if(!overlay || !img) return;
+  
+  img.src = src;
+  overlay.style.display = 'flex';
+  
+  // 觸發瀏覽器重繪，讓淡入動畫生效
+  void overlay.offsetWidth; 
+  overlay.style.opacity = '1';
+}
+
+// ✅ 新增：關閉全螢幕照片
+function closeShopImage() {
+  const overlay = document.getElementById('imgViewerOverlay');
+  if(!overlay) return;
+  
+  overlay.style.opacity = '0';
+  setTimeout(() => { 
+    overlay.style.display = 'none'; 
+  }, 300); // 等待淡出動畫結束再隱藏
 }
 
 
