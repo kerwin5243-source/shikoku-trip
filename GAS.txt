@@ -63,7 +63,9 @@ function doGet(e) {
       to: r[2],
       amount: Number(r[3] || 0),
       currency: r[4] || "JPY",
-      ts: r[5]
+      ts: r[5],
+      name: r[6] || "",
+      expenseTs: r[7] || undefined
     };
   }).filter(x => x && x.from && x.to && x.amount);
 
@@ -184,13 +186,14 @@ function doPost(e) {
 
       for (let i = 1; i < data.length; i++) {
         if (String(data[i][5]) === String(d.ts)) {
-          // 更新：從第 2 欄開始寫 5 個欄位（from/to/amount/currency/ts）
-          PAY_SHEET.getRange(i + 1, 2, 1, 5).setValues([[
+          PAY_SHEET.getRange(i + 1, 2, 1, 7).setValues([[
             d.from,
             d.to,
             d.amount,
             d.currency || "JPY",
-            d.ts
+            d.ts,
+            d.name || "",
+            d.expenseTs || ""
           ]]);
           found = true;
           break;
@@ -204,7 +207,9 @@ function doPost(e) {
           d.to,
           d.amount,
           d.currency || "JPY",
-          d.ts
+          d.ts,
+          d.name || "",
+          d.expenseTs || ""
         ]);
       }
     }

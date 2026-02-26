@@ -1,5 +1,5 @@
 // sw.js - 離線快取服務 (終極防護版)
-const CACHE_NAME = 'shikoku-pwa-v2'; // 更新版本號
+const CACHE_NAME = 'shikoku-v4'; // 更新版本號
 
 // 1. 安裝時：立刻將核心網頁放入保險箱 (Pre-cache)
 self.addEventListener('install', (event) => {
@@ -36,14 +36,25 @@ self.addEventListener('fetch', (event) => {
     fetch(event.request)
       .then((response) => {
         // 有網路：成功抓到檔案，偷存一份到快取
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        // 🚨 修正 InvalidAccessError: 確保只有 http(s) 請求才放進快取 (排除 chrome-extension:// 等)
+        if (event.request.url.startsWith('http')) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            try {
+              cache.put(event.request, clone).catch(() => {
+                // 靜默處理非同步的寫入錯誤（例如 Entry already exists）
+              });
+            } catch (err) {
+              // 靜默處理同步錯誤
+            }
+          });
+        }
         return response;
       })
       .catch(async () => {
         // 🚨 斷網飛航模式：進入快取尋寶
         const cachedRes = await caches.match(event.request);
-        if (cachedRes) return cachedRes; 
+        if (cachedRes) return cachedRes;
 
         // 💡 核心防護：如果是「切換頁面/重新整理」但快取沒對上網址
         if (event.request.mode === 'navigate') {
@@ -56,7 +67,7 @@ self.addEventListener('fetch', (event) => {
         return new Response("目前處於無網路狀態，且尚未建立快取。", {
           status: 503,
           statusText: "Service Unavailable",
-          headers: new Headers({'Content-Type': 'text/plain; charset=utf-8'})
+          headers: new Headers({ 'Content-Type': 'text/plain; charset=utf-8' })
         });
       })
   );
