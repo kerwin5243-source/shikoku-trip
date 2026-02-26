@@ -2491,10 +2491,10 @@
       <div class="section-title"><i class="fas fa-cart-shopping"></i> 待買代購清單</div>
       <div class="user-tabs" id="shoppingUserSwitch" style="background:rgba(233,225,214,.9); margin-bottom:15px;"></div>
       
-      <div style="display:flex; gap:8px; margin-bottom:15px;">
-        <input type="text" id="shopItemName" placeholder="商品名稱 (如：EVE止痛藥)" style="padding:10px; border:1px solid rgba(233,225,214,.9); border-radius:12px; flex:1; font-weight:800; background:rgba(255,255,255,.8);">
-        <input type="number" id="shopItemQty" placeholder="數量" style="padding:10px; border:1px solid rgba(233,225,214,.9); border-radius:12px; width:65px; font-weight:800; background:rgba(255,255,255,.8);">
-        <button class="btn" style="width:auto; padding:10px 16px; border-radius:12px;" onclick="addShoppingItem()">新增</button>
+      <div style="display:flex; gap:8px; margin-bottom:15px; width:100%; box-sizing:border-box;">
+        <input type="text" id="shopItemName" placeholder="商品名稱 (如：EVE)" style="padding:10px; border:1px solid rgba(233,225,214,.9); border-radius:12px; flex: 1 1 0%; min-width: 0; font-weight:800; background:rgba(255,255,255,.8); box-sizing:border-box; font-size:16px;">
+        <input type="number" id="shopItemQty" placeholder="數量" style="padding:10px; border:1px solid rgba(233,225,214,.9); border-radius:12px; width:65px; flex: 0 0 65px; font-weight:800; background:rgba(255,255,255,.8); box-sizing:border-box; font-size:16px;">
+        <button class="btn" style="flex: 0 0 auto; width:auto; padding:10px 16px; border-radius:12px; white-space:nowrap; box-sizing:border-box;" onclick="addShoppingItem()">新增</button>
       </div>
       
       <div id="shoppingListBoard"></div>
