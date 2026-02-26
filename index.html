@@ -2679,18 +2679,21 @@ function renderGasStations(){
   el.innerHTML = `
     <div class="card">
       <h3 style="margin:0 0 10px; font-family:'Noto Serif TC',serif; font-weight:900;">
-        <i class="fas fa-gas-pump"></i> 加油站備案
+        <i class="fas fa-gas-pump"></i> 加油站點
       </h3>
       <div style="color:var(--ink2); font-weight:800; margin-bottom:10px;">
-        旅行中快速找最近可加油點
+        預計最上面2個點加油就夠，其餘為被選便宜方案
       </div>
-      ${list.map(s=>`
+      ${list.map(s => `
         <div style="padding:12px 0; border-top:1px solid rgba(233,225,214,.8);">
-          <div style="font-weight:900;">${escapeHtml(s.name||'')}</div>
-          ${s.addr ? `<div style="color:var(--ink2); font-weight:800; margin-top:4px;">${escapeHtml(s.addr)}</div>`:''}
+          <div style="font-weight:900;">${escapeHtml(s.name || '')}</div>
+          ${s.addr ? `<div style="color:var(--ink2); font-weight:800; margin-top:4px;">${escapeHtml(s.addr)}</div>` : ''}
+          
+          ${s.note ? `<div style="color:#d9534f; font-weight:700; margin-top:6px; font-size:0.9em; line-height:1.4;">💡 ${escapeHtml(s.note)}</div>` : ''}
+          
           <div style="margin-top:8px; display:flex; gap:10px;">
-            ${s.tel ? `<button class="btn btn-outline" onclick="openUrl('tel:${encodeURIComponent(s.tel)}')">電話</button>`:''}
-            <button class="btn btn-outline" onclick="openUrl('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.name||s.addr||'')}')">導航</button>
+            ${s.tel ? `<button class="btn btn-outline" onclick="openUrl('tel:${encodeURIComponent(s.tel)}')">電話</button>` : ''}
+            <button class="btn btn-outline" onclick="openUrl('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.name || s.addr || '')}')">導航</button>
           </div>
         </div>
       `).join('')}
