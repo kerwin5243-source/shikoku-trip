@@ -1203,8 +1203,8 @@
     #modalSheet:not(.splash-on) #modalScroll{
       opacity:1;
     }
-    #modalSheet.swap-left  { transition: transform .14s ease, opacity .14s ease; transform: translateX(calc(-50% - 18px)) translateY(0); opacity:.88; }
-    #modalSheet.swap-right { transition: transform .14s ease, opacity .14s ease; transform: translateX(calc(-50% + 18px)) translateY(0); opacity:.88; }
+    #modalSheet.swap-left  { transition: transform .14s ease; transform: translateX(calc(-50% - 18px)) translateY(0); }
+    #modalSheet.swap-right { transition: transform .14s ease; transform: translateX(calc(-50% + 18px)) translateY(0); }
 
     .splash-caption{
       position:absolute;
@@ -3293,7 +3293,7 @@ function renderGasStations(){
 
   //   openModal(next, { keepOpen:true, skipSplash: !!opt.skipSplash });
   // }
-function modalGoto(step, opt={}) {
+  function modalGoto(step, opt={}) {
     const items = currentDayData?.items || [];
     let cur = Number(window.__activeModalIdx ?? -1);
     if (cur < 0) return;
@@ -3323,13 +3323,13 @@ function modalGoto(step, opt={}) {
       sh.classList.add(cls);
       setTimeout(() => {
         sh.classList.remove(cls);
-        openModal(next);
+        openModal(next, opt);
       }, 140);
       return;
     }
 
     // 直接重用 openModal
-    openModal(next);
+    oopenModal(next, opt);
   }
 
 
@@ -4948,7 +4948,7 @@ async function renderWeatherJMA(meta){
 
 
 /*    ====== Modal：預計到達/地址/停車/Mapcode/介紹 + Google 導航 ====== */
-  function openModal(itemIdx) {
+  function openModal(itemIdx, opt={}) {
     const idx = Number(itemIdx);
     const item = currentDayData?.items?.[idx];
     if(!item) return;
@@ -5195,8 +5195,12 @@ async function renderWeatherJMA(meta){
 
       requestAnimationFrame(() => {
         sh.classList.add('active');
-        // 你想每次切換也有明信片效果：保留
-        showSheetSplash(item);
+// 💡 關鍵：如果判斷到是「左右滑動(skipSplash)」，就強制隱藏明信片，避免文字區塊閃爍
+        if (opt.skipSplash) {
+          hideSheetSplash(); 
+        } else {
+          showSheetSplash(item);
+        }
       });
 
       // ✅ Modal 內左右滑（只綁一次，避免越綁越多次）
