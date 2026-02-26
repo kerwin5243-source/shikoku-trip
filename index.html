@@ -784,6 +784,8 @@
       border-radius:99px;
       margin:8px auto 6px;
       flex-shrink:0;
+      touch-action:none;
+      user-select:none;
     }
 
     /* ✅ X 永遠可見（在 header 內） */
@@ -1335,6 +1337,50 @@
     }
     .nav-item.active{ color:#2B2723; transform:translateY(-1px); }
 
+    /* ✅ 浮在 bottom-nav 上方的按鈕層（跟 bottom-nav 同寬同置中） */
+    .fab-layer{
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      width:min(520px, calc(100vw - 40px));
+      bottom:max(10px, env(safe-area-inset-bottom));
+      z-index:1101;          /* 比 bottom-nav(1000) 高一點 */
+      pointer-events:none;   /* 讓空白處不擋點擊 */
+    }
+
+    /* ✅ 回頂按鈕本體：預設隱藏，出現時加 .show */
+    .toTopBtn{
+      position:absolute;
+      right:10px;
+      bottom:calc(100% + 60px);  /* 在 bottom-nav 上方 */
+      width:35px;
+      height:35px;
+      border-radius:999px;
+      border:1px solid rgba(233,225,214,.9);
+      background:rgba(255,255,255,.88);
+      backdrop-filter:blur(16px);
+      box-shadow:0 14px 36px rgba(0,0,0,.14);
+      color:#2B2723;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      right:6px;
+
+      opacity:0;
+      transform:translateY(10px) scale(.96);
+      transition:opacity .18s ease, transform .18s ease;
+      pointer-events:auto;   /* 只有按鈕可點 */
+    }
+
+    .toTopBtn i{ font-size:18px; opacity:.9; }
+
+    .toTopBtn.show{
+      opacity:1;
+      transform:translateY(0) scale(1);
+    }
+
+    .toTopBtn:active{ transform:translateY(1px) scale(.98); }
+
     /* boarding */
     .boarding{
       background:rgba(255,255,255,.76);
@@ -1387,6 +1433,8 @@
       }
       .boarding-bottom .bb-bag{
         grid-column: 1 / -1;    /* 行李佔滿整行 */
+        text-align: center;     /* 文字置中 */
+        justify-self: center;   /* 這格在 grid 內也置中（更穩） */
       }
       .boarding-bottom .bb-dep{
         grid-column: 1 / 2;     /* 出發在左下 */
@@ -2097,7 +2145,12 @@
     </div>
   </div>
 
-
+  <!-- ✅ 回到最上面（浮在 bottom-nav 上方右側） -->
+  <div class="fab-layer" aria-hidden="false">
+    <button id="toTopBtn" class="toTopBtn" type="button" aria-label="回到最上面">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+  </div>
 
   <nav class="bottom-nav">
     <div class="nav-item active" onclick="nav('itinerary', this)"><i class="fas fa-map-location-dot"></i> 行程</div>
@@ -2460,7 +2513,32 @@
     renderFlights();
     normalizeExpenses();
     renderExpenseUI();
+    initToTopButton();
   });
+
+  function initToTopButton(){
+    const btn = document.getElementById('toTopBtn');
+    if(!btn) return;
+
+    const THRESHOLD = 260; // 往下滑超過多少 px 才出現（可自行調）
+
+    const update = () => {
+      const y = window.scrollY || document.documentElement.scrollTop || 0;
+      btn.classList.toggle('show', y > THRESHOLD);
+    };
+
+    // 初始：一定隱藏
+    update();
+
+    // 滾動時：再判斷要不要出現
+    window.addEventListener('scroll', update, { passive:true });
+
+    // 點擊：平滑回到最上面
+    btn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
 
   document.getElementById('modalSheet')?.addEventListener(
     'touchmove',
@@ -3969,10 +4047,23 @@ async function renderWeatherJMA(meta){
         </a>
       </div>`;
 
+    // lockBodyScroll();
+    // document.getElementById('modalOverlay').classList.add('active');
+    // document.getElementById('modalSheet').classList.add('active');
+    // showSheetSplash(item);
     lockBodyScroll();
-    document.getElementById('modalOverlay').classList.add('active');
-    document.getElementById('modalSheet').classList.add('active');
-    showSheetSplash(item);
+
+    const ov = document.getElementById('modalOverlay');
+    const sh = document.getElementById('modalSheet');
+
+    ov.classList.add('active');
+
+    // ✅ 延後一幀再讓 sheet 進場：減少 Safari「跳一下 / UI 彈出」的機率
+    requestAnimationFrame(() => {
+      sh.classList.add('active');
+      showSheetSplash(item);
+    });
+
 
 /*
     // === menu pill click + 喇叭 click：事件委派（只綁一次）===
@@ -4166,88 +4257,70 @@ async function renderWeatherJMA(meta){
   (function initModalDrag(){
     const sheet   = document.getElementById('modalSheet');
     const overlay = document.getElementById('modalOverlay');
-    const handle  = document.querySelector('.modal-header');
-    const scrollArea = document.getElementById('modalScroll');
-  
-    if(!sheet || !overlay || !handle || !scrollArea) return;
-  
-    let startY = 0, dy = 0, dragging = false;
-  
-    const onStart = (e) => {
+    const handle  = document.querySelector('.modal-drag-handle');  /* 或改成 .modal-drag-handle */
+
+    if(!sheet || !overlay || !handle) return;
+
+    let startY = 0;
+    let dy = 0;
+    let dragging = false;
+
+    function setTranslate(y){
+      sheet.style.transform = `translateX(-50%) translateY(${y}px)`;
+      sheet.style.transition = 'none';
+/*        讓遮罩跟著變淡（可選） */
+      const k = Math.max(0, 1 - y / 280);
+      overlay.style.opacity = (0.38 * k).toFixed(3);
+    }
+
+    function reset(){
+      sheet.style.transition = '';
+      sheet.style.transform = '';        /* 交回給 .active 的 transform */
+      overlay.style.opacity = '';        /* 交回給 CSS */
+    }
+
+    
+
+    handle.addEventListener('pointerdown', (e)=>{
       if(!sheet.classList.contains('active')) return;
-
-      /* 💡 只有在接近頂端時才啟動下拉關閉中斷 */
-      if (scrollArea.scrollTop > 5 && e.target !== handle) return;
-
       dragging = true;
       startY = e.clientY;
       dy = 0;
-      
-      /* 關鍵：立即鎖定指針並禁止原生捲動 */
-      sheet.setPointerCapture(e.pointerId);
-      sheet.style.touchAction = 'none';
-      scrollArea.style.touchAction = 'none';
-    };
-  
-    const onMove = (e) => {
-      if (!dragging) return;
-  
-      const deltaY = e.clientY - startY;
-      
-      /* 判定是否真的要下拉 */
-      if (deltaY < 0) {
-          /* 使用者往上推，釋放控制權交還給捲動引擎 */
-          dragging = false;
-          sheet.style.touchAction = '';
-          scrollArea.style.touchAction = 'pan-y';
-          sheet.releasePointerCapture(e.pointerId);
-          return;
-      }
+      sheet.setPointerCapture?.(e.pointerId);
+    });
 
-      /* ✅ 強制攔截所有原生行為，防止抖動 */
-      if (e.cancelable) e.preventDefault(); 
-      scrollArea.scrollTop = 0; 
-      
-      dy = deltaY;
-      
-      requestAnimationFrame(() => {
-          sheet.style.transition = 'none';
-          overlay.style.transition = 'none';
-          sheet.style.transform = `translateX(-50%) translateY(${dy}px)`;
-          
-          /* 背景隨位移線性變淡 */
-          const k = Math.max(0, 1 - dy / 450);
-          overlay.style.opacity = (0.38 * k).toFixed(3);
-      });
-    };
-  
-    const onEnd = (e) => {
-      if (!dragging) return;
+    handle.addEventListener('pointermove', (e)=>{
+      if(!dragging) return;
+      dy = Math.max(0, e.clientY - startY);  /* 只允許往下拖 */
+      setTranslate(dy);
+    });
+
+    handle.addEventListener('pointerup', (e)=>{
+      if(!dragging) return;
       dragging = false;
-      sheet.releasePointerCapture(e.pointerId);
-      
-      /* 恢復標準觸控暫存器 */
-      sheet.style.touchAction = '';
-      scrollArea.style.touchAction = 'pan-y';
-  
-      if (dy > 120) {
+      sheet.releasePointerCapture?.(e.pointerId);
+
+/*        拖超過門檻就關掉，否則彈回 */
+      if(dy > 120){
+        reset();
         closeModal();
-      } else {
-        /* 回彈程序 */
-        sheet.style.transition = 'transform .25s cubic-bezier(0.16, 1, 0.3, 1)';
-        overlay.style.transition = 'opacity .25s ease';
-        sheet.style.transform = 'translateX(-50%) translateY(0)';
-        overlay.style.opacity = '0.38'; 
+      }else{
+/*          彈回原位 */
+        sheet.style.transition = 'transform .18s cubic-bezier(.16,1,.3,1)';
+        sheet.style.transform  = 'translateX(-50%) translateY(0)';
+        overlay.style.opacity  = '0.38';
+        setTimeout(reset, 200);
       }
-      dy = 0;
-    };
-  
-    handle.addEventListener('pointerdown', onStart);
-    scrollArea.addEventListener('pointerdown', onStart);
-    sheet.addEventListener('pointermove', onMove, { passive: false });
-    sheet.addEventListener('pointerup', onEnd);
-    sheet.addEventListener('pointercancel', onEnd);
+    });
+
+    handle.addEventListener('pointercancel', ()=>{
+      if(!dragging) return;
+      dragging = false;
+      reset();
+    });
   })();
+
+
 
   function openUrl(url){
     window.open(url, '_blank', 'noopener');
@@ -4302,7 +4375,7 @@ async function renderWeatherJMA(meta){
           <div class="boarding-mid">
             <div style="text-align:left;">
               <div class="code">${escapeHtml(f.from?.code || '')}</div>
-              <div class="t">${escapeHtml(f.from?.city || '')} • ${escapeHtml(f.depart_time || '')} ${escapeHtml(terminal)}</div>
+              <div class="t">${escapeHtml(f.from?.city || '')} • ${escapeHtml(f.depart_time || '')}</div>
             </div>
             <i class="fas fa-arrow-right" style="color:#B9B2AA; font-size:1.1rem;"></i>
             <div style="text-align:right;">
@@ -4314,7 +4387,7 @@ async function renderWeatherJMA(meta){
           <div class="boarding-bottom">
             <div class="bb-bag"><i class="fas fa-suitcase-rolling"></i> 行李：${escapeHtml(baggage)}</div>
             <div class="bb-dep"><i class="fas fa-plane-departure"></i> 出發：${escapeHtml(f.from?.city || '')} ${escapeHtml(f.from?.terminal || '')}</div>
-            <div class="bb-arr"><i class="fas fa-plane-arrival"></i> 抵達：${escapeHtml(f.to?.city || '')}</div>
+            <div class="bb-arr"><i class="fas fa-plane-arrival"></i> 抵達：${escapeHtml(f.to?.city || '')} </div>
           </div>
         </div>
       `;
@@ -4777,21 +4850,27 @@ async function renderWeatherJMA(meta){
 
   
 /*    ====== Desktop: wheel -> horizontal scroll for horizontal strips ====== */
+//   function enableWheelHorizontal(el){
+//     if(!el) return;
+//     el.addEventListener('wheel', (e)=>{
+// /*        只在滑鼠停在可水平滾動區塊時，把滾輪轉成水平移動 */
+//       if(Math.abs(e.deltaY) > Math.abs(e.deltaX)){
+//         e.preventDefault();
+//         el.scrollLeft += e.deltaY;
+//       }
+//     }, { passive:false });
+//   }
   function enableWheelHorizontal(el){
     if(!el) return;
-    el.addEventListener('wheel', (e)=>{
-      /* 偵測垂直滾輪意圖 */
-      if(Math.abs(e.deltaY) > Math.abs(e.deltaX)){
-        const canScrollLeft = el.scrollLeft > 0;
-        const canScrollRight = el.scrollLeft < (el.scrollWidth - el.clientWidth - 1);
 
-        /* 💡 BIOS 邏輯：只有在內部還有空間可以水平位移時，才攔截(PreventDefault)捲動中斷 */
-        if ((e.deltaY < 0 && canScrollLeft) || (e.deltaY > 0 && canScrollRight)) {
-          e.preventDefault();
-          el.scrollLeft += e.deltaY;
-        }
-        /* 否則：不執行 preventDefault，讓捲動事件冒泡給 body 處理 */
-      }
+    el.addEventListener('wheel', (e)=>{
+      // 只在「按住 Shift」且此區塊真的可以水平滾動時，才接管滾輪
+      const canHScroll = el.scrollWidth > el.clientWidth + 2;
+      if(!canHScroll) return;
+      if(!e.shiftKey) return;
+
+      e.preventDefault();
+      el.scrollLeft += e.deltaY;
     }, { passive:false });
   }
 
