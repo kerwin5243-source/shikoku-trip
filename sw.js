@@ -1,63 +1,63 @@
-// sw.js - 離線快取服務 (終極防護版)
-const CACHE_NAME = 'shikoku-pwa-v2'; // 更新版本號
+// sw.js - 離線快取服務 (Vercel & iOS 專武版 v3)
+const CACHE_NAME = 'shikoku-pwa-v3'; // 升級版本號強制更新
 
-// 1. 安裝時：立刻將核心網頁放入保險箱 (Pre-cache)
+const CORE_URLS = [
+  '/',
+  '/index.html'
+];
+
+// 安裝：預先下載絕對路徑的核心檔案
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      // 強制寫入根目錄與 index.html，確保絕對有網頁可以顯示
-      return cache.addAll([
-        './',
-        './index.html'
-      ]).catch(() => console.log('部份預載略過，不影響運作'));
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_URLS).catch(() => console.log('預載略過')))
   );
 });
 
-// 2. 啟動時：接管控制權，並清除舊版快取
+// 啟動：清除所有舊的、卡住的快取
 self.addEventListener('activate', (event) => {
   event.waitUntil(clients.claim());
   event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.map(k => (k !== CACHE_NAME ? caches.delete(k) : null))
-      );
-    })
+    caches.keys().then((keys) => Promise.all(
+      keys.map(k => (k !== CACHE_NAME ? caches.delete(k) : null))
+    ))
   );
 });
 
-// 3. 攔截請求：Network First 搭配無敵 Fallback
+// 攔截請求
 self.addEventListener('fetch', (event) => {
-  // 只攔截讀取 (GET) 動作，略過上傳 (POST)
   if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  
+  // 只攔截同網域的請求 (Vercel 本身)
+  if (url.origin !== location.origin) return;
 
-  event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        // 有網路：成功抓到檔案，偷存一份到快取
+  // 針對 HTML 網頁切換 (飛航模式重新整理會觸發 navigate)
+  if (event.request.mode === 'navigate' || (event.request.headers.get('accept') || '').includes('text/html')) {
+    event.respondWith(
+      fetch(event.request).then((response) => {
         const clone = response.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
         return response;
-      })
-      .catch(async () => {
-        // 🚨 斷網飛航模式：進入快取尋寶
-        const cachedRes = await caches.match(event.request);
-        if (cachedRes) return cachedRes; 
+      }).catch(async () => {
+        const cache = await caches.open(CACHE_NAME);
+        
+        // 💡 無敵 Fallback：依序尋找快取，絕對不回傳 null 讓 Safari 崩潰
+        const cachedRes = await cache.match(event.request);
+        if (cachedRes) return cachedRes;
+        
+        const fallback1 = await cache.match('/');
+        if (fallback1) return fallback1;
+        
+        const fallback2 = await cache.match('/index.html');
+        if (fallback2) return fallback2;
 
-        // 💡 核心防護：如果是「切換頁面/重新整理」但快取沒對上網址
-        if (event.request.mode === 'navigate') {
-          // 強制回傳我們剛剛在 install 階段鎖進保險箱的 index.html
-          const fallback = await caches.match('./index.html') || await caches.match('./');
-          if (fallback) return fallback;
-        }
-
-        // 最底線防護：連保險箱都空了，回傳純文字避免 Safari 出現 Returned response is null
-        return new Response("目前處於無網路狀態，且尚未建立快取。", {
-          status: 503,
-          statusText: "Service Unavailable",
-          headers: new Headers({'Content-Type': 'text/plain; charset=utf-8'})
+        // 連保險箱都沒東西時，給純文字避免報錯
+        return new Response("目前處於無網路狀態，請恢復連線。", { 
+          status: 503, 
+          headers: { 'Content-Type': 'text/plain; charset=utf-8' } 
         });
       })
-  );
+    );
+  }
 });
