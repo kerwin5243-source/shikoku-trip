@@ -49,7 +49,8 @@ self.addEventListener('fetch', (event) => {
 
       // 背景去網路上抓最新版
       const networkPromise = fetch(event.request).then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200) {
+        // 💡 關鍵修正：允許 200 (正常) 與 opaque (跨網域圖片) 被存入快取
+        if (networkResponse && (networkResponse.status === 200 || networkResponse.type === 'opaque')) {
           cache.put(event.request, networkResponse.clone());
         }
         return networkResponse;

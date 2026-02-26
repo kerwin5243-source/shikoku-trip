@@ -3371,6 +3371,8 @@ async function loadAllData(){
     initModalSwipe();
     await selectDay(0);
     autoJumpToNextSpot();
+    // 💡 加入這一行：啟動背景抓圖 (不加 await，讓它在背景默默跑，不卡住畫面)
+    preloadEverythingForOffline();
   });
 
   function initModalSwipe(){
@@ -7255,6 +7257,54 @@ function closeShopImage() {
   setTimeout(() => { 
     overlay.style.display = 'none'; 
   }, 300); // 等待淡出動畫結束再隱藏
+}
+
+// ✅ 新增：背景全自動快取機器人 (無聲無息下載所有天數與照片)
+async function preloadEverythingForOffline() {
+  console.log("開始背景預載所有行程與照片...");
+  
+  // 1. 預載所有天數的 JSON 與裡面的圖片
+  for (const meta of itineraryIndex) {
+    if (!meta.file) continue;
+    try {
+      // 偷偷抓取該天的 JSON (這動作會順便讓 sw.js 把 JSON 存進快取)
+      const raw = await fetch(`./${meta.file}`).then(r => r.json());
+      const dayData = Array.isArray(raw) ? raw[0] : raw;
+      
+      // 抓取 Hero 橫幅照片
+      const photos = Array.isArray(dayData.photos) ? dayData.photos : [];
+      photos.forEach(p => {
+         const url = typeof p === 'string' ? p : p.src;
+         if(url) fetch(normalizeAssetUrl(url), { mode: 'no-cors' }).catch(()=>{});
+      });
+
+      // 抓取 Splash 明信片 與 Menu 菜單照片
+      const items = Array.isArray(dayData.items) ? dayData.items : [];
+      items.forEach(item => {
+         const splashSrcs = pickSheetSplashSrcs(item);
+         splashSrcs.forEach(src => fetch(src, { mode: 'no-cors' }).catch(()=>{}));
+         
+         if(Array.isArray(item.menu)){
+            item.menu.forEach(m => {
+               if(m.img) fetch(normalizeAssetUrl(m.img), { mode: 'no-cors' }).catch(()=>{});
+            });
+         }
+      });
+    } catch(e) {}
+  }
+
+  // 2. 預載伴手禮圖片
+  if (Array.isArray(SOUVENIRS)) {
+    SOUVENIRS.forEach(g => {
+      if(Array.isArray(g.items)){
+        g.items.forEach(it => {
+          if(it.img) fetch(normalizeAssetUrl(it.img), { mode: 'no-cors' }).catch(()=>{});
+        });
+      }
+    });
+  }
+  
+  console.log("背景預載完成！現在您可以安心開啟飛航模式了。");
 }
 
 if ('serviceWorker' in navigator) {
