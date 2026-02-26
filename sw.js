@@ -1,63 +1,67 @@
-// sw.js - 離線快取服務 (Vercel & iOS 專武版 v3)
-const CACHE_NAME = 'shikoku-pwa-v3'; // 升級版本號強制更新
+// sw.js - 終極 PWA 離線機器人 (v4)
+const CACHE_NAME = 'shikoku-pwa-v4';
 
-const CORE_URLS = [
-  '/',
-  '/index.html'
-];
-
-// 安裝：預先下載絕對路徑的核心檔案
 self.addEventListener('install', (event) => {
   self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_URLS).catch(() => console.log('預載略過')))
-  );
 });
 
-// 啟動：清除所有舊的、卡住的快取
 self.addEventListener('activate', (event) => {
   event.waitUntil(clients.claim());
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(
-      keys.map(k => (k !== CACHE_NAME ? caches.delete(k) : null))
+    caches.keys().then(keys => Promise.all(
+      keys.map(k => k !== CACHE_NAME ? caches.delete(k) : null)
     ))
   );
 });
 
-// 攔截請求
+// 全面攔截器：優先給快取，背景偷偷更新
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
-  const url = new URL(event.request.url);
-  
-  // 只攔截同網域的請求 (Vercel 本身)
-  if (url.origin !== location.origin) return;
+  if (!event.request.url.startsWith('http')) return;
 
-  // 針對 HTML 網頁切換 (飛航模式重新整理會觸發 navigate)
-  if (event.request.mode === 'navigate' || (event.request.headers.get('accept') || '').includes('text/html')) {
-    event.respondWith(
-      fetch(event.request).then((response) => {
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-        return response;
-      }).catch(async () => {
-        const cache = await caches.open(CACHE_NAME);
-        
-        // 💡 無敵 Fallback：依序尋找快取，絕對不回傳 null 讓 Safari 崩潰
-        const cachedRes = await cache.match(event.request);
-        if (cachedRes) return cachedRes;
-        
-        const fallback1 = await cache.match('/');
-        if (fallback1) return fallback1;
-        
-        const fallback2 = await cache.match('/index.html');
-        if (fallback2) return fallback2;
-
-        // 連保險箱都沒東西時，給純文字避免報錯
-        return new Response("目前處於無網路狀態，請恢復連線。", { 
-          status: 503, 
-          headers: { 'Content-Type': 'text/plain; charset=utf-8' } 
-        });
-      })
-    );
+  // 🚨 略過 Google API 同步，確保這部分不被錯誤快取
+  if (event.request.url.includes('script.google.com') || 
+      event.request.url.includes('script.googleusercontent.com')) {
+    return; 
   }
+
+  event.respondWith(
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+      // 1. 去保險箱找有沒有舊檔案
+      const cachedResponse = await cache.match(event.request);
+
+      // 2. 同時派人去網路上抓最新版
+      const networkPromise = fetch(event.request).then((networkResponse) => {
+        // 如果抓成功，偷偷把新資料放進保險箱，供下次秒開使用
+        if (networkResponse && (networkResponse.status === 200 || networkResponse.type === 'opaque')) {
+          cache.put(event.request, networkResponse.clone());
+        }
+        return networkResponse;
+      }).catch(() => {
+        // 斷網時派出去的人會失敗，安靜忽略即可
+      });
+
+      // 3. 決策：如果保險箱有東西，立刻交給畫面 (秒開體驗！)
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      // 4. 如果保險箱是空的，等網路的人回來
+      try {
+        const response = await networkPromise;
+        if (response) return response;
+        throw new Error('No response');
+      } catch (err) {
+        // 5. 斷網，且保險箱也是空的：防崩潰機制
+        if (event.request.mode === 'navigate') {
+           const fallback = await cache.match('/index.html') || await cache.match('/');
+           if (fallback) return fallback;
+        }
+        return new Response("目前無網路，請恢復連線。", {
+          status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+        });
+      }
+    })()
+  );
 });
