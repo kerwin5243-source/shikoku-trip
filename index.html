@@ -3239,25 +3239,53 @@ function renderGasStations(){
     openDirections(from, to, mode);
    });
 
-   function modalGoto(step, opt={}){
-    const items = currentDayData?.items || [];
-    const cur = Number(window.__activeModalIdx ?? 0);
-    const next = cur + step;
+  //  function modalGoto(step, opt={}){
+  //   const items = currentDayData?.items || [];
+  //   const cur = Number(window.__activeModalIdx ?? 0);
+  //   const next = cur + step;
 
-    if(next < 0 || next >= items.length) return;
+  //   if(next < 0 || next >= items.length) return;
+
+  //   const sh = document.getElementById('modalSheet');
+  //   if(opt.animate && sh){
+  //     const cls = step > 0 ? 'swap-left' : 'swap-right';
+  //     sh.classList.add(cls);
+  //     setTimeout(()=>{
+  //       sh.classList.remove(cls);
+  //       openModal(next, { keepOpen:true, skipSplash: !!opt.skipSplash });
+  //     }, 140);
+  //     return;
+  //   }
+
+  //   openModal(next, { keepOpen:true, skipSplash: !!opt.skipSplash });
+  // }
+  function modalGoto(step, opt={}) {
+    const items = currentDayData?.items || [];
+    let cur = Number(window.__activeModalIdx ?? -1);
+    if (cur < 0) return;
+
+    let next = cur + step;
+
+    // 💡 核心修改 1：遇到 route (交通時間) 就自動繼續跳下一筆，直到找到真正的景點/飯店
+    while (next >= 0 && next < items.length && items[next]?.type === 'route') {
+      next += step;
+    }
+
+    // 如果已經滑到第一筆之前，或最後一筆之後，就停住不動作
+    if (next < 0 || next >= items.length) return;
 
     const sh = document.getElementById('modalSheet');
-    if(opt.animate && sh){
+    if (opt.animate && sh) {
       const cls = step > 0 ? 'swap-left' : 'swap-right';
       sh.classList.add(cls);
-      setTimeout(()=>{
+      setTimeout(() => {
         sh.classList.remove(cls);
-        openModal(next, { keepOpen:true, skipSplash: !!opt.skipSplash });
+        openModal(next);
       }, 140);
       return;
     }
 
-    openModal(next, { keepOpen:true, skipSplash: !!opt.skipSplash });
+    openModal(next);
   }
 
 
@@ -5094,14 +5122,14 @@ async function renderWeatherJMA(meta){
         window.__modalSwipeBound = true;
 
         const splash = document.getElementById('sheetSplash');
-        const scrollArea = document.getElementById('modalScroll');
+        
 
         let sx = 0, sy = 0, tracking = false;
 
         sh.addEventListener('pointerdown', (e) => {
           if(!sh.classList.contains('active')) return;
           if(splash?.classList.contains('active')) return;
-          if(scrollArea && scrollArea.scrollTop > 8) return;
+          
 
           tracking = true;
           sx = e.clientX; sy = e.clientY;
@@ -5114,11 +5142,12 @@ async function renderWeatherJMA(meta){
           const dx = e.clientX - sx;
           const dy = e.clientY - sy;
 
-          if(Math.abs(dx) < 60) return;
-          if(Math.abs(dx) < Math.abs(dy) * 1.2) return;
+          if(Math.abs(dx) < 50) return;
+          if(Math.abs(dx) < Math.abs(dy) * 1.5) return;
 
-          if(dx < 0) modalGoto(+1);
-          else       modalGoto(-1);
+          // 呼叫 modalGoto 時加上 {animate: true}，切換會帶有滑動動畫
+          if(dx < 0) modalGoto(+1, { animate: true });
+          else       modalGoto(-1, { animate: true });
         }, { passive: true });
 
         sh.addEventListener('pointercancel', () => { tracking = false; }, { passive: true });
