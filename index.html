@@ -5718,7 +5718,7 @@ function showUserDetail(userName) {
   //   });
   // }
 
-  function renderSouvenirs(){
+function renderSouvenirs(){
     const el = document.getElementById('souvenirBoard');
     if(!el) return;
     const groups = Array.isArray(SOUVENIRS) ? SOUVENIRS : [];
@@ -5729,14 +5729,20 @@ function showUserDetail(userName) {
         <div class="card" style="padding:16px; margin-bottom:14px;">
           <div style="font-weight:900; margin-bottom:10px;">${escapeHtml(g.region||'')}</div>
           <div class="souvenir-grid">
-            ${items.map(it => `
-              <div class="souvenir-item">
-                <div class="souvenir-avatar">
-                  <img src="${escapeHtml(normalizeAssetUrl(it.img||''))}" alt="" loading="lazy" decoding="async">
+            ${items.map(it => {
+              // 取得處理過的安全圖片網址
+              const imgSrc = escapeHtml(normalizeAssetUrl(it.img||''));
+              return `
+                <div class="souvenir-item">
+                  <div class="souvenir-avatar">
+                    <img src="${imgSrc}" alt="" loading="lazy" decoding="async" 
+                         style="cursor:pointer;" 
+                         onclick="openShopImage('${imgSrc}')">
+                  </div>
+                  <div class="souvenir-name">${escapeHtml(it.name||'')}</div>
                 </div>
-                <div class="souvenir-name">${escapeHtml(it.name||'')}</div>
-              </div>
-            `).join('')}
+              `;
+            }).join('')}
           </div>
         </div>
       `;
