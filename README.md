@@ -1,2 +1,2 @@
 ## Link
-https://shikoku-trip-orcin.vercel.app/
+https://shikoku-trip-xxjourney.vercel.app/
