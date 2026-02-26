@@ -1,0 +1,30 @@
+[
+  { "region":"高松香川", "items":[
+    {"name":"Quattro蝦夷起司蝦餅","img":"/photos/souvenir/01001.png"},
+    {"name":"讚歧烏龍麵","img":"/photos/souvenir/01002.png"},
+    {"name":"橄欖類產品","img":"/photos/souvenir/01003.png"},
+    {"name":"烏龍麵軟糖","img":"/photos/souvenir/01004.png"},
+    {"name":"酥脆烏龍麵零食","img":"/photos/souvenir/01005.png"}
+  ]},
+  { "region":"徳島鳴門", "items":[
+    {"name":"Mamma Rosa","img":"/photos/souvenir/02001.png"},
+    {"name":"金長饅頭","img":"/photos/souvenir/02002.png"},
+    {"name":"鳴門金時地瓜","img":"/photos/souvenir/02003.png"},
+    {"name":"阿波外郎糕","img":"/photos/souvenir/02005.png"}
+  ]},
+  { "region":"松山愛媛", "items":[
+    {"name":"蜜柑大福","img":"/photos/souvenir/03001.png"},
+    {"name":"霧之森大福","img":"/photos/souvenir/03002.png"},
+    {"name":"母惠夢","img":"/photos/souvenir/03003.png"},
+    {"name":"六時屋蛋糕捲","img":"/photos/souvenir/03004.png"},
+    {"name":"愛媛柑橘","img":"/photos/souvenir/03005.png"},
+    {"name":"今治毛巾","img":"/photos/souvenir/03006.png"},
+    {"name":"血橙鹽味巧克力","img":"/photos/souvenir/03007.png"}
+  ]},
+  { "region":"高知土佐", "items":[
+    {"name":"美樂小圓餅","img":"/photos/souvenir/04001.png"},
+    {"name":"都饅","img":"/photos/souvenir/04002.png"},
+    {"name":"鰹節（鰹魚乾）","img":"/photos/souvenir/04003.png"},
+    {"name":"柚子胡椒","img":"/photos/souvenir/04004.png"}
+  ]}
+]
