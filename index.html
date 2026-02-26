@@ -2380,11 +2380,11 @@
       </div>
 
       <!-- 輸入：項目 / 金額（兩種模式共用） -->
-      <div style="display:flex; gap:10px; margin-bottom:15px;">
-        <input type="text" id="exName" placeholder="項目 / 備註（例：晚餐）"
-          style="padding:12px; border:1px solid rgba(233,225,214,.9); border-radius:14px; flex:1; background:rgba(255,255,255,.8);">
+      <div style="display:flex; gap:8px; margin-bottom:15px; width:100%; box-sizing:border-box;">
+        <input type="text" id="exName" class="input" placeholder="項目 / 備註（例：晚餐）"
+          style="flex: 1 1 0%; min-width: 0; box-sizing: border-box; font-size: 16px;">
         <input type="number" id="exCost" placeholder="金額"
-          style="padding:12px; border:1px solid rgba(233,225,214,.9); border-radius:14px; width:110px; background:rgba(255,255,255,.8);">
+          style="flex: 0 0 80px; width: 80px; box-sizing: border-box; font-size: 16px;">
       </div>
 
       <!-- 付款人（from） -->
@@ -2529,10 +2529,9 @@
           <img class="splash-img" id="sheetSplashImg1" alt="" />
           <img class="splash-img" id="sheetSplashImg2" alt="" />
         </div>
-        <div class="splash-caption" id="sheetSplashCaption"></div>
+        </div>
       </div>
-    </div>
-    <div class="modal-scroll" id="modalScroll">
+      <div class="modal-scroll" id="modalScroll">
         <div id="modalSticky"></div>
         <div id="modalBody"></div>
     </div>
@@ -2672,8 +2671,8 @@ function showSheetSplash(item){
   img1.style.display = 'block';
 
   // ✅ caption（如果你有這個 DOM）
-  const cap = document.getElementById('sheetSplashCaption');
-  if(cap) cap.textContent = item?.title ? String(item.title).replace(/\n/g,' ') : '';
+  // const cap = document.getElementById('sheetSplashCaption');
+  // if(cap) cap.textContent = item?.title ? String(item.title).replace(/\n/g,' ') : '';
 
   ov.classList.add('active');
   ov.setAttribute('aria-hidden','false');
