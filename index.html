@@ -834,43 +834,48 @@
     .souvenir-avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
     .souvenir-name{ font-weight:900; color:var(--primary); line-height:1.2; }
 
-
-    /* ===== 待買代購清單專用樣式 ===== */
-    .shop-item {
-      display:flex; align-items:flex-start; gap:10px;
-      padding:12px 0; border-bottom:1px solid rgba(233,225,214,.8);
-    }
+/* ===== 待買代購清單專用樣式 (更新版) ===== */
+    .shop-item { display:flex; align-items:flex-start; gap:10px; padding:12px 0; border-bottom:1px solid rgba(233,225,214,.8); }
     .shop-item:last-child { border-bottom:none; }
-    .shop-chk { 
-      width:22px; height:22px; margin-top:2px; flex:0 0 auto; cursor:pointer; 
-      accent-color: var(--accent);
-    }
+    .shop-chk { width:22px; height:22px; margin-top:2px; flex:0 0 auto; cursor:pointer; accent-color: var(--accent); }
     .shop-img-box {
       width:54px; height:54px; border-radius:8px; background:rgba(0,0,0,.05);
       display:flex; align-items:center; justify-content:center;
-      flex:0 0 auto; overflow:hidden; position:relative; border:1px solid rgba(0,0,0,.08);
-      cursor:pointer;
+      flex:0 0 auto; overflow:hidden; position:relative; border:1px solid rgba(0,0,0,.08); cursor:pointer;
     }
     .shop-img-box img { width:100%; height:100%; object-fit:cover; display:block; }
     .shop-img-box i { color:var(--ink2); font-size:1.2rem; }
-    /* 隱藏式的上傳按鈕，疊在圖片框正上方 */
-    .shop-img-upload { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
     
     .shop-info { flex:1; min-width:0; }
-    .shop-title { font-weight:900; font-size:1rem; color:var(--primary); line-height:1.3; word-break:break-word; transition:0.2s; }
-    .shop-title.done { text-decoration:line-through; opacity:0.4; }
+    
+    /* 💡 商品名稱改成透明無框的 input */
+    .shop-title-input { 
+      font-weight:900; font-size:1rem; color:var(--primary); width:100%; 
+      border:none; background:transparent; padding:0; margin:0; outline:none; transition:0.2s; 
+    }
+    .shop-title-input.done { text-decoration:line-through; opacity:0.4; }
     
     .shop-meta { display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap; }
-    .shop-qty { font-size:.85rem; font-weight:900; color:var(--ink2); background:#f2f2f7; padding:2px 8px; border-radius:6px; }
+    .shop-qty { font-size:.85rem; font-weight:900; color:var(--ink2); background:#f2f2f7; padding:2px 8px; border-radius:6px; display:flex; align-items:center; }
+    
+    /* 💡 數量改成透明無框的 input */
+    .shop-qty-input {
+      width: 35px; border:none; background:transparent; font-weight:900; 
+      color:var(--ink2); outline:none; font-size:.85rem; padding:0; text-align:center;
+    }
+    
+    /* 💡 價格外框，用來包住 ¥ 符號跟輸入框 */
+    .shop-price-wrapper {
+      display:inline-flex; align-items:center; border:1px solid rgba(233,225,214,.9);
+      border-radius:6px; background:rgba(255,255,255,.8); padding:0 6px;
+    }
+    .shop-price-wrapper span { color:var(--primary); font-weight:900; font-size:.85rem; margin-right:2px; }
     .shop-price-input {
-      width:80px; padding:4px 8px; border:1px solid rgba(233,225,214,.9);
-      border-radius:6px; font-size:.85rem; font-weight:900; background:rgba(255,255,255,.8);
-      color:var(--primary);
+      width:55px; padding:4px 0; border:none; background:transparent;
+      font-size:.85rem; font-weight:900; color:var(--primary); outline:none;
     }
     .shop-price-input::placeholder { color:#B9B2AA; font-weight:700; }
     .shop-del { color:#B42318; cursor:pointer; font-size:1rem; font-weight:900; padding:4px; margin-left:auto; }
-
-
 
 
     /* ===== Modal: bottom sheet ===== */
@@ -6928,12 +6933,10 @@ function renderShoppingList() {
 
   el.innerHTML = list.map((item, idx) => {
     const isDone = item.bought ? 'checked' : '';
-    const titleCls = item.bought ? 'shop-title done' : 'shop-title';
+    const titleCls = item.bought ? 'shop-title-input done' : 'shop-title-input';
     
-    // 💡 核心修改：判斷有沒有照片，給予不同的點擊行為
     let imgBoxContent = '';
     if (item.img) {
-      // 有照片：點擊照片放大，右下角放一個小按鈕用來換照片
       imgBoxContent = `
         <img src="${escapeHtml(item.img)}" alt="pic" style="width:100%; height:100%; object-fit:cover;" onclick="openShopImage('${escapeHtml(item.img)}')">
         <label style="position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.6); color:#fff; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; cursor:pointer;">
@@ -6942,7 +6945,6 @@ function renderShoppingList() {
         </label>
       `;
     } else {
-      // 沒照片：整個框框都是上傳按鈕
       imgBoxContent = `
         <i class="fas fa-camera" style="color:var(--ink2); font-size:1.2rem;"></i>
         <input type="file" accept="image/*" onchange="uploadShopImg(event, ${idx})" style="position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;">
@@ -6956,10 +6958,18 @@ function renderShoppingList() {
           ${imgBoxContent}
         </div>
         <div class="shop-info">
-          <div class="${titleCls}">${escapeHtml(item.name)}</div>
+          <input type="text" class="${titleCls}" value="${escapeHtml(item.name)}" onchange="updateShopName(${idx}, this.value)">
+          
           <div class="shop-meta">
-            <span class="shop-qty">數量: ${escapeHtml(item.qty)}</span>
-            <input type="number" class="shop-price-input" placeholder="¥ 價格" value="${item.price || ''}" onchange="updateShopPrice(${idx}, this.value)">
+            <span class="shop-qty">
+              數量: <input type="number" class="shop-qty-input" value="${escapeHtml(item.qty)}" onchange="updateShopQty(${idx}, this.value)">
+            </span>
+            
+            <div class="shop-price-wrapper">
+              <span>¥</span>
+              <input type="number" class="shop-price-input" placeholder="價格" value="${item.price || ''}" onchange="updateShopPrice(${idx}, this.value)">
+            </div>
+            
             <i class="fas fa-trash shop-del" onclick="delShopItem(${idx})"></i>
           </div>
         </div>
@@ -6968,9 +6978,27 @@ function renderShoppingList() {
   }).join('');
 }
 
+// ✅ 新增：更新商品名稱
+function updateShopName(idx, val) {
+  if (!shoppingList[curShopUser][idx]) return;
+  shoppingList[curShopUser][idx].name = val.trim();
+  saveShoppingList();
+}
+
+// ✅ 新增：更新商品數量
+function updateShopQty(idx, val) {
+  if (!shoppingList[curShopUser][idx]) return;
+  shoppingList[curShopUser][idx].qty = val.trim();
+  saveShoppingList();
+}
 function saveShoppingList() {
   localStorage.setItem('shopping_list', JSON.stringify(shoppingList));
   // 未來如果需要，也可以加一句 cloudPost 把這個資料丟到 Google Sheet
+}
+function updateShopPrice(idx, val) {
+  if (!shoppingList[curShopUser][idx]) return;
+  shoppingList[curShopUser][idx].price = val;
+  saveShoppingList();
 }
 
 function addShoppingItem() {
@@ -7003,11 +7031,7 @@ function toggleShopItem(idx) {
   renderShoppingList();
 }
 
-function updateShopPrice(idx, val) {
-  if (!shoppingList[curShopUser][idx]) return;
-  shoppingList[curShopUser][idx].price = val;
-  saveShoppingList();
-}
+
 
 function delShopItem(idx) {
   if (!confirm('確定刪除此代購商品？')) return;
