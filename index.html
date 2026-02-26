@@ -835,6 +835,42 @@
     .souvenir-name{ font-weight:900; color:var(--primary); line-height:1.2; }
 
 
+    /* ===== 待買代購清單專用樣式 ===== */
+    .shop-item {
+      display:flex; align-items:flex-start; gap:10px;
+      padding:12px 0; border-bottom:1px solid rgba(233,225,214,.8);
+    }
+    .shop-item:last-child { border-bottom:none; }
+    .shop-chk { 
+      width:22px; height:22px; margin-top:2px; flex:0 0 auto; cursor:pointer; 
+      accent-color: var(--accent);
+    }
+    .shop-img-box {
+      width:54px; height:54px; border-radius:8px; background:rgba(0,0,0,.05);
+      display:flex; align-items:center; justify-content:center;
+      flex:0 0 auto; overflow:hidden; position:relative; border:1px solid rgba(0,0,0,.08);
+      cursor:pointer;
+    }
+    .shop-img-box img { width:100%; height:100%; object-fit:cover; display:block; }
+    .shop-img-box i { color:var(--ink2); font-size:1.2rem; }
+    /* 隱藏式的上傳按鈕，疊在圖片框正上方 */
+    .shop-img-upload { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+    
+    .shop-info { flex:1; min-width:0; }
+    .shop-title { font-weight:900; font-size:1rem; color:var(--primary); line-height:1.3; word-break:break-word; transition:0.2s; }
+    .shop-title.done { text-decoration:line-through; opacity:0.4; }
+    
+    .shop-meta { display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap; }
+    .shop-qty { font-size:.85rem; font-weight:900; color:var(--ink2); background:#f2f2f7; padding:2px 8px; border-radius:6px; }
+    .shop-price-input {
+      width:80px; padding:4px 8px; border:1px solid rgba(233,225,214,.9);
+      border-radius:6px; font-size:.85rem; font-weight:900; background:rgba(255,255,255,.8);
+      color:var(--primary);
+    }
+    .shop-price-input::placeholder { color:#B9B2AA; font-weight:700; }
+    .shop-del { color:#B42318; cursor:pointer; font-size:1rem; font-weight:900; padding:4px; margin-left:auto; }
+
+
 
 
     /* ===== Modal: bottom sheet ===== */
@@ -2452,6 +2488,19 @@
   <!-- 伴手禮 -->
   <div id="page-souvenir" class="page">
     <div class="card">
+      <div class="section-title"><i class="fas fa-cart-shopping"></i> 待買代購清單</div>
+      <div class="user-tabs" id="shoppingUserSwitch" style="background:rgba(233,225,214,.9); margin-bottom:15px;"></div>
+      
+      <div style="display:flex; gap:8px; margin-bottom:15px;">
+        <input type="text" id="shopItemName" placeholder="商品名稱 (如：EVE止痛藥)" style="padding:10px; border:1px solid rgba(233,225,214,.9); border-radius:12px; flex:1; font-weight:800; background:rgba(255,255,255,.8);">
+        <input type="number" id="shopItemQty" placeholder="數量" style="padding:10px; border:1px solid rgba(233,225,214,.9); border-radius:12px; width:65px; font-weight:800; background:rgba(255,255,255,.8);">
+        <button class="btn" style="width:auto; padding:10px 16px; border-radius:12px;" onclick="addShoppingItem()">新增</button>
+      </div>
+      
+      <div id="shoppingListBoard"></div>
+    </div>
+
+    <div class="card">
       <div class="section-title"><i class="fas fa-gift"></i> 伴手禮總覽</div>
       <div id="souvenirBoard"></div>
     </div>
@@ -3186,6 +3235,7 @@ function renderGasStations(){
     normalizeExpenses();
     renderExpenseUI();
     renderSouvenirs();
+    initShoppingList();
     initToTopButton();
     enableWheelHorizontal(document.getElementById('dayScroller'));
     initModalDragToClose();
@@ -6830,6 +6880,165 @@ function addPaymentFromForm(){
     // 點 overlay 也可關（你本來就有）
     if(overlay) overlay.addEventListener('click', closeModal);
   }
+
+  /* ====== 待買代購清單 ====== */
+let shoppingList = JSON.parse(localStorage.getItem('shopping_list')) || {};
+let curShopUser = '';
+
+function initShoppingList() {
+  if (!curShopUser) curShopUser = users[0] || 'Kerwin';
+  renderShoppingUserTabs();
+  renderShoppingList();
+}
+
+function renderShoppingUserTabs() {
+  const el = document.getElementById('shoppingUserSwitch');
+  if (!el) return;
+  el.innerHTML = users.map(u => 
+    `<div class="user-tab ${u === curShopUser ? 'active' : ''}" onclick="switchShopUser('${escapeHtml(u)}')">${escapeHtml(u)}</div>`
+  ).join('');
+}
+
+function switchShopUser(u) {
+  curShopUser = u;
+  renderShoppingUserTabs();
+  renderShoppingList();
+}
+
+function renderShoppingList() {
+  const el = document.getElementById('shoppingListBoard');
+  if (!el) return;
+
+  const list = shoppingList[curShopUser] || [];
+  
+  if (!list.length) {
+    el.innerHTML = `<div style="color:var(--ink2); font-weight:800; text-align:center; padding:15px 0;">目前沒有代購項目</div>`;
+    return;
+  }
+
+  el.innerHTML = list.map((item, idx) => {
+    const isDone = item.bought ? 'checked' : '';
+    const titleCls = item.bought ? 'shop-title done' : 'shop-title';
+    
+    // 如果有照片顯示照片，沒有則顯示相機 Icon 提示上傳
+    const imgHtml = item.img 
+      ? `<img src="${escapeHtml(item.img)}" alt="pic">`
+      : `<i class="fas fa-camera"></i>`;
+
+    return `
+      <div class="shop-item">
+        <input type="checkbox" class="shop-chk" ${isDone} onchange="toggleShopItem(${idx})">
+        <div class="shop-img-box">
+          ${imgHtml}
+          <input type="file" class="shop-img-upload" accept="image/*" onchange="uploadShopImg(event, ${idx})">
+        </div>
+        <div class="shop-info">
+          <div class="${titleCls}">${escapeHtml(item.name)}</div>
+          <div class="shop-meta">
+            <span class="shop-qty">數量: ${escapeHtml(item.qty)}</span>
+            <input type="number" class="shop-price-input" placeholder="¥ 價格" value="${item.price || ''}" onchange="updateShopPrice(${idx}, this.value)">
+            <i class="fas fa-trash shop-del" onclick="delShopItem(${idx})"></i>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function saveShoppingList() {
+  localStorage.setItem('shopping_list', JSON.stringify(shoppingList));
+  // 未來如果需要，也可以加一句 cloudPost 把這個資料丟到 Google Sheet
+}
+
+function addShoppingItem() {
+  const nameInput = document.getElementById('shopItemName');
+  const qtyInput = document.getElementById('shopItemQty');
+  const name = nameInput.value.trim();
+  const qty = qtyInput.value.trim() || '1';
+
+  if (!name) return alert('請輸入商品名稱');
+  if (!shoppingList[curShopUser]) shoppingList[curShopUser] = [];
+  
+  shoppingList[curShopUser].push({
+    name: name,
+    qty: qty,
+    price: '',
+    bought: false,
+    img: ''
+  });
+
+  saveShoppingList();
+  nameInput.value = '';
+  qtyInput.value = '';
+  renderShoppingList();
+}
+
+function toggleShopItem(idx) {
+  if (!shoppingList[curShopUser][idx]) return;
+  shoppingList[curShopUser][idx].bought = !shoppingList[curShopUser][idx].bought;
+  saveShoppingList();
+  renderShoppingList();
+}
+
+function updateShopPrice(idx, val) {
+  if (!shoppingList[curShopUser][idx]) return;
+  shoppingList[curShopUser][idx].price = val;
+  saveShoppingList();
+}
+
+function delShopItem(idx) {
+  if (!confirm('確定刪除此代購商品？')) return;
+  shoppingList[curShopUser].splice(idx, 1);
+  saveShoppingList();
+  renderShoppingList();
+}
+
+// ✅ 照片自動壓縮機制 (避免照片太大把網頁存儲空間塞爆)
+function uploadShopImg(event, idx) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      
+      // 限制照片最大尺寸為 400px (以代購縮圖來說非常夠用)
+      const MAX_SIZE = 400;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > MAX_SIZE) {
+          height *= MAX_SIZE / width;
+          width = MAX_SIZE;
+        }
+      } else {
+        if (height > MAX_SIZE) {
+          width *= MAX_SIZE / height;
+          height = MAX_SIZE;
+        }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // 轉換成輕量的 JPEG 格式 (品質 60%)
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+      
+      if (shoppingList[curShopUser] && shoppingList[curShopUser][idx]) {
+        shoppingList[curShopUser][idx].img = dataUrl;
+        saveShoppingList();
+        renderShoppingList();
+      }
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
 
 
 </script>
