@@ -2566,6 +2566,45 @@
   </button>
 
 <script>
+
+/* ====== 核心：離線快取讀取器 ====== */
+  async function fetchWithCache(url, cacheKey) {
+    // 1. 先嘗試從 localStorage 拿出舊資料
+    const cachedText = localStorage.getItem(cacheKey);
+    let parsedData = cachedText ? JSON.parse(cachedText) : null;
+
+    // 2. 在背景默默去抓取最新資料 (加上時間戳避免瀏覽器死存舊檔)
+    try {
+      // 不用 await 阻擋畫面，直接發送請求
+      fetch(`${url}?v=${Date.now()}`).then(async (res) => {
+        if (res.ok) {
+          const freshData = await res.json();
+          // 如果抓到新資料，更新 localStorage
+          localStorage.setItem(cacheKey, JSON.stringify(freshData));
+          
+          // 如果一開始完全沒有本地資料(第一次開)，就在抓完後回傳
+          if (!parsedData) parsedData = freshData; 
+        }
+      }).catch(e => {
+        console.warn(`[離線模式] 無法更新 ${cacheKey}，繼續使用本地快取`);
+      });
+    } catch (e) {}
+
+    // 3. 回傳資料（如果有快取就秒回，如果沒有就等 fetch 完）
+    // 如果真的都抓不到（第一次開就沒網路），回傳 null 免得報錯
+    if (!parsedData) {
+      try {
+        const res = await fetch(`${url}?v=${Date.now()}`);
+        parsedData = await res.json();
+        localStorage.setItem(cacheKey, JSON.stringify(parsedData));
+      } catch (e) {
+        console.error(`[致命錯誤] 首次載入失敗且無網路: ${url}`);
+      }
+    }
+    return parsedData;
+  }
+
+
 /*    ====== Globals (JSON 驅動) ====== */
   let CONFIG, CHECKLISTS, TODOS, FLIGHTS, HOTELS, ITINERARY, SOUVENIRS, GASSTATIONS;
 
@@ -3153,29 +3192,34 @@ function renderGasStations(){
     }
   }
 
-/*    寫入資料時加入 token 欄位 */
-  function cloudPost(action, data) {
-    fetch(G_API_URL, {
-      method: "POST",
-      mode: "no-cors", 
-      body: JSON.stringify({
-        token: G_TOKEN,  /* 🔑 加入驗證暗號 */
-        action: action,
-        data: data
-      })
-    });
-  }
+/* 寫入資料時加入 token 欄位，並加入離線防護 */
+function cloudPost(action, data) {
+  fetch(G_API_URL, {
+    method: "POST",
+    mode: "no-cors", 
+    body: JSON.stringify({
+      token: G_TOKEN,
+      action: action,
+      data: data
+    })
+  }).catch(err => {
+    // 💡 離線時會走到這裡，安靜攔截錯誤，因為本機已經存檔了
+    console.log(`[離線] 無法即時上傳 ${action}，待連線後點擊標題同步`);
+  });
+}
+
 
   async function loadAllData(){ 
+    // 💡 全部改用 fetchWithCache，實現「秒開」與「離線讀取」
     [CONFIG, CHECKLISTS, TODOS, FLIGHTS, HOTELS, GASSTATIONS, ITINERARY, SOUVENIRS] = await Promise.all([
-      fetch("./data/config.json").then(r=>r.json()),
-      fetch("./data/checklists.json").then(r=>r.json()),
-      fetch("./data/todos.json").then(r=>r.json()),
-      fetch("./data/flights.json").then(r=>r.json()),
-      fetch("./data/hotels.json").then(r=>r.json()),
-      fetch("./data/gasstations.json").then(r=>r.json()),
-      fetch("./data/itinerary.index.json").then(r=>r.json()),
-      fetch("./data/souvenirs.json").then(r=>r.json()),
+      fetchWithCache("./data/config.json", "cache_config"),
+      fetchWithCache("./data/checklists.json", "cache_checklists"),
+      fetchWithCache("./data/todos.json", "cache_todos"),
+      fetchWithCache("./data/flights.json", "cache_flights"),
+      fetchWithCache("./data/hotels.json", "cache_hotels"),
+      fetchWithCache("./data/gasstations.json", "cache_gasstations"),
+      fetchWithCache("./data/itinerary.index.json", "cache_itinerary_index"),
+      fetchWithCache("./data/souvenirs.json", "cache_souvenirs"),
     ]);
 
     users = CONFIG?.members || ['Kerwin','Alan','Roy','Billy','Rick'];
@@ -3187,19 +3231,47 @@ function renderGasStations(){
     itineraryIndex = ITINERARY || [];
 
     const title = (CONFIG?.trip_title || '四國巡禮');
-
-/*      2) subtitle 不顯示 L,K,R,Y,J */
     const sub = `${CONFIG?.days || 9}天${CONFIG?.nights || 8}夜${CONFIG?.mode ? CONFIG.mode : ''}`;
     
     document.getElementById('hdrTitle').innerText = title;
     document.getElementById('hdrKana').innerText = 'とくしまけん、かがわけん、えひめけん、こうちけん';
     document.getElementById('hdrSub').innerText = sub;
     document.getElementById('hdrYear').innerText = '2026';
+  }
+//   async function loadAllData(){ 
+//     [CONFIG, CHECKLISTS, TODOS, FLIGHTS, HOTELS, GASSTATIONS, ITINERARY, SOUVENIRS] = await Promise.all([
+//       fetch("./data/config.json").then(r=>r.json()),
+//       fetch("./data/checklists.json").then(r=>r.json()),
+//       fetch("./data/todos.json").then(r=>r.json()),
+//       fetch("./data/flights.json").then(r=>r.json()),
+//       fetch("./data/hotels.json").then(r=>r.json()),
+//       fetch("./data/gasstations.json").then(r=>r.json()),
+//       fetch("./data/itinerary.index.json").then(r=>r.json()),
+//       fetch("./data/souvenirs.json").then(r=>r.json()),
+//     ]);
+
+//     users = CONFIG?.members || ['Kerwin','Alan','Roy','Billy','Rick'];
+//     curUser = users[0] || 'Kerwin';
+//     curPayer = users[0] || 'Kerwin';
+
+//     checklistData = CHECKLISTS || { carry: [], check: [] };
+//     hotels = HOTELS || [];
+//     itineraryIndex = ITINERARY || [];
+
+//     const title = (CONFIG?.trip_title || '四國巡禮');
+
+// /*      2) subtitle 不顯示 L,K,R,Y,J */
+//     const sub = `${CONFIG?.days || 9}天${CONFIG?.nights || 8}夜${CONFIG?.mode ? CONFIG.mode : ''}`;
+    
+//     document.getElementById('hdrTitle').innerText = title;
+//     document.getElementById('hdrKana').innerText = 'とくしまけん、かがわけん、えひめけん、こうちけん';
+//     document.getElementById('hdrSub').innerText = sub;
+//     document.getElementById('hdrYear').innerText = '2026';
     
 
 
-    document.getElementById('hdrSub').innerText = sub;
-  }
+//     document.getElementById('hdrSub').innerText = sub;
+//   }
 
   document.addEventListener('DOMContentLoaded', async () => {
     /*       💡 若無 Token 則提示輸入（僅需輸入第一次，後續會存於 Cookie） */
@@ -4151,28 +4223,52 @@ async function moveItemToDay(fromDayIdx, itemIdx, toDayIdx){
       return dayData;
     }
 
-    async function loadDayData(dayIdx, meta){
-      // 1) 若已有 cache，直接用
-      if(dayCache?.[dayIdx]) return dayCache[dayIdx];
+  async function loadDayData(dayIdx, meta){
+    // 1) 若已有記憶體快取，直接用
+    if(dayCache?.[dayIdx]) return dayCache[dayIdx];
 
-      // 2) 否則讀檔（你原本 selectDay 用什麼載，就照它）
-      const file = meta?.file;
-      const res = await fetch(file, { cache:'no-store' });
-      const data = await res.json();
+    const file = meta?.file;
+    const cacheKey = `cache_day_${file}`;
 
-      // 3) 套用 localStorage edits（若你本來就有 applyDayEdits 邏輯，就改呼叫它）
-      const key = `day_edits_${file}`;
-      try{
-        const raw = localStorage.getItem(key);
-        if(raw){
-          const patch = JSON.parse(raw);
-          if(Array.isArray(patch?.items)) data.items = patch.items;
-        }
-      }catch(e){}
+    // 2) 💡 改用 fetchWithCache 支援離線讀取每日行程
+    const data = await fetchWithCache(`./${file}`, cacheKey);
 
-      dayCache[dayIdx] = data;
-      return data;
-    }
+    // 3) 套用 localStorage 裡你拖曳修改過的順序 edits
+    const editKey = `day_edits_${file}`;
+    try{
+      const raw = localStorage.getItem(editKey);
+      if(raw){
+        const patch = JSON.parse(raw);
+        if(Array.isArray(patch?.items)) data.items = patch.items;
+      }
+    }catch(e){}
+
+    dayCache[dayIdx] = data;
+    return data;
+  }
+
+    // async function loadDayData(dayIdx, meta){
+    //   // 1) 若已有 cache，直接用
+    //   if(dayCache?.[dayIdx]) return dayCache[dayIdx];
+
+    //   // 2) 否則讀檔（你原本 selectDay 用什麼載，就照它）
+    //   const file = meta?.file;
+    //   const res = await fetch(file, { cache:'no-store' });
+    //   const data = await res.json();
+
+    //   // 3) 套用 localStorage edits（若你本來就有 applyDayEdits 邏輯，就改呼叫它）
+    //   const key = `day_edits_${file}`;
+    //   try{
+    //     const raw = localStorage.getItem(key);
+    //     if(raw){
+    //       const patch = JSON.parse(raw);
+    //       if(Array.isArray(patch?.items)) data.items = patch.items;
+    //     }
+    //   }catch(e){}
+
+    //   dayCache[dayIdx] = data;
+    //   return data;
+    // }
 
     function saveDayEditsForDayIdx(dayIdx, dayData){
       const file = itineraryIndex?.[dayIdx]?.file;
