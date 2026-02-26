@@ -834,7 +834,48 @@
     .souvenir-avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
     .souvenir-name{ font-weight:900; color:var(--primary); line-height:1.2; }
 
-
+/* ===== 待買代購清單專用樣式 (更新版) ===== */
+    .shop-item { display:flex; align-items:flex-start; gap:10px; padding:12px 0; border-bottom:1px solid rgba(233,225,214,.8); }
+    .shop-item:last-child { border-bottom:none; }
+    .shop-chk { width:22px; height:22px; margin-top:2px; flex:0 0 auto; cursor:pointer; accent-color: var(--accent); }
+    .shop-img-box {
+      width:54px; height:54px; border-radius:8px; background:rgba(0,0,0,.05);
+      display:flex; align-items:center; justify-content:center;
+      flex:0 0 auto; overflow:hidden; position:relative; border:1px solid rgba(0,0,0,.08); cursor:pointer;
+    }
+    .shop-img-box img { width:100%; height:100%; object-fit:cover; display:block; }
+    .shop-img-box i { color:var(--ink2); font-size:1.2rem; }
+    
+    .shop-info { flex:1; min-width:0; }
+    
+    /* 💡 商品名稱改成透明無框的 input */
+    .shop-title-input { 
+      font-weight:900; font-size:1rem; color:var(--primary); width:100%; 
+      border:none; background:transparent; padding:0; margin:0; outline:none; transition:0.2s; 
+    }
+    .shop-title-input.done { text-decoration:line-through; opacity:0.4; }
+    
+    .shop-meta { display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap; }
+    .shop-qty { font-size:.85rem; font-weight:900; color:var(--ink2); background:#f2f2f7; padding:2px 8px; border-radius:6px; display:flex; align-items:center; }
+    
+    /* 💡 數量改成透明無框的 input */
+    .shop-qty-input {
+      width: 35px; border:none; background:transparent; font-weight:900; 
+      color:var(--ink2); outline:none; font-size:.85rem; padding:0; text-align:center;
+    }
+    
+    /* 💡 價格外框，用來包住 ¥ 符號跟輸入框 */
+    .shop-price-wrapper {
+      display:inline-flex; align-items:center; border:1px solid rgba(233,225,214,.9);
+      border-radius:6px; background:rgba(255,255,255,.8); padding:0 6px;
+    }
+    .shop-price-wrapper span { color:var(--primary); font-weight:900; font-size:.85rem; margin-right:2px; }
+    .shop-price-input {
+      width:55px; padding:4px 0; border:none; background:transparent;
+      font-size:.85rem; font-weight:900; color:var(--primary); outline:none;
+    }
+    .shop-price-input::placeholder { color:#B9B2AA; font-weight:700; }
+    .shop-del { color:#B42318; cursor:pointer; font-size:1rem; font-weight:900; padding:4px; margin-left:auto; }
 
 
     /* ===== Modal: bottom sheet ===== */
@@ -1203,8 +1244,8 @@
     #modalSheet:not(.splash-on) #modalScroll{
       opacity:1;
     }
-    #modalSheet.swap-left  { transition: transform .14s ease, opacity .14s ease; transform: translateX(calc(-50% - 18px)) translateY(0); opacity:.88; }
-    #modalSheet.swap-right { transition: transform .14s ease, opacity .14s ease; transform: translateX(calc(-50% + 18px)) translateY(0); opacity:.88; }
+    #modalSheet.swap-left  { transition: transform .14s ease; transform: translateX(calc(-50% - 18px)) translateY(0); }
+    #modalSheet.swap-right { transition: transform .14s ease; transform: translateX(calc(-50% + 18px)) translateY(0); }
 
     .splash-caption{
       position:absolute;
@@ -2339,11 +2380,11 @@
       </div>
 
       <!-- 輸入：項目 / 金額（兩種模式共用） -->
-      <div style="display:flex; gap:10px; margin-bottom:15px;">
-        <input type="text" id="exName" placeholder="項目 / 備註（例：晚餐）"
-          style="padding:12px; border:1px solid rgba(233,225,214,.9); border-radius:14px; flex:1; background:rgba(255,255,255,.8);">
+      <div style="display:flex; gap:8px; margin-bottom:15px; width:100%; box-sizing:border-box;">
+        <input type="text" id="exName" class="input" placeholder="項目 / 備註（例：晚餐）"
+          style="flex: 1 1 0%; min-width: 0; box-sizing: border-box; font-size: 16px; padding: 12px; border: 1px solid rgba(233,225,214,.9); border-radius: 14px; background: rgba(255,255,255,.8);">
         <input type="number" id="exCost" placeholder="金額"
-          style="padding:12px; border:1px solid rgba(233,225,214,.9); border-radius:14px; width:110px; background:rgba(255,255,255,.8);">
+          style="flex: 0 0 110px; width: 110px; box-sizing: border-box; font-size: 16px; padding: 12px; border: 1px solid rgba(233,225,214,.9); border-radius: 14px; background: rgba(255,255,255,.8);">
       </div>
 
       <!-- 付款人（from） -->
@@ -2452,8 +2493,25 @@
   <!-- 伴手禮 -->
   <div id="page-souvenir" class="page">
     <div class="card">
+      <div class="section-title"><i class="fas fa-cart-shopping"></i> 待買代購清單</div>
+      <div class="user-tabs" id="shoppingUserSwitch" style="background:rgba(233,225,214,.9); margin-bottom:15px;"></div>
+      
+      <div style="display:flex; gap:8px; margin-bottom:15px; width:100%; box-sizing:border-box;">
+        <input type="text" id="shopItemName" placeholder="商品名稱 (如：EVE)" style="padding:10px; border:1px solid rgba(233,225,214,.9); border-radius:12px; flex: 1 1 0%; min-width: 0; font-weight:800; background:rgba(255,255,255,.8); box-sizing:border-box; font-size:16px;">
+        <input type="number" id="shopItemQty" placeholder="數量" style="padding:10px; border:1px solid rgba(233,225,214,.9); border-radius:12px; width:65px; flex: 0 0 65px; font-weight:800; background:rgba(255,255,255,.8); box-sizing:border-box; font-size:16px;">
+        <button class="btn" style="flex: 0 0 auto; width:auto; padding:10px 16px; border-radius:12px; white-space:nowrap; box-sizing:border-box;" onclick="addShoppingItem()">新增</button>
+      </div>
+      
+      <div id="shoppingListBoard"></div>
+    </div>
+
+    <div class="card">
       <div class="section-title"><i class="fas fa-gift"></i> 伴手禮總覽</div>
       <div id="souvenirBoard"></div>
+    </div>
+    <div id="imgViewerOverlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:99999; display:none; justify-content:center; align-items:center; opacity:0; transition:opacity 0.3s;" onclick="closeShopImage()">
+      <img id="imgViewerPic" src="" style="max-width:90%; max-height:85%; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.5);">
+      <div style="position:absolute; top:20px; right:25px; color:#fff; font-size:2.5rem; font-weight:100; cursor:pointer;">&times;</div>
     </div>
   </div>
 
@@ -2471,10 +2529,9 @@
           <img class="splash-img" id="sheetSplashImg1" alt="" />
           <img class="splash-img" id="sheetSplashImg2" alt="" />
         </div>
-        <div class="splash-caption" id="sheetSplashCaption"></div>
+        </div>
       </div>
-    </div>
-    <div class="modal-scroll" id="modalScroll">
+      <div class="modal-scroll" id="modalScroll">
         <div id="modalSticky"></div>
         <div id="modalBody"></div>
     </div>
@@ -2509,6 +2566,45 @@
   </button>
 
 <script>
+
+/* ====== 核心：離線快取讀取器 ====== */
+  async function fetchWithCache(url, cacheKey) {
+    // 1. 先嘗試從 localStorage 拿出舊資料
+    const cachedText = localStorage.getItem(cacheKey);
+    let parsedData = cachedText ? JSON.parse(cachedText) : null;
+
+    // 2. 在背景默默去抓取最新資料 (加上時間戳避免瀏覽器死存舊檔)
+    try {
+      // 不用 await 阻擋畫面，直接發送請求
+      fetch(`${url}?v=${Date.now()}`).then(async (res) => {
+        if (res.ok) {
+          const freshData = await res.json();
+          // 如果抓到新資料，更新 localStorage
+          localStorage.setItem(cacheKey, JSON.stringify(freshData));
+          
+          // 如果一開始完全沒有本地資料(第一次開)，就在抓完後回傳
+          if (!parsedData) parsedData = freshData; 
+        }
+      }).catch(e => {
+        console.warn(`[離線模式] 無法更新 ${cacheKey}，繼續使用本地快取`);
+      });
+    } catch (e) {}
+
+    // 3. 回傳資料（如果有快取就秒回，如果沒有就等 fetch 完）
+    // 如果真的都抓不到（第一次開就沒網路），回傳 null 免得報錯
+    if (!parsedData) {
+      try {
+        const res = await fetch(`${url}?v=${Date.now()}`);
+        parsedData = await res.json();
+        localStorage.setItem(cacheKey, JSON.stringify(parsedData));
+      } catch (e) {
+        console.error(`[致命錯誤] 首次載入失敗且無網路: ${url}`);
+      }
+    }
+    return parsedData;
+  }
+
+
 /*    ====== Globals (JSON 驅動) ====== */
   let CONFIG, CHECKLISTS, TODOS, FLIGHTS, HOTELS, ITINERARY, SOUVENIRS, GASSTATIONS;
 
@@ -2614,8 +2710,8 @@ function showSheetSplash(item){
   img1.style.display = 'block';
 
   // ✅ caption（如果你有這個 DOM）
-  const cap = document.getElementById('sheetSplashCaption');
-  if(cap) cap.textContent = item?.title ? String(item.title).replace(/\n/g,' ') : '';
+  // const cap = document.getElementById('sheetSplashCaption');
+  // if(cap) cap.textContent = item?.title ? String(item.title).replace(/\n/g,' ') : '';
 
   ov.classList.add('active');
   ov.setAttribute('aria-hidden','false');
@@ -3009,52 +3105,86 @@ function renderGasStations(){
          });
        }
 */
-/*         ✅ 修正行程卡消失後的 syncFromCloud 片段 */
+
       if (cloudData.itineraryEdits) {
-        const currentFile = itineraryIndex[currentDayIdx]?.file;
-        
         Object.keys(cloudData.itineraryEdits).forEach(file => {
           const key = `day_edits_${file}`;
           const editData = cloudData.itineraryEdits[file];
-          
-/*            💡 關鍵修正：判斷 editData 是陣列還是物件 */
           const itemsArray = Array.isArray(editData) ? editData : (editData.items || []);
           
-/*            更新 LocalStorage 與 快取 */
-          localStorage.setItem(key, JSON.stringify({ items: itemsArray }));
-          
-/*
-          // if (file === currentFile) {
-          //   // 確保將快取中的 items 設為正確的陣列
-          //   dayCache[currentDayIdx] = { ...dayCache[currentDayIdx], items: itemsArray };
-          //   currentDayData = dayCache[currentDayIdx];
-            
-          //   if (document.getElementById('page-itinerary').classList.contains('active')) {
-          //     renderTimelineList(currentDayData);
-          //     if (typeof enableTimelineSortable === 'function') enableTimelineSortable();
-          //   }
-          // }
-*/
-          if (cloudData.itineraryEdits) {
-            Object.keys(cloudData.itineraryEdits).forEach(file => {
-              const key = `day_edits_${file}`;
-              const editData = cloudData.itineraryEdits[file];
-              const itemsArray = Array.isArray(editData) ? editData : (editData.items || []);
-              localStorage.setItem(key, JSON.stringify({ items: itemsArray }));
-            });
+          // 💡 核心 2：取得本地最後一次修改的時間
+          const localTs = Number(localStorage.getItem(key + '_local_ts')) || 0;
+          const now = Date.now();
 
-/*              如果目前就在行程頁，重繪當天（用 applyDayEdits 套用最新 localStorage） */
-            if (document.getElementById('page-itinerary').classList.contains('active')) {
-              const meta = itineraryIndex[currentDayIdx];
-              if (dayCache[currentDayIdx]) {
-                currentDayData = applyDayEdits(dayCache[currentDayIdx], meta);
-                renderTimelineList(currentDayData);
-                if (__tlEditMode) enableTimelineSortable();
-              }
-            }
+          // 🛡️ 防護機制：如果這個檔案在「過去 15 秒內」才剛被本機修改過，
+          // 就不要讓雲端資料覆蓋它 (避免您剛改完，雲端還沒更新的舊資料剛好載下來把它洗掉)
+          if (now - localTs < 15000) {
+            console.log(`[防護攔截] ${file} 剛被本機修改，略過本次雲端覆蓋`);
+            return; // 跳過這個檔案的覆蓋
           }
+
+          // 安全覆蓋：寫入雲端最新資料，並清除本地時間標記
+          localStorage.setItem(key, JSON.stringify({ items: itemsArray }));
+          localStorage.removeItem(key + '_local_ts');
         });
+
+        // 如果目前就在行程頁，重繪當天
+        if (document.getElementById('page-itinerary').classList.contains('active')) {
+          const meta = itineraryIndex[currentDayIdx];
+          if (dayCache[currentDayIdx]) {
+            currentDayData = applyDayEdits(dayCache[currentDayIdx], meta);
+            renderTimelineList(currentDayData);
+            if (__tlEditMode) enableTimelineSortable();
+          }
+        }
       }
+
+// /*         ✅ 修正行程卡消失後的 syncFromCloud 片段 */
+//       if (cloudData.itineraryEdits) {
+//         const currentFile = itineraryIndex[currentDayIdx]?.file;
+        
+//         Object.keys(cloudData.itineraryEdits).forEach(file => {
+//           const key = `day_edits_${file}`;
+//           const editData = cloudData.itineraryEdits[file];
+          
+// /*            💡 關鍵修正：判斷 editData 是陣列還是物件 */
+//           const itemsArray = Array.isArray(editData) ? editData : (editData.items || []);
+          
+// /*            更新 LocalStorage 與 快取 */
+//           localStorage.setItem(key, JSON.stringify({ items: itemsArray }));
+          
+// /*
+//           // if (file === currentFile) {
+//           //   // 確保將快取中的 items 設為正確的陣列
+//           //   dayCache[currentDayIdx] = { ...dayCache[currentDayIdx], items: itemsArray };
+//           //   currentDayData = dayCache[currentDayIdx];
+            
+//           //   if (document.getElementById('page-itinerary').classList.contains('active')) {
+//           //     renderTimelineList(currentDayData);
+//           //     if (typeof enableTimelineSortable === 'function') enableTimelineSortable();
+//           //   }
+//           // }
+// */
+//           if (cloudData.itineraryEdits) {
+//             Object.keys(cloudData.itineraryEdits).forEach(file => {
+//               const key = `day_edits_${file}`;
+//               const editData = cloudData.itineraryEdits[file];
+//               const itemsArray = Array.isArray(editData) ? editData : (editData.items || []);
+//               localStorage.setItem(key, JSON.stringify({ items: itemsArray }));
+//             });
+
+// /*              如果目前就在行程頁，重繪當天（用 applyDayEdits 套用最新 localStorage） */
+//             if (document.getElementById('page-itinerary').classList.contains('active')) {
+//               const meta = itineraryIndex[currentDayIdx];
+//               if (dayCache[currentDayIdx]) {
+//                 currentDayData = applyDayEdits(dayCache[currentDayIdx], meta);
+//                 renderTimelineList(currentDayData);
+//                 if (__tlEditMode) enableTimelineSortable();
+//               }
+//             }
+//           }
+//         });
+//       }
   
       console.log("雲端資料同步完成");
     } catch (e) {
@@ -3062,29 +3192,34 @@ function renderGasStations(){
     }
   }
 
-/*    寫入資料時加入 token 欄位 */
-  function cloudPost(action, data) {
-    fetch(G_API_URL, {
-      method: "POST",
-      mode: "no-cors", 
-      body: JSON.stringify({
-        token: G_TOKEN,  /* 🔑 加入驗證暗號 */
-        action: action,
-        data: data
-      })
-    });
-  }
+/* 寫入資料時加入 token 欄位，並加入離線防護 */
+function cloudPost(action, data) {
+  fetch(G_API_URL, {
+    method: "POST",
+    mode: "no-cors", 
+    body: JSON.stringify({
+      token: G_TOKEN,
+      action: action,
+      data: data
+    })
+  }).catch(err => {
+    // 💡 離線時會走到這裡，安靜攔截錯誤，因為本機已經存檔了
+    console.log(`[離線] 無法即時上傳 ${action}，待連線後點擊標題同步`);
+  });
+}
+
 
   async function loadAllData(){ 
+    // 💡 全部改用 fetchWithCache，實現「秒開」與「離線讀取」
     [CONFIG, CHECKLISTS, TODOS, FLIGHTS, HOTELS, GASSTATIONS, ITINERARY, SOUVENIRS] = await Promise.all([
-      fetch("./data/config.json").then(r=>r.json()),
-      fetch("./data/checklists.json").then(r=>r.json()),
-      fetch("./data/todos.json").then(r=>r.json()),
-      fetch("./data/flights.json").then(r=>r.json()),
-      fetch("./data/hotels.json").then(r=>r.json()),
-      fetch("./data/gasstations.json").then(r=>r.json()),
-      fetch("./data/itinerary.index.json").then(r=>r.json()),
-      fetch("./data/souvenirs.json").then(r=>r.json()),
+      fetchWithCache("./data/config.json", "cache_config"),
+      fetchWithCache("./data/checklists.json", "cache_checklists"),
+      fetchWithCache("./data/todos.json", "cache_todos"),
+      fetchWithCache("./data/flights.json", "cache_flights"),
+      fetchWithCache("./data/hotels.json", "cache_hotels"),
+      fetchWithCache("./data/gasstations.json", "cache_gasstations"),
+      fetchWithCache("./data/itinerary.index.json", "cache_itinerary_index"),
+      fetchWithCache("./data/souvenirs.json", "cache_souvenirs"),
     ]);
 
     users = CONFIG?.members || ['Kerwin','Alan','Roy','Billy','Rick'];
@@ -3096,19 +3231,47 @@ function renderGasStations(){
     itineraryIndex = ITINERARY || [];
 
     const title = (CONFIG?.trip_title || '四國巡禮');
-
-/*      2) subtitle 不顯示 L,K,R,Y,J */
     const sub = `${CONFIG?.days || 9}天${CONFIG?.nights || 8}夜${CONFIG?.mode ? CONFIG.mode : ''}`;
     
     document.getElementById('hdrTitle').innerText = title;
     document.getElementById('hdrKana').innerText = 'とくしまけん、かがわけん、えひめけん、こうちけん';
     document.getElementById('hdrSub').innerText = sub;
     document.getElementById('hdrYear').innerText = '2026';
+  }
+//   async function loadAllData(){ 
+//     [CONFIG, CHECKLISTS, TODOS, FLIGHTS, HOTELS, GASSTATIONS, ITINERARY, SOUVENIRS] = await Promise.all([
+//       fetch("./data/config.json").then(r=>r.json()),
+//       fetch("./data/checklists.json").then(r=>r.json()),
+//       fetch("./data/todos.json").then(r=>r.json()),
+//       fetch("./data/flights.json").then(r=>r.json()),
+//       fetch("./data/hotels.json").then(r=>r.json()),
+//       fetch("./data/gasstations.json").then(r=>r.json()),
+//       fetch("./data/itinerary.index.json").then(r=>r.json()),
+//       fetch("./data/souvenirs.json").then(r=>r.json()),
+//     ]);
+
+//     users = CONFIG?.members || ['Kerwin','Alan','Roy','Billy','Rick'];
+//     curUser = users[0] || 'Kerwin';
+//     curPayer = users[0] || 'Kerwin';
+
+//     checklistData = CHECKLISTS || { carry: [], check: [] };
+//     hotels = HOTELS || [];
+//     itineraryIndex = ITINERARY || [];
+
+//     const title = (CONFIG?.trip_title || '四國巡禮');
+
+// /*      2) subtitle 不顯示 L,K,R,Y,J */
+//     const sub = `${CONFIG?.days || 9}天${CONFIG?.nights || 8}夜${CONFIG?.mode ? CONFIG.mode : ''}`;
+    
+//     document.getElementById('hdrTitle').innerText = title;
+//     document.getElementById('hdrKana').innerText = 'とくしまけん、かがわけん、えひめけん、こうちけん';
+//     document.getElementById('hdrSub').innerText = sub;
+//     document.getElementById('hdrYear').innerText = '2026';
     
 
 
-    document.getElementById('hdrSub').innerText = sub;
-  }
+//     document.getElementById('hdrSub').innerText = sub;
+//   }
 
   document.addEventListener('DOMContentLoaded', async () => {
     /*       💡 若無 Token 則提示輸入（僅需輸入第一次，後續會存於 Cookie） */
@@ -3152,6 +3315,7 @@ function renderGasStations(){
     normalizeExpenses();
     renderExpenseUI();
     renderSouvenirs();
+    initShoppingList();
     initToTopButton();
     enableWheelHorizontal(document.getElementById('dayScroller'));
     initModalDragToClose();
@@ -3239,25 +3403,63 @@ function renderGasStations(){
     openDirections(from, to, mode);
    });
 
-   function modalGoto(step, opt={}){
-    const items = currentDayData?.items || [];
-    const cur = Number(window.__activeModalIdx ?? 0);
-    const next = cur + step;
+  //  function modalGoto(step, opt={}){
+  //   const items = currentDayData?.items || [];
+  //   const cur = Number(window.__activeModalIdx ?? 0);
+  //   const next = cur + step;
 
-    if(next < 0 || next >= items.length) return;
+  //   if(next < 0 || next >= items.length) return;
+
+  //   const sh = document.getElementById('modalSheet');
+  //   if(opt.animate && sh){
+  //     const cls = step > 0 ? 'swap-left' : 'swap-right';
+  //     sh.classList.add(cls);
+  //     setTimeout(()=>{
+  //       sh.classList.remove(cls);
+  //       openModal(next, { keepOpen:true, skipSplash: !!opt.skipSplash });
+  //     }, 140);
+  //     return;
+  //   }
+
+  //   openModal(next, { keepOpen:true, skipSplash: !!opt.skipSplash });
+  // }
+  function modalGoto(step, opt={}) {
+    const items = currentDayData?.items || [];
+    let cur = Number(window.__activeModalIdx ?? -1);
+    if (cur < 0) return;
+
+    let next = cur + step;
+
+    // 💡 核心修改：精準判定是否為「交通路徑 (Route)」卡片
+    // 條件：type 是 route，或者裡面有 route.from / route.to 屬性
+    const isRoute = (it) => {
+      if (!it) return false;
+      if (it.type === 'route') return true;
+      if (it.route && (it.route.from || it.route.to)) return true;
+      return false;
+    };
+
+    // 遇到路徑就自動繼續往下/往上找，直到找到真正的景點或飯店
+    while (next >= 0 && next < items.length && isRoute(items[next])) {
+      next += step;
+    }
+
+    // 如果已經滑到第一筆之前，或最後一筆之後，就停住不動作
+    if (next < 0 || next >= items.length) return;
 
     const sh = document.getElementById('modalSheet');
-    if(opt.animate && sh){
+    if (opt.animate && sh) {
       const cls = step > 0 ? 'swap-left' : 'swap-right';
       sh.classList.add(cls);
-      setTimeout(()=>{
+      setTimeout(() => {
         sh.classList.remove(cls);
-        openModal(next, { keepOpen:true, skipSplash: !!opt.skipSplash });
+        openModal(next, opt);
       }, 140);
       return;
     }
 
-    openModal(next, { keepOpen:true, skipSplash: !!opt.skipSplash });
+    // 直接重用 openModal
+    oopenModal(next, opt);
   }
 
 
@@ -4021,28 +4223,52 @@ async function moveItemToDay(fromDayIdx, itemIdx, toDayIdx){
       return dayData;
     }
 
-    async function loadDayData(dayIdx, meta){
-      // 1) 若已有 cache，直接用
-      if(dayCache?.[dayIdx]) return dayCache[dayIdx];
+  async function loadDayData(dayIdx, meta){
+    // 1) 若已有記憶體快取，直接用
+    if(dayCache?.[dayIdx]) return dayCache[dayIdx];
 
-      // 2) 否則讀檔（你原本 selectDay 用什麼載，就照它）
-      const file = meta?.file;
-      const res = await fetch(file, { cache:'no-store' });
-      const data = await res.json();
+    const file = meta?.file;
+    const cacheKey = `cache_day_${file}`;
 
-      // 3) 套用 localStorage edits（若你本來就有 applyDayEdits 邏輯，就改呼叫它）
-      const key = `day_edits_${file}`;
-      try{
-        const raw = localStorage.getItem(key);
-        if(raw){
-          const patch = JSON.parse(raw);
-          if(Array.isArray(patch?.items)) data.items = patch.items;
-        }
-      }catch(e){}
+    // 2) 💡 改用 fetchWithCache 支援離線讀取每日行程
+    const data = await fetchWithCache(`./${file}`, cacheKey);
 
-      dayCache[dayIdx] = data;
-      return data;
-    }
+    // 3) 套用 localStorage 裡你拖曳修改過的順序 edits
+    const editKey = `day_edits_${file}`;
+    try{
+      const raw = localStorage.getItem(editKey);
+      if(raw){
+        const patch = JSON.parse(raw);
+        if(Array.isArray(patch?.items)) data.items = patch.items;
+      }
+    }catch(e){}
+
+    dayCache[dayIdx] = data;
+    return data;
+  }
+
+    // async function loadDayData(dayIdx, meta){
+    //   // 1) 若已有 cache，直接用
+    //   if(dayCache?.[dayIdx]) return dayCache[dayIdx];
+
+    //   // 2) 否則讀檔（你原本 selectDay 用什麼載，就照它）
+    //   const file = meta?.file;
+    //   const res = await fetch(file, { cache:'no-store' });
+    //   const data = await res.json();
+
+    //   // 3) 套用 localStorage edits（若你本來就有 applyDayEdits 邏輯，就改呼叫它）
+    //   const key = `day_edits_${file}`;
+    //   try{
+    //     const raw = localStorage.getItem(key);
+    //     if(raw){
+    //       const patch = JSON.parse(raw);
+    //       if(Array.isArray(patch?.items)) data.items = patch.items;
+    //     }
+    //   }catch(e){}
+
+    //   dayCache[dayIdx] = data;
+    //   return data;
+    // }
 
     function saveDayEditsForDayIdx(dayIdx, dayData){
       const file = itineraryIndex?.[dayIdx]?.file;
@@ -4052,28 +4278,66 @@ async function moveItemToDay(fromDayIdx, itemIdx, toDayIdx){
       }catch(e){}
       dayCache[dayIdx] = dayData;
     }
-/*       ✅ 修正後的 saveDayEdits */
+
+    function saveDayEditsForDayIdx(dayIdx, dayData){
+      const file = itineraryIndex?.[dayIdx]?.file;
+      if(!file) return;
+      try{
+        const key = `day_edits_${file}`;
+        localStorage.setItem(key, JSON.stringify({ items: dayData.items }));
+        
+        // 💡 核心 1：寫入本地修改的時間戳記
+        localStorage.setItem(key + '_local_ts', Date.now().toString());
+      }catch(e){}
+      dayCache[dayIdx] = dayData;
+    }
+
      function saveDayEdits() {
        try {
          const file = itineraryIndex[currentDayIdx]?.file;
          if (!file) return;
      
-         const key = dayEditKey();  /* 現在這裡不會再報錯了 */
+         const key = dayEditKey();
          const dataToSave = { items: (currentDayData?.items || []) };
          
-/*           1. 本地備份 */
+         // 1. 本地備份
          localStorage.setItem(key, JSON.stringify(dataToSave));
+         
+         // 💡 核心 1：寫入本地修改的時間戳記
+         localStorage.setItem(key + '_local_ts', Date.now().toString());
      
-/*           2. 雲端同步 */
+         // 2. 雲端同步
          cloudPost("updateItinerary", {
            file: file,
-           items: dataToSave.items  /* 確保傳送的是陣列 */
+           items: dataToSave.items
          });
          console.log(`Day ${currentDayIdx + 1} 行程異動已同步雲端`);
        } catch (e) {
          console.error("儲存失敗", e);
        }
      }
+    // /*       ✅ 修正後的 saveDayEdits */
+    // function saveDayEdits() {
+    //   try {
+    //     const file = itineraryIndex[currentDayIdx]?.file;
+    //     if (!file) return;
+    
+    //     const key = dayEditKey();  /* 現在這裡不會再報錯了 */
+    //     const dataToSave = { items: (currentDayData?.items || []) };
+        
+    //     /*           1. 本地備份 */
+    //     localStorage.setItem(key, JSON.stringify(dataToSave));
+    
+    //     /*           2. 雲端同步 */
+    //     cloudPost("updateItinerary", {
+    //       file: file,
+    //       items: dataToSave.items  /* 確保傳送的是陣列 */
+    //     });
+    //     console.log(`Day ${currentDayIdx + 1} 行程異動已同步雲端`);
+    //   } catch (e) {
+    //     console.error("儲存失敗", e);
+    //   }
+    // }
 
     function resetDayEdits(){
       try{ localStorage.removeItem(dayEditKey()); }catch(e){}
@@ -4815,30 +5079,30 @@ async function renderWeatherJMA(meta){
     });
   }
 
-  function modalGoto(step){
-    const items = currentDayData?.items || [];
-    const cur = Number(window.__activeModalIdx ?? -1);
-    if(cur < 0) return;
-    const next = cur + step;
-    if(next < 0 || next >= items.length) return;
-    openModal(next, { keepOpen: true, skipAnim: false });
-  }
+  // function modalGoto(step){
+  //   const items = currentDayData?.items || [];
+  //   const cur = Number(window.__activeModalIdx ?? -1);
+  //   if(cur < 0) return;
+  //   const next = cur + step;
+  //   if(next < 0 || next >= items.length) return;
+  //   openModal(next, { keepOpen: true, skipAnim: false });
+  // }
 
-  function modalGoto(delta){
-    const list = currentDayData?.items || [];
-    const cur  = Number(window.__activeModalIdx ?? -1);
-    if(cur < 0) return;
+  // function modalGoto(delta){
+  //   const list = currentDayData?.items || [];
+  //   const cur  = Number(window.__activeModalIdx ?? -1);
+  //   if(cur < 0) return;
 
-    const nxt = cur + delta;
-    if(nxt < 0 || nxt >= list.length) return; // ✅ 第一筆/最後一筆擋住
+  //   const nxt = cur + delta;
+  //   if(nxt < 0 || nxt >= list.length) return; // ✅ 第一筆/最後一筆擋住
 
-    // ✅ 直接重用 openModal：不用先 close
-    openModal(nxt);
-  }
+  //   // ✅ 直接重用 openModal：不用先 close
+  //   openModal(nxt);
+  // }
 
 
 /*    ====== Modal：預計到達/地址/停車/Mapcode/介紹 + Google 導航 ====== */
-  function openModal(itemIdx) {
+  function openModal(itemIdx, opt={}) {
     const idx = Number(itemIdx);
     const item = currentDayData?.items?.[idx];
     if(!item) return;
@@ -5014,7 +5278,7 @@ async function renderWeatherJMA(meta){
         ${(!eta && !addr && !parking && !mapcode) ? `
         <div class="meta-row">
           <span class="meta-ico">ℹ️</span>
-          <span class="meta-val">（此行程尚未填：到達/地址/停車/Mapcode）</span>
+          <span class="meta-val"></span>
         </div>` : ''}
       </div>
       ${reserveBlock}
@@ -5085,8 +5349,12 @@ async function renderWeatherJMA(meta){
 
       requestAnimationFrame(() => {
         sh.classList.add('active');
-        // 你想每次切換也有明信片效果：保留
-        showSheetSplash(item);
+// 💡 關鍵：如果判斷到是「左右滑動(skipSplash)」，就強制隱藏明信片，避免文字區塊閃爍
+        if (opt.skipSplash) {
+          hideSheetSplash(); 
+        } else {
+          showSheetSplash(item);
+        }
       });
 
       // ✅ Modal 內左右滑（只綁一次，避免越綁越多次）
@@ -5094,14 +5362,14 @@ async function renderWeatherJMA(meta){
         window.__modalSwipeBound = true;
 
         const splash = document.getElementById('sheetSplash');
-        const scrollArea = document.getElementById('modalScroll');
+        
 
         let sx = 0, sy = 0, tracking = false;
 
         sh.addEventListener('pointerdown', (e) => {
           if(!sh.classList.contains('active')) return;
           if(splash?.classList.contains('active')) return;
-          if(scrollArea && scrollArea.scrollTop > 8) return;
+          
 
           tracking = true;
           sx = e.clientX; sy = e.clientY;
@@ -5114,11 +5382,12 @@ async function renderWeatherJMA(meta){
           const dx = e.clientX - sx;
           const dy = e.clientY - sy;
 
-          if(Math.abs(dx) < 60) return;
-          if(Math.abs(dx) < Math.abs(dy) * 1.2) return;
+          if(Math.abs(dx) < 50) return;
+          if(Math.abs(dx) < Math.abs(dy) * 1.5) return;
 
-          if(dx < 0) modalGoto(+1);
-          else       modalGoto(-1);
+          // 呼叫 modalGoto 時加上 {animate: true}，切換會帶有滑動動畫
+          if(dx < 0) modalGoto(+1, { animate: true });
+          else       modalGoto(-1, { animate: true });
         }, { passive: true });
 
         sh.addEventListener('pointercancel', () => { tracking = false; }, { passive: true });
@@ -5221,27 +5490,79 @@ async function renderWeatherJMA(meta){
     setTimeout(done, 200); 
   }
 
-
-  function showUserDetail(userName) {
+function showUserDetail(userName) {
+    // 1. 抓出該使用者的「支出」與「收付款」
     const userExpenses = expenses.filter(e => e.payer === userName || e.participants.includes(userName));
+    const userPayments = payments.filter(p => p.from === userName || p.to === userName);
+
     let html = `<div style="padding:10px;">`;
-    userExpenses.forEach(e => {
-      const isPayer = e.payer === userName;
-      const symbol = e.currency === 'TWD' ? '$' : '¥';
-      html += `<div style="margin-bottom:10px; border-bottom:1px dashed #DDD; padding-bottom:5px;">
-        <div style="font-weight:800;">${e.name} (${e.currency})</div>
-        <div style="font-size:0.85rem; color:#666;">${isPayer ? '你付了' : '你分攤'} ${symbol}${e.cost}</div>
-      </div>`;
-    });
+
+    // 2. 顯示支出明細
+    if (userExpenses.length > 0) {
+      html += `<div style="font-weight:900; margin-bottom:10px; color:var(--primary);">🧾 支出與分攤</div>`;
+      
+      userExpenses.forEach(e => {
+        // 計算分攤人數與金額
+        const parts = (Array.isArray(e.participants) && e.participants.length) ? e.participants : users;
+        const share = Math.round(Number(e.cost || 0) / parts.length);
+        const total = Math.round(Number(e.cost || 0));
+        const symbol = e.currency === 'TWD' ? '$' : '¥';
+        
+        const isPayer = e.payer === userName;
+        const isPart = parts.includes(userName);
+        
+        let descHtml = '';
+        if (isPayer && isPart) {
+          // 是付款人，且自己也有參與分攤
+          descHtml = `<span style="color:#2F8F5B; font-weight:800;">你先付 ${symbol}${total}</span> <span style="color:#666;">(自付 ${symbol}${share})</span>`;
+        } else if (isPayer && !isPart) {
+          // 幫別人代付，自己不分攤
+          descHtml = `<span style="color:#2F8F5B; font-weight:800;">你代付 ${symbol}${total}</span>`;
+        } else if (!isPayer && isPart) {
+          // 不是付款人，純粹被分攤
+          descHtml = `<span style="color:#B42318; font-weight:800;">你分攤 ${symbol}${share}</span> <span style="color:#666;">(總額 ${symbol}${total})</span>`;
+        }
+
+        html += `<div style="margin-bottom:12px; border-bottom:1px dashed #DDD; padding-bottom:8px;">
+          <div style="font-weight:800; font-size:1rem;">${escapeHtml(e.name)}</div>
+          <div style="font-size:0.85rem; margin-top:6px;">${descHtml}</div>
+        </div>`;
+      });
+    }
+
+    // 3. 顯示收付款明細
+    if (userPayments.length > 0) {
+      html += `<div style="font-weight:900; margin:24px 0 10px; color:var(--primary);">💸 收付款紀錄</div>`;
+      
+      userPayments.forEach(p => {
+        const symbol = p.currency === 'TWD' ? '$' : '¥';
+        const amt = Math.round(p.amount || 0);
+        const isFrom = p.from === userName;
+        
+        const title = isFrom ? `給 ${escapeHtml(p.to)}` : `收到 ${escapeHtml(p.from)} 的款項`;
+        const amountHtml = isFrom 
+          ? `<span style="color:#B42318; font-weight:800;">支出 ${symbol}${amt}</span>` 
+          : `<span style="color:#2F8F5B; font-weight:800;">收入 ${symbol}${amt}</span>`;
+
+        html += `<div style="margin-bottom:12px; border-bottom:1px dashed #DDD; padding-bottom:8px;">
+          <div style="font-weight:800; font-size:0.95rem;">${title}</div>
+          <div style="font-size:0.85rem; margin-top:6px;">${amountHtml}</div>
+        </div>`;
+      });
+    }
+
+    if (userExpenses.length === 0 && userPayments.length === 0) {
+      html += `<div style="color:var(--ink2); text-align:center; padding:30px 0; font-weight:800;">目前沒有明細紀錄</div>`;
+    }
+
     html += `</div>`;
 
-    // 填入您現有的 Modal
-    document.getElementById('modalSticky').innerHTML = `<div class="modal-title">${userName} 的個人明細</div>`;
+    // 4. 填入 Modal 並開啟
+    document.getElementById('modalSticky').innerHTML = `<div class="modal-title">${escapeHtml(userName)} 的個人明細</div>`;
     document.getElementById('modalBody').innerHTML = html;
     document.getElementById('modalOverlay').classList.add('active');
     document.getElementById('modalSheet').classList.add('active');
   }
-
 
   function openMenuCard(m){
     const card = document.getElementById('menuCard');
@@ -5497,7 +5818,7 @@ async function renderWeatherJMA(meta){
   //   });
   // }
 
-  function renderSouvenirs(){
+function renderSouvenirs(){
     const el = document.getElementById('souvenirBoard');
     if(!el) return;
     const groups = Array.isArray(SOUVENIRS) ? SOUVENIRS : [];
@@ -5508,14 +5829,20 @@ async function renderWeatherJMA(meta){
         <div class="card" style="padding:16px; margin-bottom:14px;">
           <div style="font-weight:900; margin-bottom:10px;">${escapeHtml(g.region||'')}</div>
           <div class="souvenir-grid">
-            ${items.map(it => `
-              <div class="souvenir-item">
-                <div class="souvenir-avatar">
-                  <img src="${escapeHtml(normalizeAssetUrl(it.img||''))}" alt="" loading="lazy" decoding="async">
+            ${items.map(it => {
+              // 取得處理過的安全圖片網址
+              const imgSrc = escapeHtml(normalizeAssetUrl(it.img||''));
+              return `
+                <div class="souvenir-item">
+                  <div class="souvenir-avatar">
+                    <img src="${imgSrc}" alt="" loading="lazy" decoding="async" 
+                         style="cursor:pointer;" 
+                         onclick="openShopImage('${imgSrc}')">
+                  </div>
+                  <div class="souvenir-name">${escapeHtml(it.name||'')}</div>
                 </div>
-                <div class="souvenir-name">${escapeHtml(it.name||'')}</div>
-              </div>
-            `).join('')}
+              `;
+            }).join('')}
           </div>
         </div>
       `;
@@ -6663,6 +6990,231 @@ function addPaymentFromForm(){
     // 點 overlay 也可關（你本來就有）
     if(overlay) overlay.addEventListener('click', closeModal);
   }
+
+  /* ====== 待買代購清單 ====== */
+let shoppingList = JSON.parse(localStorage.getItem('shopping_list')) || {};
+let curShopUser = '';
+
+function initShoppingList() {
+  if (!curShopUser) curShopUser = users[0] || 'Kerwin';
+  renderShoppingUserTabs();
+  renderShoppingList();
+}
+
+function renderShoppingUserTabs() {
+  const el = document.getElementById('shoppingUserSwitch');
+  if (!el) return;
+  el.innerHTML = users.map(u => 
+    `<div class="user-tab ${u === curShopUser ? 'active' : ''}" onclick="switchShopUser('${escapeHtml(u)}')">${escapeHtml(u)}</div>`
+  ).join('');
+}
+
+function switchShopUser(u) {
+  curShopUser = u;
+  renderShoppingUserTabs();
+  renderShoppingList();
+}
+
+function renderShoppingList() {
+  const el = document.getElementById('shoppingListBoard');
+  if (!el) return;
+
+  const list = shoppingList[curShopUser] || [];
+  
+  if (!list.length) {
+    el.innerHTML = `<div style="color:var(--ink2); font-weight:800; text-align:center; padding:15px 0;">目前沒有代購項目</div>`;
+    return;
+  }
+
+  el.innerHTML = list.map((item, idx) => {
+    const isDone = item.bought ? 'checked' : '';
+    const titleCls = item.bought ? 'shop-title-input done' : 'shop-title-input';
+    
+    let imgBoxContent = '';
+    if (item.img) {
+      imgBoxContent = `
+        <img src="${escapeHtml(item.img)}" alt="pic" style="width:100%; height:100%; object-fit:cover;" onclick="openShopImage('${escapeHtml(item.img)}')">
+        
+        <label style="position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.25); color:rgba(255,255,255,0.9); border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; cursor:pointer; backdrop-filter: blur(2px);">
+          <i class="fas fa-pen" style="font-size:10px;"></i>
+          <input type="file" accept="image/*" onchange="uploadShopImg(event, ${idx})" style="display:none;">
+        </label>
+      `;
+    } else {
+      imgBoxContent = `
+        <i class="fas fa-camera" style="color:var(--ink2); font-size:1.2rem;"></i>
+        <input type="file" accept="image/*" onchange="uploadShopImg(event, ${idx})" style="position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;">
+      `;
+    }
+
+    return `
+      <div class="shop-item">
+        <input type="checkbox" class="shop-chk" ${isDone} onchange="toggleShopItem(${idx})">
+        <div class="shop-img-box">
+          ${imgBoxContent}
+        </div>
+        <div class="shop-info">
+          <input type="text" class="${titleCls}" value="${escapeHtml(item.name)}" onchange="updateShopName(${idx}, this.value)">
+          
+          <div class="shop-meta">
+            <span class="shop-qty">
+              數量: <input type="number" class="shop-qty-input" value="${escapeHtml(item.qty)}" onchange="updateShopQty(${idx}, this.value)">
+            </span>
+            
+            <div class="shop-price-wrapper">
+              <span>¥</span>
+              <input type="number" class="shop-price-input" placeholder="價格" value="${item.price || ''}" onchange="updateShopPrice(${idx}, this.value)">
+            </div>
+            
+            <i class="fas fa-trash shop-del" onclick="delShopItem(${idx})"></i>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ✅ 新增：更新商品名稱
+function updateShopName(idx, val) {
+  if (!shoppingList[curShopUser][idx]) return;
+  shoppingList[curShopUser][idx].name = val.trim();
+  saveShoppingList();
+}
+
+// ✅ 新增：更新商品數量
+function updateShopQty(idx, val) {
+  if (!shoppingList[curShopUser][idx]) return;
+  shoppingList[curShopUser][idx].qty = val.trim();
+  saveShoppingList();
+}
+function saveShoppingList() {
+  localStorage.setItem('shopping_list', JSON.stringify(shoppingList));
+  // 未來如果需要，也可以加一句 cloudPost 把這個資料丟到 Google Sheet
+}
+function updateShopPrice(idx, val) {
+  if (!shoppingList[curShopUser][idx]) return;
+  shoppingList[curShopUser][idx].price = val;
+  saveShoppingList();
+}
+
+function addShoppingItem() {
+  const nameInput = document.getElementById('shopItemName');
+  const qtyInput = document.getElementById('shopItemQty');
+  const name = nameInput.value.trim();
+  const qty = qtyInput.value.trim() || '1';
+
+  if (!name) return alert('請輸入商品名稱');
+  if (!shoppingList[curShopUser]) shoppingList[curShopUser] = [];
+  
+  shoppingList[curShopUser].push({
+    name: name,
+    qty: qty,
+    price: '',
+    bought: false,
+    img: ''
+  });
+
+  saveShoppingList();
+  nameInput.value = '';
+  qtyInput.value = '';
+  renderShoppingList();
+}
+
+function toggleShopItem(idx) {
+  if (!shoppingList[curShopUser][idx]) return;
+  shoppingList[curShopUser][idx].bought = !shoppingList[curShopUser][idx].bought;
+  saveShoppingList();
+  renderShoppingList();
+}
+
+
+
+function delShopItem(idx) {
+  if (!confirm('確定刪除此代購商品？')) return;
+  shoppingList[curShopUser].splice(idx, 1);
+  saveShoppingList();
+  renderShoppingList();
+}
+
+// ✅ 照片自動壓縮機制 (避免照片太大把網頁存儲空間塞爆)
+function uploadShopImg(event, idx) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      
+      // 限制照片最大尺寸為 400px (以代購縮圖來說非常夠用)
+      const MAX_SIZE = 400;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > MAX_SIZE) {
+          height *= MAX_SIZE / width;
+          width = MAX_SIZE;
+        }
+      } else {
+        if (height > MAX_SIZE) {
+          width *= MAX_SIZE / height;
+          height = MAX_SIZE;
+        }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // 轉換成輕量的 JPEG 格式 (品質 60%)
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+      
+      if (shoppingList[curShopUser] && shoppingList[curShopUser][idx]) {
+        shoppingList[curShopUser][idx].img = dataUrl;
+        saveShoppingList();
+        renderShoppingList();
+      }
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ✅ 新增：打開全螢幕照片
+function openShopImage(src) {
+  const overlay = document.getElementById('imgViewerOverlay');
+  const img = document.getElementById('imgViewerPic');
+  if(!overlay || !img) return;
+  
+  img.src = src;
+  overlay.style.display = 'flex';
+  
+  // 觸發瀏覽器重繪，讓淡入動畫生效
+  void overlay.offsetWidth; 
+  overlay.style.opacity = '1';
+}
+
+// ✅ 新增：關閉全螢幕照片
+function closeShopImage() {
+  const overlay = document.getElementById('imgViewerOverlay');
+  if(!overlay) return;
+  
+  overlay.style.opacity = '0';
+  setTimeout(() => { 
+    overlay.style.display = 'none'; 
+  }, 300); // 等待淡出動畫結束再隱藏
+}
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('✅ 離線核心 (Service Worker) 註冊成功！'))
+      .catch(err => console.log('❌ 離線核心註冊失敗：', err));
+  });
+}
 
 
 </script>
