@@ -2679,30 +2679,67 @@ function renderGasStations(){
   el.innerHTML = `
     <div class="card">
       <h3 style="margin:0 0 10px; font-family:'Noto Serif TC',serif; font-weight:900;">
-        <i class="fas fa-gas-pump"></i> 加油站備案
+        <i class="fas fa-gas-pump"></i> 加油站點
       </h3>
+      
+      <details style="margin-bottom: 15px; background: #fdfaf3; border: 1px solid #e9e1d6; border-radius: 8px; padding: 10px; transition: all 0.3s;">
+        <summary style="font-weight: 900; color: #d9534f; cursor: pointer; outline: none; list-style: none; display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-info-circle"></i> 日本自助/人工加油必讀指南 (點此展開)
+        </summary>
+        
+        <div style="margin-top: 12px; font-size: 0.9em; line-height: 1.6; color: var(--ink);">
+          <div style="font-weight: 800; border-bottom: 1px solid #e9e1d6; padding-bottom: 4px; margin-bottom: 8px;">
+            🚗 去加油前請先確認
+          </div>
+          <ul style="margin: 0 0 12px 0; padding-left: 20px; color: var(--ink2);">
+            <li>加油口的位置（左側 / 右側）與如何開啟</li>
+            <li>
+              <b>本次 Alphard HEV 請加：<br>
+              <span style="color: #d9534f; font-weight: 900; background: #ffebeb; padding: 2px 4px; border-radius: 4px;">🔴 紅色油槍：レギュラー (Regular)</span></b>
+            </li>
+            <li><span style="color: #f0ad4e; font-weight: bold;">🟡 黃色：ハイオク</span> (特級/98) ｜ <span style="color: #5cb85c; font-weight: bold;">🟢 綠色：軽油</span> (柴油)</li>
+            
+            <li style="margin-top: 8px;">
+              <b>告知/選擇加油份量：</b><br>
+              ✅ 加滿：<b>満タン</b> (man-tan)<br>
+              ✅ 加20公升：<b>20 リットル</b> (ni-juu rittoru)<br>
+              ✅ 加3000日圓：<b>3000円分</b> (san-zen en bun)
+            </li>
+          </ul>
+
+          <div style="font-weight: 800; border-bottom: 1px solid #e9e1d6; padding-bottom: 4px; margin-bottom: 8px;">
+            ⛽ 自助加油 6 步驟
+          </div>
+          <ol style="margin: 0; padding-left: 20px; color: var(--ink2);">
+            <li>停靠對應車道，<b>務必關閉引擎熄火</b>。</li>
+            <li>操作螢幕（選付款方式 ➔ 選油種 ➔ <b>選「満タン」或指定金額/公升數</b>）。</li>
+            <li><b>觸摸黑色靜電墊</b>（日本乾燥易靜電，這步超重要）。</li>
+            <li>插入油槍，確認機器數值歸「0.00」後壓下把手。</li>
+            <li>自動跳停後，將油槍放回原位。</li>
+            <li><b>關緊油箱蓋</b>，記得拿收據與找零。</li>
+          </ol>
+        </div>
+      </details>
       <div style="color:var(--ink2); font-weight:800; margin-bottom:10px;">
-        預計最上面2個點加油就夠，其餘為被選便宜方案
+        預計最上面 2 個點加油就夠，其餘為備選便宜方案
       </div>
+      
       ${list.map(s => {
-        // 容錯處理：統一變數名稱，相容各種 JSON 寫法
         const name = s.name || '';
-        const addr = s.address || s.addr || ''; // 同時支援 address 與 addr 兩種寫法
+        const addr = s.address || s.addr || '';
         const note = s.note || '';
         const tel = s.tel || s.phone || '';
         
-        // 如果 JSON 裡有 map 連結就用 map 的，沒有的話就自動用名稱產出 Google Maps 搜尋網址
-        const mapUrl = s.map || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name || addr)}`;
+        const query = encodeURIComponent(name + (addr ? ' ' + addr : ''));
+        const mapUrl = `https://www.google.com/maps/search/?api=1&query=$${query}`;
 
         return `
         <div style="padding:12px 0; border-top:1px solid rgba(233,225,214,.8);">
-          <div style="font-weight:900;">${escapeHtml(name)}</div>
+          <div style="font-weight:900; font-size:1.05em;">${escapeHtml(name)}</div>
+          ${addr ? `<div style="color:var(--ink2); font-weight:800; margin-top:4px; font-size:0.9em;">${escapeHtml(addr)}</div>` : ''}
+          ${note ? `<div style="color:#d9534f; font-weight:800; margin-top:6px; font-size:0.9em; line-height:1.4; background:#fff5f5; padding:6px; border-radius:4px;">💡 ${escapeHtml(note)}</div>` : ''}
           
-          ${addr ? `<div style="color:var(--ink2); font-weight:800; margin-top:4px;">${escapeHtml(addr)}</div>` : ''}
-          
-          ${note ? `<div style="color:#d9534f; font-weight:700; margin-top:6px; font-size:0.9em; line-height:1.4;">💡 ${escapeHtml(note)}</div>` : ''}
-          
-          <div style="margin-top:8px; display:flex; gap:10px;">
+          <div style="margin-top:10px; display:flex; gap:10px;">
             ${tel ? `<button class="btn btn-outline" onclick="openUrl('tel:${encodeURIComponent(tel)}')">電話</button>` : ''}
             <button class="btn btn-outline" onclick="openUrl('${mapUrl}')">導航</button>
           </div>
