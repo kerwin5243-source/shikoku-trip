@@ -4230,7 +4230,7 @@ async function moveItemToDay(fromDayIdx, itemIdx, toDayIdx){
           (dayCache[idx]?.items && !dayCache[idx]?.route && !dayCache[idx]?.loc); // 依你資料型態自行微調
 
         if (needFetch) {
-          const url = `./${meta.file}?v=${Date.now()}`;
+          const url = `./${meta.file}`;  // ✅ 恢復純淨網址
           const raw = await fetch(url).then(r => r.json());
           dayCache[idx] = Array.isArray(raw) ? raw[0] : raw;
         }
