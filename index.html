@@ -3259,15 +3259,24 @@ function renderGasStations(){
 
   //   openModal(next, { keepOpen:true, skipSplash: !!opt.skipSplash });
   // }
-  function modalGoto(step, opt={}) {
+function modalGoto(step, opt={}) {
     const items = currentDayData?.items || [];
     let cur = Number(window.__activeModalIdx ?? -1);
     if (cur < 0) return;
 
     let next = cur + step;
 
-    // 💡 核心修改 1：遇到 route (交通時間) 就自動繼續跳下一筆，直到找到真正的景點/飯店
-    while (next >= 0 && next < items.length && items[next]?.type === 'route') {
+    // 💡 核心修改：精準判定是否為「交通路徑 (Route)」卡片
+    // 條件：type 是 route，或者裡面有 route.from / route.to 屬性
+    const isRoute = (it) => {
+      if (!it) return false;
+      if (it.type === 'route') return true;
+      if (it.route && (it.route.from || it.route.to)) return true;
+      return false;
+    };
+
+    // 遇到路徑就自動繼續往下/往上找，直到找到真正的景點或飯店
+    while (next >= 0 && next < items.length && isRoute(items[next])) {
       next += step;
     }
 
@@ -3285,6 +3294,7 @@ function renderGasStations(){
       return;
     }
 
+    // 直接重用 openModal
     openModal(next);
   }
 
@@ -4843,26 +4853,26 @@ async function renderWeatherJMA(meta){
     });
   }
 
-  function modalGoto(step){
-    const items = currentDayData?.items || [];
-    const cur = Number(window.__activeModalIdx ?? -1);
-    if(cur < 0) return;
-    const next = cur + step;
-    if(next < 0 || next >= items.length) return;
-    openModal(next, { keepOpen: true, skipAnim: false });
-  }
+  // function modalGoto(step){
+  //   const items = currentDayData?.items || [];
+  //   const cur = Number(window.__activeModalIdx ?? -1);
+  //   if(cur < 0) return;
+  //   const next = cur + step;
+  //   if(next < 0 || next >= items.length) return;
+  //   openModal(next, { keepOpen: true, skipAnim: false });
+  // }
 
-  function modalGoto(delta){
-    const list = currentDayData?.items || [];
-    const cur  = Number(window.__activeModalIdx ?? -1);
-    if(cur < 0) return;
+  // function modalGoto(delta){
+  //   const list = currentDayData?.items || [];
+  //   const cur  = Number(window.__activeModalIdx ?? -1);
+  //   if(cur < 0) return;
 
-    const nxt = cur + delta;
-    if(nxt < 0 || nxt >= list.length) return; // ✅ 第一筆/最後一筆擋住
+  //   const nxt = cur + delta;
+  //   if(nxt < 0 || nxt >= list.length) return; // ✅ 第一筆/最後一筆擋住
 
-    // ✅ 直接重用 openModal：不用先 close
-    openModal(nxt);
-  }
+  //   // ✅ 直接重用 openModal：不用先 close
+  //   openModal(nxt);
+  // }
 
 
 /*    ====== Modal：預計到達/地址/停車/Mapcode/介紹 + Google 導航 ====== */
