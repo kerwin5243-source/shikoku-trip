@@ -6939,7 +6939,8 @@ function renderShoppingList() {
     if (item.img) {
       imgBoxContent = `
         <img src="${escapeHtml(item.img)}" alt="pic" style="width:100%; height:100%; object-fit:cover;" onclick="openShopImage('${escapeHtml(item.img)}')">
-        <label style="position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.6); color:#fff; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; cursor:pointer;">
+        
+        <label style="position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.25); color:rgba(255,255,255,0.9); border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; cursor:pointer; backdrop-filter: blur(2px);">
           <i class="fas fa-pen" style="font-size:10px;"></i>
           <input type="file" accept="image/*" onchange="uploadShopImg(event, ${idx})" style="display:none;">
         </label>
