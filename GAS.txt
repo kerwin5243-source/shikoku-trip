@@ -12,6 +12,7 @@ const SS = SpreadsheetApp.getActiveSpreadsheet();
 const EXP_SHEET = SS.getSheetByName("Expenses");
 const CHK_SHEET = SS.getSheetByName("Checklists");
 const ITIN_SHEET = SS.getSheetByName("ItineraryEdits");
+const PAY_SHEET = SS.getSheetByName("Payments");
 
 // 權限驗證：確保請求來自你的網頁
 function isAuthorized(token) {
@@ -53,9 +54,22 @@ function doGet(e) {
     }
     return acc;
   }, {});
+  
+  // 4. 讀取付款紀錄
+  const payValues = PAY_SHEET.getDataRange().getValues();
+  const paymentList = (payValues.length <= 1) ? [] : payValues.slice(1).map(r => {
+    return {
+      from: r[1],
+      to: r[2],
+      amount: Number(r[3] || 0),
+      currency: r[4] || "JPY",
+      ts: r[5]
+    };
+  }).filter(x => x && x.from && x.to && x.amount);
 
   const result = {
     expenses: expenseList,
+    payments: paymentList,
     checklists: checklistMap,
     itineraryEdits: itineraryEdits
   };
@@ -159,6 +173,49 @@ function doPost(e) {
       for (let i = itinRows.length - 1; i >= 1; i--) {
         if (itinRows[i][0] === d.file) {
           ITIN_SHEET.deleteRow(i + 1);
+        }
+      }
+    }
+
+    // --- [動作 F]：新增或更新收付款 ---
+    else if (action === "addPayment" && d) {
+      const data = PAY_SHEET.getDataRange().getValues();
+      let found = false;
+
+      for (let i = 1; i < data.length; i++) {
+        if (String(data[i][5]) === String(d.ts)) {
+          // 更新：從第 2 欄開始寫 5 個欄位（from/to/amount/currency/ts）
+          PAY_SHEET.getRange(i + 1, 2, 1, 5).setValues([[
+            d.from,
+            d.to,
+            d.amount,
+            d.currency || "JPY",
+            d.ts
+          ]]);
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        PAY_SHEET.appendRow([
+          new Date(),
+          d.from,
+          d.to,
+          d.amount,
+          d.currency || "JPY",
+          d.ts
+        ]);
+      }
+    }
+
+    // --- [動作 G]：刪除收付款 ---
+    else if (action === "deletePayment" && d.ts) {
+      const data = PAY_SHEET.getDataRange().getValues();
+      for (let i = data.length - 1; i >= 1; i--) {
+        if (String(data[i][5]) === String(d.ts)) {
+          PAY_SHEET.deleteRow(i + 1);
+          break;
         }
       }
     }
