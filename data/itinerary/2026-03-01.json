@@ -6,27 +6,27 @@
     "hotel_id": "H1",
     "photos": [
       {
-        "src": "/photos/day3/0101.png",
+        "src": "/photos/day3/030101.png",
         "loc": "",
         "caption": ""
       },
       {
-        "src": "/photos/day3/0102.jpg",
+        "src": "/photos/day3/030102.jpg",
         "loc": "栗林公園",
         "caption": "大名庭園"
       },
       {
-        "src": "/photos/day3/0103.jpg",
+        "src": "/photos/day3/030103.jpg",
         "loc": "鳴門",
         "caption": "渦潮"
       },
       {
-        "src": "/photos/day3/0104.png",
+        "src": "/photos/day3/030104.png",
         "loc": "王子神社",
         "caption": ""
       },
       {
-        "src": "/photos/day3/0105.png",
+        "src": "/photos/day3/030105.png",
         "loc": "眉山",
         "caption": "夕景夜景"
       }

@@ -1,13 +1,13 @@
 [
   {
     "title": "租車預約 (ETC + SEP 高速吃到飽)",
-    "note": "租車時確認 ETC + SEP",
+    "note": "打電話與租車公司確認",
     "link": ""
   },
   {
     "title": "Visit Japan Web 填寫",
-    "note": "",
-    "link": ""
+    "note": "截圖儲存",
+    "link": "https://www.vjw.digital.go.jp/main/#/vjwplo001"
   },
   {
     "title": "小豆島渡輪預約 (含車輛)",
@@ -15,28 +15,34 @@
     "link": "https://yoyaku.shikokuferry.com/pub/yoyakunew/?"
   },
   {
-    "title": "鳴門觀潮船預約",
+    "title": "餐廳預約",
     "note": "",
-    "link": "https://www.uzusio.com/tw/geton/#lnk_rat"
+    "link": ""
   },
   {
     "title": "栗林公園 船票/時段預約",
-    "note": "",
+    "note": "09:00",
     "link": "https://www.my-kagawa.jp/ritsuringarden/wasen/reserve"
   },
   {
     "title": "GoGo Adventure 滑索預約",
-    "note": "",
-    "link": "https://iya.gogo-adventure.com/"
+    "note": "官網 / kkday",
+    "link": "https://reserve.foret-aventure.jp/user/courses?facility_id=36"
   },
   {
     "title": "香川優惠券登記",
-    "note": "",
+    "note": "截圖儲存",
     "link": "https://cheng-ya.deeeep.com.tw/index.php"
+  },
+  {
+    "title": "中野烏龍麵學校 琴平校",
+    "note": "提前3天預約",
+    "link": "https://www.nakanoya.net/nakanoudon/form/"
   },
   {
     "title": "民宿入住資料預先填寫",
     "note": "",
     "link": "https://connect.minpakuin.jp/register/AAABIcWXEd-XD9GI4oC_pFD5lrGeW0cf52o?page=Menu"
   }
+  
 ]

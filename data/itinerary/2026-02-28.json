@@ -6,27 +6,27 @@
     "hotel_id": "H1",
     "photos": [
       {
-        "src": "/photos/day2/01.png",
+        "src": "/photos/day2/022801.png",
         "loc": "",
         "caption": ""
       },
       {
-        "src": "/photos/day2/2026-02-03_00h05_32.png",
+        "src": "/photos/day2/022802.png",
         "loc": "小豆島",
         "caption": "瀨戶內海"
       },
       {
-        "src": "/photos/day2/2026-02-02_23h15_26.png",
+        "src": "/photos/day2/022803.png",
         "loc": "天使之路",
         "caption": "退潮限定"
       },
       {
-        "src": "/photos/day2/2026-02-02_23h15_15.png",
+        "src": "/photos/day2/022804.png",
         "loc": "橄欖公園",
         "caption": "魔法少女"
       },
       {
-        "src": "/photos/day2/2805.jpg",
+        "src": "/photos/day2/022805.jpg",
         "loc": "高松城",
         "caption": "水城風景"
       }
@@ -273,10 +273,10 @@
         "price": "¥1,000-2,000",
         "stay": "40–60 min",
         "menu": [
-          {"jp": "醤そば", "zh": "招牌醬油拉麵", "rec": true, "img": "/photos/day2/2026-01-30_22h17_10.png" },
-          {"jp": "HISHIO special 2.2", "zh": "加量拉麵","rec": true, "img": "/photos/day2/2026-01-30_22h17_17.png" },
-          {"jp": "餃子", "zh": "島餃子","rec": true, "img": "/photos/day2/2026-01-30_22h17_24.png" },
-          {"jp": "オリーブサイダー", "zh": "小豆島橄欖汽水","rec": true, "img": "/photos/day2/2026-01-30_22h17_38.png" }
+          {"jp": "醤そば", "zh": "招牌醬油拉麵", "rec": true, "img": "/photos/day2/022811.png" },
+          {"jp": "HISHIO special 2.2", "zh": "加量拉麵","rec": true, "img": "/photos/day2/022812.png" },
+          {"jp": "餃子", "zh": "島餃子","rec": true, "img": "/photos/day2/022813.png" },
+          {"jp": "オリーブサイダー", "zh": "小豆島橄欖汽水","rec": true, "img": "/photos/day2/022814.png" }
         ],
         "avoid": [],
         "guide": [
@@ -384,10 +384,10 @@
         "price": "¥1000–¥3000",
         "stay": "40–60 min",
         "menu": [
-          {"jp": "ぶりかま", "zh": "鹽烤鰤魚下巴", "rec": true, "img": "/photos/day2/022802.png" },
-          {"jp": "刺身（さしみ）", "zh": "生魚片拼盤","rec": true, "img": "/photos/day2/022804.jpg" },
-          {"jp": "エビフライ", "zh": "炸蝦","rec": true, "img": "/photos/day2/022805.jpg" },
-          {"jp": "カキフライ", "zh": "炸牡蠣","rec": true, "img": "/photos/day2/022801.png" }
+          {"jp": "ぶりかま", "zh": "鹽烤鰤魚下巴", "rec": true, "img": "/photos/day2/022812.png" },
+          {"jp": "刺身（さしみ）", "zh": "生魚片拼盤","rec": true, "img": "/photos/day2/022814.jpg" },
+          {"jp": "エビフライ", "zh": "炸蝦","rec": true, "img": "/photos/day2/022815.jpg" },
+          {"jp": "カキフライ", "zh": "炸牡蠣","rec": true, "img": "/photos/day2/022811.png" }
         ],
         "avoid": [],
         "guide": [

@@ -6,29 +6,34 @@
     "hotel_id": "H3",
     "photos": [
       {
-        "src": "/photos/day6/01.jpg",
+        "src": "/photos/day6/030401.png",
         "loc": "",
         "caption": ""
       },
       {
-        "src": "/photos/day6/01.jpg",
+        "src": "/photos/day6/030402.png",
         "loc": "四萬十川",
         "caption": "日本最後清流"
       },
       {
-        "src": "/photos/day6/02.jpg",
+        "src": "/photos/day6/030403.png",
+        "loc": "赤鉄橋",
+        "caption": ""
+      },
+      {
+        "src": "/photos/day6/030404.png",
         "loc": "沈下橋",
         "caption": "無欄杆的橋"
       },
       {
-        "src": "/photos/day6/03.jpg",
+        "src": "/photos/day6/030405.png",
         "loc": "單車道",
         "caption": "河畔騎行"
       },
       {
-        "src": "/photos/day6/04.jpg",
-        "loc": "高知市區",
-        "caption": "回到市區晚餐"
+        "src": "/photos/day6/030406.png",
+        "loc": "屋形船 四万十の碧",
+        "caption": ""
       }
     ],
     "items": [
@@ -426,7 +431,7 @@
         { "q": "屋形船 四万十の碧", "lat": 33.011712, "lng": 132.865796 },
         { "q": "高瀬沈下橋", "lat": 33.036001, "lng": 132.845131 },
         { "q": "一條神社", "lat": 32.993591, "lng": 132.934143 },
-        { "q": "天神橋商店街", "lat": 32.992477, "lng": 132.933663 },
+        { "q": "Tenjinbashi", "lat": 32.992477, "lng": 132.933663 },
         { "q": "Sunriver四萬十物產館", "lat": 32.98069, "lng": 132.944643 }
       ],
       "preview": {
