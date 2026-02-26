@@ -491,12 +491,13 @@
         "tag": "hotel",
         "desc": "第二晚：返回民宿休息。",
         "detail": "",
-        "addr": "",
-        "mapcode": "",
-        "parking": "",
+        "addr": "1077-1 Murojinmachi, Takamatsu, Kagawa 761-8062日本",
+        "mapcode": "60 545 336*17",
+        "parking": "住宿提供停車位 2 個",
         "reservations": [
           { "label": "booking.com No.", "value": "6297.508.902" },
-          { "label": "PIN 碼", "value": "0054" }
+          { "label": "PIN 碼", "value": "0054" },
+          { "label": "民宿密碼", "value": "700616" }
         ],
         "price": "¥121,666",
         "stay": "2 Days",
