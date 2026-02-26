@@ -5221,27 +5221,79 @@ async function renderWeatherJMA(meta){
     setTimeout(done, 200); 
   }
 
-
-  function showUserDetail(userName) {
+function showUserDetail(userName) {
+    // 1. 抓出該使用者的「支出」與「收付款」
     const userExpenses = expenses.filter(e => e.payer === userName || e.participants.includes(userName));
+    const userPayments = payments.filter(p => p.from === userName || p.to === userName);
+
     let html = `<div style="padding:10px;">`;
-    userExpenses.forEach(e => {
-      const isPayer = e.payer === userName;
-      const symbol = e.currency === 'TWD' ? '$' : '¥';
-      html += `<div style="margin-bottom:10px; border-bottom:1px dashed #DDD; padding-bottom:5px;">
-        <div style="font-weight:800;">${e.name} (${e.currency})</div>
-        <div style="font-size:0.85rem; color:#666;">${isPayer ? '你付了' : '你分攤'} ${symbol}${e.cost}</div>
-      </div>`;
-    });
+
+    // 2. 顯示支出明細
+    if (userExpenses.length > 0) {
+      html += `<div style="font-weight:900; margin-bottom:10px; color:var(--primary);">🧾 支出與分攤</div>`;
+      
+      userExpenses.forEach(e => {
+        // 計算分攤人數與金額
+        const parts = (Array.isArray(e.participants) && e.participants.length) ? e.participants : users;
+        const share = Math.round(Number(e.cost || 0) / parts.length);
+        const total = Math.round(Number(e.cost || 0));
+        const symbol = e.currency === 'TWD' ? '$' : '¥';
+        
+        const isPayer = e.payer === userName;
+        const isPart = parts.includes(userName);
+        
+        let descHtml = '';
+        if (isPayer && isPart) {
+          // 是付款人，且自己也有參與分攤
+          descHtml = `<span style="color:#2F8F5B; font-weight:800;">你先付 ${symbol}${total}</span> <span style="color:#666;">(自付 ${symbol}${share})</span>`;
+        } else if (isPayer && !isPart) {
+          // 幫別人代付，自己不分攤
+          descHtml = `<span style="color:#2F8F5B; font-weight:800;">你代付 ${symbol}${total}</span>`;
+        } else if (!isPayer && isPart) {
+          // 不是付款人，純粹被分攤
+          descHtml = `<span style="color:#B42318; font-weight:800;">你分攤 ${symbol}${share}</span> <span style="color:#666;">(總額 ${symbol}${total})</span>`;
+        }
+
+        html += `<div style="margin-bottom:12px; border-bottom:1px dashed #DDD; padding-bottom:8px;">
+          <div style="font-weight:800; font-size:1rem;">${escapeHtml(e.name)}</div>
+          <div style="font-size:0.85rem; margin-top:6px;">${descHtml}</div>
+        </div>`;
+      });
+    }
+
+    // 3. 顯示收付款明細
+    if (userPayments.length > 0) {
+      html += `<div style="font-weight:900; margin:24px 0 10px; color:var(--primary);">💸 收付款紀錄</div>`;
+      
+      userPayments.forEach(p => {
+        const symbol = p.currency === 'TWD' ? '$' : '¥';
+        const amt = Math.round(p.amount || 0);
+        const isFrom = p.from === userName;
+        
+        const title = isFrom ? `給 ${escapeHtml(p.to)}` : `收到 ${escapeHtml(p.from)} 的款項`;
+        const amountHtml = isFrom 
+          ? `<span style="color:#B42318; font-weight:800;">支出 ${symbol}${amt}</span>` 
+          : `<span style="color:#2F8F5B; font-weight:800;">收入 ${symbol}${amt}</span>`;
+
+        html += `<div style="margin-bottom:12px; border-bottom:1px dashed #DDD; padding-bottom:8px;">
+          <div style="font-weight:800; font-size:0.95rem;">${title}</div>
+          <div style="font-size:0.85rem; margin-top:6px;">${amountHtml}</div>
+        </div>`;
+      });
+    }
+
+    if (userExpenses.length === 0 && userPayments.length === 0) {
+      html += `<div style="color:var(--ink2); text-align:center; padding:30px 0; font-weight:800;">目前沒有明細紀錄</div>`;
+    }
+
     html += `</div>`;
 
-    // 填入您現有的 Modal
-    document.getElementById('modalSticky').innerHTML = `<div class="modal-title">${userName} 的個人明細</div>`;
+    // 4. 填入 Modal 並開啟
+    document.getElementById('modalSticky').innerHTML = `<div class="modal-title">${escapeHtml(userName)} 的個人明細</div>`;
     document.getElementById('modalBody').innerHTML = html;
     document.getElementById('modalOverlay').classList.add('active');
     document.getElementById('modalSheet').classList.add('active');
   }
-
 
   function openMenuCard(m){
     const card = document.getElementById('menuCard');
