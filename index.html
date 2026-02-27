@@ -7216,23 +7216,10 @@
           });
         }
 
-        // 2. 剩下的 unallocatedPaid，用 FIFO 方式依序扣抵
+        // 2. unallocatedPaid 不再扣抵支出明細，改為獨立顯示「額外支付」
+        let extraPaid = 0;
         if (unallocatedPaid > 0) {
-          data.items.forEach(e => {
-            if (e.unpaidShare > 0 && unallocatedPaid > 0) {
-              if (unallocatedPaid >= e.unpaidShare) {
-                unallocatedPaid -= e.unpaidShare;
-                e.unpaidShare = 0;
-              } else {
-                e.unpaidShare -= unallocatedPaid;
-                unallocatedPaid = 0;
-              }
-            }
-          });
-          // 如果所有 item 都扣完了還有剩，就算進 globalOverpaid
-          if (unallocatedPaid > 0) {
-            globalOverpaid += unallocatedPaid;
-          }
+          extraPaid = unallocatedPaid;
         } else if (unallocatedPaid < 0) {
           // 退款造成負數，把它加回第一個 unpaidShare
           let refund = Math.abs(unallocatedPaid);
@@ -7249,20 +7236,27 @@
         // 計算實際尚欠總額
         let finalRemainingDebt = data.items.reduce((sum, e) => sum + e.unpaidShare, 0);
 
-        // ✅ 安全網：僅在配對失敗時補救（不覆蓋已精準計算的溢繳）
-        if (data.paid > data.total) {
-          globalOverpaid = Math.max(globalOverpaid, data.paid - data.total);
+        // ✅ 安全網：僅在配對失敗時補救（排除已獨立計算的額外支付）
+        const matchedPaid = data.paid - extraPaid;
+        if (matchedPaid > data.total) {
+          globalOverpaid = Math.max(globalOverpaid, matchedPaid - data.total);
         }
 
         const payerName = data.items.length > 0 ? data.items[0].payer : data.payer;
         const symbol = data.items.length > 0 ? (data.items[0].currency === 'TWD' ? '$' : '¥') : (data.currency === 'TWD' ? '$' : '¥');
 
         let headerHtml = '';
-        let overpaidText = globalOverpaid > 0 ? ` <span style="color:#166534; font-size:14px;">(已溢繳 ${symbol}${globalOverpaid})</span>` : '';
+        let overpaidText = '';
+        if (globalOverpaid > 0 || extraPaid > 0) {
+          const parts = [];
+          if (globalOverpaid > 0) parts.push(`已溢繳 ${symbol}${globalOverpaid}`);
+          if (extraPaid > 0) parts.push(`額外支付 ${symbol}${extraPaid}`);
+          overpaidText = ` <span style="color:#166534; font-size:14px;">(${parts.join(' + ')})</span>`;
+        }
 
         if (finalRemainingDebt > 0) {
           headerHtml = `<div style="font-weight:900; color:var(--primary); font-size:16px; margin-bottom:8px;">尚欠 ${escapeHtml(payerName)} 總計 ${symbol}${finalRemainingDebt}${overpaidText}</div>`;
-        } else if (finalRemainingDebt === 0 && globalOverpaid > 0) {
+        } else if (finalRemainingDebt === 0 && (globalOverpaid > 0 || extraPaid > 0)) {
           headerHtml = `<div style="font-weight:900; color:var(--primary); font-size:16px; margin-bottom:8px;">尚欠 ${escapeHtml(payerName)} 總計 ${symbol}0${overpaidText}</div>`;
         } else if (data.total > 0 && finalRemainingDebt === 0) {
           headerHtml = `<div style="font-weight:900; color:var(--text-sec); font-size:16px; margin-bottom:8px;">與 ${escapeHtml(payerName)} 的帳款已結清${overpaidText}</div>`;
@@ -7612,7 +7606,7 @@
         currency: curCurrency,
         name: name,
         ts: Date.now(),
-        expenseTs: activeExpenseTs || undefined
+        expenseTs: (name.startsWith("付款:") && activeExpenseTs) ? activeExpenseTs : undefined
       };
 
       payments.push(p);
